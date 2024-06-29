@@ -781,7 +781,9 @@ class Basic(Cog):
 
     @commands.command()
     async def staffhelp(self, ctx):
-        await ctx.reply()
+        test_embed = stock_embed(self.bot)
+        test_embed.description = "ma nuts lol.."
+        await ctx.reply(embed=test_embed)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command(aliases=["showcolor"])
