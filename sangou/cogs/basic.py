@@ -787,8 +787,8 @@ class Basic(Cog):
         test_embed.add_field(name="Muting & Unmuting Users", value="""I can mute users! I don't use slash commands to provide a simple alternative to Smol/Tol for mobile moderation. When I mute users, I create multiple channels so nothing gets messy. I do this automatically. To mute users, you can use `pls toss`, `pls mute`, or `pls roleban`. To unmute users, you can use `pls untoss`, `pls unmute`, or `pls unroleban`.""", inline=True)
         test_embed.add_field(name="Archiving & Closing Sessions", value="""When a muted session is done, please remember to archive with `pls archive`! This is handled by a separate bot for Various Reasons, but it's here for posterity. Then close the muted channel with `pls close`.""", inline=True)
         test_embed.add_field(name="Namefixing & Dehoisting", value="""If somebody has a name with unmentionable characters, you can easily fix it with `pls fixname`. If somebody is purposefully hoisting themselves on the userlist, you can dehoist them with `pls dehoist`.""", inline=True)
-        test_embed.add_field(name="Latency Checking", value="""If I'm slow, you can check my ping with `pls ping`.""")
-        test_embed.add_field(name="Rule Snippets", value="""If you need to call up a specific rule, you can use `pls rule [rulename]`. You can check the list of rule snippets with `pls rule`. You can create new rule snippets with `pls rule create`. You can delete a rule snippet with `pls rule delete`.""")
+        test_embed.add_field(name="Latency Checking", value="""If I'm slow, you can check my ping with `pls ping`.""", inline=True)
+        test_embed.add_field(name="Rule Snippets", value="""If you need to call up a specific rule, you can use `pls rule [rulename]`. You can check the list of rule snippets with `pls rule`. You can create new rule snippets with `pls rule create`. You can delete a rule snippet with `pls rule delete`.""", inline=True)
         await ctx.reply(embed=test_embed)
 
     @commands.bot_has_permissions(embed_links=True)
