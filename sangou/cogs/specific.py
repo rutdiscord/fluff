@@ -48,7 +48,7 @@ class specific(Cog):
 
         embed = stock_embed(self.bot)
         embed.color = color
-        embed.title = "🛠️ Staff List"
+        embed.title = "Staff List"
         embed.description = f"Voting requirement is `{int(len(members)/2//1+1)}`."
 
         online = []
@@ -57,10 +57,6 @@ class specific(Cog):
         offline = []
         for m in members:
             u = f"{m.mention}"
-            if m.is_on_mobile():
-                u += " 📱"
-            if m == ctx.guild.owner:
-                u += " 👑"
             if m.raw_status == "online":
                 online.append(u)
             elif m.raw_status == "offline":
@@ -95,104 +91,21 @@ class specific(Cog):
             )
         await ctx.reply(embed=embed, mention_author=False)
 
-    @commands.guild_only()
-    @commands.command(aliases=["pingmods", "summonmods"])
-    async def pingmod(self, ctx):
-        """This ping the mods.
 
-        Please only use in case of emergency.
-
-        No arguments."""
-        await ctx.reply(
-            f"<@&{get_config(ctx.guild.id, 'staff', 'modrole') if get_config(ctx.guild.id, 'staff', 'modrole') else get_config(ctx.guild.id, 'staff', 'adminrole')}>, {ctx.author.display_name} is requesting assistance.",
-            mention_author=False,
-        )
-
-    @commands.guild_only()
-    @commands.command(aliases=["togglemod"])
-    async def modtoggle(self, ctx):
-        """This toggles your mod role.
-
-        If you have Mod, it will replace it with Ex-Staff.
-        Doesn't work for admins.
-
-        No arguments."""
-        """[S] Toggles your Staff role.
-
-        If you have Staff, it will replace it with Ex-Staff, and vice versa."""
-        staff_role = (
-            self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "staff", "modrole"))
-            if self.bot.pull_role(
-                ctx.guild, get_config(ctx.guild.id, "staff", "modrole")
-            )
-            else self.bot.pull_role(
-                ctx.guild, get_config(ctx.guild.id, "staff", "adminrole")
-            )
-        )
-        exstaff_role = self.bot.pull_role(
-            ctx.guild, get_config(ctx.guild.id, "staff", "exstaffrole")
-        )
-
-        if staff_role in ctx.author.roles:
-            await ctx.author.remove_roles(
-                staff_role, reason="Staff self-unassigned Staff role"
-            )
-            await ctx.author.add_roles(
-                exstaff_role, reason="Staff self-unassigned Staff role"
-            )
-            await ctx.message.reply(content="`🔴 Staff`", mention_author=False)
-        elif exstaff_role in ctx.author.roles:
-            await ctx.author.add_roles(
-                staff_role, reason="Staff self-assigned Staff role"
-            )
-            await ctx.author.remove_roles(
-                exstaff_role, reason="Staff self-assigned Staff role"
-            )
-            await ctx.message.reply(content="`🟢 Staff`", mention_author=False)
-        else:
-            await ctx.reply(
-                content="You are unable to use this command.", mention_author=False
-            )
 
     @Cog.listener()
     async def on_message(self, message):
         await self.bot.wait_until_ready()
 
-        # R/UTDR's announcement handling.
+        # announcement handling
         if (
             message.guild
-            and message.guild.id == 1236369655212412968
-            and message.channel.id == 1236417696741199873
+            and message.guild.id == 120330239996854274
+            and message.channel.id == 120664346421493760
         ):
-            general = await message.guild.fetch_channel(1236370991857532990)
+            general = await message.guild.fetch_channel(120330239996854274)
             return await general.send(
-                f"<:sangouspeak:1182927625161809931> {message.author.display_name} posted a new announcement in <#1236417696741199873>.\n<:sangoueat:1182927631977558086> Just letting you know."
-            )
-
-        # OSDS's Ban Appeal system.
-        if (
-            message.guild
-            and message.channel.id == 402019542345449472
-            and message.author.id == 402016472878284801
-            and message.embeds[0].fields[1].value is not None
-        ):
-            await message.add_reaction("✅")
-            await message.add_reaction("❎")
-            await message.add_reaction("✳️")
-            appealthread = await message.create_thread(
-                name=f"{message.embeds[0].fields[2].value}'s Appeal",
-                reason="Automatic Appeal Thread Generating by Sangou.",
-            )
-            staff_role = self.bot.pull_role(
-                message.guild,
-                (
-                    get_config(message.guild.id, "staff", "modrole")
-                    if get_config(message.guild.id, "staff", "modrole")
-                    else get_config(message.guild.id, "staff", "adminrole")
-                ),
-            )
-            await appealthread.send(
-                content=f"Vote using reactions. Use this thread for discussion.\n`✅ = Yes`\n`❎ = No`\n`✳️ = Abstain`\n\nUntil it can be coded to automatically appear here, use `pws logs {message.embeds[0].fields[2].value}`.\nRemember to post ban context if available (ban record, modmail logs, etc.).\n\nThere are currently `{int(len(staff_role.members))}` Staff members at this time.\nVoting should end once one option reaches `{int(len(staff_role.members)/2//1+1)}` votes.\n\nThis appeal will turn stale on <t:{int(datetime.now(timezone.utc).timestamp())+604800}:f>, or <t:{int(datetime.now(timezone.utc).timestamp())+604800}:R>."
+                f"*binkies in* AN ANNOUNCEMENT HAS BEEN POSTED IN <#120664346421493760> *binkies away*"
             )
 
 

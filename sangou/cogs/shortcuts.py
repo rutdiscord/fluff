@@ -23,7 +23,7 @@ class Shortcuts(Cog):
 
         No arguments."""
         embed = stock_embed(self.bot)
-        embed.title = "📣 Your current prefixes..."
+        embed.title = "Your current prefixes..."
         embed.description = f"Use `{ctx.prefix}{ctx.command} add/remove` to change your prefixes.\nMentioning the bot will always be a prefix."
         embed.color = ctx.author.color
         author_embed(embed, ctx.author)
@@ -91,7 +91,7 @@ class Shortcuts(Cog):
 
         No arguments."""
         embed = stock_embed(self.bot)
-        embed.title = "⏺️ Your current aliases..."
+        embed.title = "Your current aliases..."
         embed.description = (
             f"Use `{ctx.prefix}{ctx.command} add/remove` to change your aliases."
         )
