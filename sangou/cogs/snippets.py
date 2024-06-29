@@ -70,7 +70,7 @@ class Snippets(Cog):
             return await ctx.reply(content=snippets[name.lower()], mention_author=False)
 
     @commands.check(isadmin)
-    @snippet.command()
+    @rule.command()
     async def create(self, ctx, name, *, contents):
         """This creates a new rule snippet.
 
@@ -109,7 +109,7 @@ class Snippets(Cog):
             )
 
     @commands.check(isadmin)
-    @snippet.command()
+    @rule.command()
     async def delete(self, ctx, name):
         """This deletes a snippet
 
