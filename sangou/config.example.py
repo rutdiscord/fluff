@@ -9,13 +9,13 @@ managers = [120698901236809728]
 logchannel = 1006820351134683186
 
 # If you forked Sangou, put your repo here.
-source_url = "https://github.com/vrnavi/sangou"
+source_url = "https://github.com/dfault-user/fluff"
 # The bot description to be used in the help command.
-short_desc = "Sangou, a multipurpose Hacka Bot."
+short_desc = "Fluff, a slightly-less-multi-purpose bunny."
 # The bot description to be used in the about command.
 long_desc = (
-    "> 3号 / Sangou\n"
-    + "*A multipurpose Hacka Bot.*\n\n"
+    "Fluff\n"
+    + "A slightly-less-multi-purpose bunny. \n\n"
     + "Built and coded by [renavi](https://0ccu.lt), forked from [robocop-ng](https://github.com/reswitched/robocop-ng)."
 )
 

@@ -678,13 +678,13 @@ class Basic(Cog):
         The text file or link to a text file that you want to read."""
         if not file and not url:
             return await ctx.reply(
-                content="<:sangoubruh:1182927627388989491> You need to give a file, or a URL.",
+                content="You need to give a file, or a URL.",
                 mention_author=False,
             )
         if file:
             if file.size / 1048576 > 5:
                 return await ctx.reply(
-                    content="<:sangoubaka:1182927626919223376> I refuse to open a file that big!",
+                    content="I refuse to open a file that big!",
                     mention_author=False,
                 )
             content = await file.read()
@@ -700,7 +700,7 @@ class Basic(Cog):
         for index, content_frag in enumerate(split_content):
             if index == 5:
                 return await ctx.send(
-                    "<:sangoubruh:1182927627388989491> There's more, but I'm not spamming the chat."
+                    "There's more, but I'm not spamming the chat."
                 )
             await ctx.send(content_frag)
 
@@ -714,10 +714,12 @@ class Basic(Cog):
         - `command`
         The command to get help on. Optional."""
         if not command:
-            return await ctx.reply(
-                "For how to use my services, please see my documentation:\nhttps://3gou.0ccu.lt/.",
-                mention_author=False,
-            )
+            help_embed = stock_embed(self.bot)
+            help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
+            help_embed.add_field(name="Image Hosting", value="Use `pls rehost`, `pls imgur`, or `pls catbox` with an attachment or link to host that attachment forever. Please respect the service.", inline=False)
+            help_embed.add_field(name="Join Graph", value="`pls joingraph` shows a graph of users who have joined.", inline=False)
+            help_embed.add_field(name="Join Score", value=" `pls joinscore` shows when you joined in comparison to other users.", inline=False)
+            return await ctx.reply(embed=help_embed,mention_author=False)
         else:
             botcommand = self.bot.get_command(command)
             if not botcommand:
@@ -781,9 +783,9 @@ class Basic(Cog):
 
     @commands.command()
     async def staffhelp(self, ctx):
-        test_embed = stock_embed(self.bot)
+        test_embed = stock_embed(self.bot).color = 0xce7398
         test_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        
+        test_embed.color = 0xce7398
         test_embed.add_field(name="Muting & Unmuting Users", value="""I can mute users! I don't use slash commands to provide a simple alternative to Smol/Tol for mobile moderation. When I mute users, I create multiple channels so nothing gets messy. I do this automatically. To mute users, you can use `pls toss`, `pls mute`, or `pls roleban`. To unmute users, you can use `pls untoss`, `pls unmute`, or `pls unroleban`.""", inline=True)
         test_embed.add_field(name="Archiving & Closing Sessions", value="""When a muted session is done, please remember to archive with `pls archive`! This is handled by a separate bot for Various Reasons, but it's here for posterity. Then close the muted channel with `pls close`.""", inline=True)
         test_embed.add_field(name="Namefixing & Dehoisting", value="""If somebody has a name with unmentionable characters, you can easily fix it with `pls fixname`. If somebody is purposefully hoisting themselves on the userlist, you can dehoist them with `pls dehoist`.""", inline=True)

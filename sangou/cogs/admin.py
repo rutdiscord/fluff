@@ -308,10 +308,10 @@ class Admin(Cog):
         Useful for trying to figure out problems within Discord.
 
         No arguments."""
-        shutil.copy("logs/sangou.log", "logs/upload.log")
+        shutil.copy("logs/fluff.log", "logs/upload.log")
         await ctx.message.reply(
             content="The current log file...",
-            file=discord.File("logs/upload.log", filename="sangou.log"),
+            file=discord.File("logs/upload.log", filename="fluff.log"),
             mention_author=False,
         )
         os.remove("logs/upload.log")
@@ -324,7 +324,7 @@ class Admin(Cog):
         Useful for trying to figure out problems within Discord.
 
         No arguments."""
-        shutil.copy("logs/sangou.log", "logs/upload.log")
+        shutil.copy("logs/fluff.log", "logs/upload.log")
         with open("logs/upload.log", "r+") as f:
             tail = "\n".join(f.read().split("\n")[-10:])
         os.remove("logs/upload.log")

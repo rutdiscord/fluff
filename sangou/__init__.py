@@ -1,4 +1,4 @@
-# This is the initialization file for Sangou. You're meant to run this.
+# This is the initialization file for Fluff. You're meant to run this.
 
 # Imports.
 import os
@@ -24,7 +24,7 @@ log_format = logging.Formatter(
 )
 stdout_handler = logging.StreamHandler(sys.stdout)
 stdout_handler.setFormatter(log_format)
-logfile_handler = logging.FileHandler("logs/sangou.log", mode="w")
+logfile_handler = logging.FileHandler("logs/fluff.log", mode="w")
 logfile_handler.setFormatter(log_format)
 log = logging.getLogger("discord")
 log.setLevel(logging.INFO)
@@ -87,7 +87,7 @@ async def on_ready():
     bot.session = aiohttp.ClientSession()
     bot.start_timestamp = int(datetime.datetime.now().timestamp())
     log.info(
-        f"Sangou version {bot.version} is logged in as {bot.user} ({bot.user.id}) running discord.py version {discord.__version__}"
+        f"Fluff version {bot.version} is logged in as {bot.user} ({bot.user.id}) running discord.py version {discord.__version__}"
     )
 
 
