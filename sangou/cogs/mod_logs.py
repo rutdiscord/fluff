@@ -47,7 +47,7 @@ class ModLogs(Cog):
         # Summary
         embed = stock_embed(self.bot)
         author_embed(embed, user)
-        embed.title = "📇 Log summary..."
+        embed.title = "📇 Log Summary"
 
         for index, event in enumerate(events):
             if index < 2 and own:
