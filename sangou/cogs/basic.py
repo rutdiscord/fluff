@@ -13,7 +13,7 @@ import zlib
 from datetime import datetime, timezone
 from discord.ext import commands
 from discord.ext.commands import Cog
-from helpers.embeds import stock_embed, author_embed
+from helpers.embeds import stock_embed, author_embed, sympage
 from helpers.datafiles import fill_profile
 from zoneinfo import ZoneInfo, available_timezones
 import aiohttp
@@ -778,6 +778,10 @@ class Basic(Cog):
             embed.add_field(name="Executable", value=when, inline=True)
 
             await ctx.reply(embed=embed, mention_author=False)
+
+    @commands.command()
+    async def staffhelp(self, ctx):
+        await ctx.reply()
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command(aliases=["showcolor"])

@@ -64,11 +64,6 @@ class ModLogs(Cog):
             )
 
         if not own:
-            embed.description = (
-                "User "
-                + ("**is**" if userlog[uid]["watch"]["state"] else "is **not**")
-                + " under watch."
-            )
             timestamps = []
             for event in events:
                 for instance in userlog[uid][event]:
