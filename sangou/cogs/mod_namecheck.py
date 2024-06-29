@@ -23,7 +23,7 @@ class ModNamecheck(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command()
-    async def decancer(self, ctx, target: discord.Member):
+    async def fixname(self, ctx, target: discord.Member):
         """This cleans unicode from a username.
 
         There's not much more to it.
@@ -36,7 +36,8 @@ class ModNamecheck(Cog):
             newname = "Unreadable Name"
         await target.edit(nick=newname, reason="Namecheck")
         return await ctx.reply(
-            content=f"Successfully decancered **{oldname}** to  `{newname}`.",
+            content=f"""Successfully fixed **{oldname}**, changing it to `{newname}`. 
+			Please review rule 6! Your nickname must be at least partially typable using a standard QWERTY keyboard.""",
             mention_author=False,
         )
 
