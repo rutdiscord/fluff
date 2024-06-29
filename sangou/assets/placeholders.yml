@@ -1,166 +1,146 @@
 # If you want to customize this file, COPY this file and put it into the data/ folder.
 
-# By default, Sangou will fill in any word wrapped in {} with a shorthand from here.
+# By default, Fluff will fill in any word wrapped in {} with a shorthand from here.
 shorthands:
-#   normal: <:sangouspeak:1182927625161809931>
-#   angry: <:sangoubaka:1182927626919223376>
-#   unamused: <:sangoubruh:1182927627388989491>
-#   cry: <:sangoucry:1182927628802469958>
-#   dizzy: <:sangoudizzy:1182927629695860757>
-#   sleep: <:sangousleep:1182927635706298438>
-#   drunk: <:sangoudrunk:1182927630736044132>
-#   eat: <:sangoueat:1182927631977558086>
-#   fear: <:sangoufear:1182927633290379304>
-#   smug: <:sangouhehe:1182927835460026448>
-#   huh: <:sangouhuh:1182927894989783101>
-#   love: <:sangoulove:1182927665028661310>
   noping: <:noreplyping:1256413872638656585>
   plsping: <:pleasereplyping:1256413910664220702>
   waitping: <:waitbeforereplyping:1256413894189256734>
-# A list of things that Sangou will "listen" to.
+# A list of things that Fluff will "listen" to.
 # For example, "Listening to the validity of trans people".
 games:
-  - a Dishwasher run.
-  - Lapis casting spells.
-  - graveyard ambience.
-  - the fact dinner isn't ready. Your bath isn't ready. Nothing's ready.
-  - Ren spilling all the config options.
-  - Sigil's innocence.
-  - Razz's rudeness.
-  - the Lighthouse spin.
-  - moonlit rituals on a full moon.
-  - a leaky faucet.
-  - candles burning.
-  - the International Wrestling Festival.
-  - someone giving away free crack.
-  - the Hacka Doll soundtrack.
-  - peace and quiet.
-  - someone sorting a library.
-  - the illusion of freedom.
-  - her.
-  - the memories of the others.
-  - the hum of the 1998 PC.
-  - Serial Experiments Lain.
-  - LSD: Dream Emulator.
-  - Mike Tyson's Punch Out!!
-  - the end of the world.
-  - the wires in the Wired.
-  - my host server. Use pls server.
-  - the validity of plural people.
-  - the validity of gay people.
-  - the validity of trans people.
-  - the validity of you.
+  - Pancake's hare-brained schemes.
+  - pellets drop in the bowl.
+  - my loves munching hay.
+  - a symphony of thumps.
+  - Blackberry twitch her nose.
+  - a cardboard box being shredded.
+  - parsley being chewed.
+  - the sounds of mischief.
+  - everybunny flop.
+  - Marr typing in the closet.
+  - the sweet sound of bunny kisses.
+  - Blackberry and Pancake snuggle.
+  - the rustle of leafy greens.
+  - the bunny zoomies.
+  - Marr filling the litterbox.
+  - the quiet of bunny nap time.
+  - bunny pitter-patter.
+  - the munching of dandelions.
+  - the rustling of bunny fur.
+  - bunny dreams.
+  - the gnawing on a hay cube.
+  - the fridge door open.
 
 # === ERRORS ===
 
 # A generic error message.
 err_generic:
-  - "I'm sorry! Something broke! I let Ren know about it!"
-  - "Something broke while I was doing that... I let Ren know..."
+  - "That didn't work - oh, I may have chewed through that wire... I let my owner know."
+  - "*Thump! Thump!* I'm letting my owner know something went wrong!"
 
 # An error message for commands that can be used in servers only.
 err_serversonly:
-  - "Hey, you have to do this in a server... I don't know what server you want..."
+  - "*nose twitch*... This is a server-only command, I can't do anything here."
 
 # An error message for commands that can be used in DMs only.
 err_dmsonly:
-  - "You can only do this in DMs, you know."
+  - "*nose twitch*... This command can only be used in DMs, I can't do this here."
 
-# An error message for if Sangou cannot understand the quotes in a command.
+# An error message for if Fluff cannot understand the quotes in a command.
 err_quotes:
-  - "I didn't get that, your quotes are off..."
-  - "Hey, check your quotes! I can't work with this input..."
+  - "I can barely read messages structured *correctly*... I couldn't understand your quotes!"
+  - "Huh? Your quotes are confusing me - please fix them."
 
 # An error message for unauthorized users missing a specific role.
 err_role:
-  - "No, I'm not listening to you! You don't have the role you need for that."
-  - "{Nope. Didn't hear that. I can only hear people with a role saying that."
+  - "You do Not tell me what to do *indignant flop* (You don't have the permissions for this)"
+  - "And who are you? *flicks feet* (You don't have the permissions for this)"
 
 # An error message for when the bot is missing permissions.
 err_perms:
-  - "I can't do that, I don't have the permissions for that. I need these."
-  - "I tried, but it didn't work! It told me I needed these permissions..."
-  - "How am I supposed to do that without permissions... I need these."
+  - "My hop's been restricted due to missing permissions... I need these."
+  - "I really tried, but something's in the way! It told me I needed these permissions..."
+  - "Help! I can't see, my fur's in my eyes, I need a brushing... oh and I need these permissions."
 
 # An error message for when a command is on cooldown.
 err_cooldown:
-  - "Hey, slow down, I can't go that fast... Give me "
-  - "Stop trying to overwork me, I'm on a cooldown... Try again in "
-  - "Sure, I'll get to that... in "
+  - "I'm tired, I can't hop that fast... Give me "
+  - "I'm napping... Try again in "
+  - "I just flopped over... try again in "
 
 # An error message for when a command is missing an attachment.
 err_noattachment:
-  - "You didn't give me an attachment to work with..."
-  - "It's not funny, I need an attachment to work with."
-  - "W-With what attachment?"
+  - "I perked my ears up waiting for the attachment, but it never came."
+  - "You dropped your attachment!"
+  - "This command without an attachment is like a litterbox without hay."
 
 # A generic error message for failed checks. Used for manager commands mostly.
 err_checkfail:
-  - "Lalala, I can't hear you. You're unauthorized."
-  - "...Huh? Who are you? You can't ask me to do that."
-  - "Why am I going to do that for you...? I don't know you."
+  - "Nuhuh, not listening. You're unauthorized."
+  - "Who are you? You can't ask me to do that."
+  - "I don't know you. I'm not doing that."
 
 # An error message for if the bot needs to DM you, but cannot.
 err_dmfail:
-  - "I can't do that, you won't let me DM you! Check your DM settings..."
-  - "Hey, I can't DM you... check your settings first."
+  - "I'm getting mixed messages! I need to DM you for that, but you have DMs off!"
+  - "I don't bite (much), turn your DMs on or I can't do that."
 
 # An error message for if a user given does not exist.
 err_usernotfound:
-  - "I don't know who that user is..."
-  - "Discord API says that's not a user."
-  - "Hey, that isn't a user. It doesn't exist."
+  - "I don't know anyone like that - are you sure you have the right information?"
+  - "Who's that? There's no data matching them that I can find."
+  - "This user doesn't seem to exist."
 
 # An error message for if a user given is not on the server.
 err_membernotfound:
-  - "That's not a member on this server."
-  - "You either gave me something wrong, or that member isn't on this server..."
-  - "I looked, that's not a member here."
+  - "This member isn't here - I'm going back to sleep."
+  - "I even looked inside the cardboard castle, but this member isn't on this server."
+  - "There's nobody here like that."
 
 # === WARNINGS ===
 
 # Used if you try to use a dangerous command on yourself.
 # {authorname} = Name of message author.
 warn_targetself:
-  - "For the sake of everyone else, {authorname}, don't do this to yourself!"
-  - "{authorname}, you're a test subject, but this isn't safe..."
-  - "{authorname}, I'm not doing that."
+  - "Err, {authorname}, did you miss?"
+  - "{authorname}, I don't know what you're doing, but I'm not helping."
+  - "{authorname}, *thump*"
 
-# Used if you try to use a dangerous command on himself.
+# Used if you try to use a dangerous command on the bot.
 # {authorname} = Name of message author.
 warn_targetbot:
-  - "{smug} I'm sorry {authorname}, I'm afraid I can't do that."
-  - "{unamused} {authorname}, I am not a test subject like you."
-  - "{angry} Please leave me alone, {authorname}!"
+  - "Okay {authorname}, I'm settled in, I'm staying."
+  - "{authorname}, I don't think you know how hard I bite."
+  - "Oh come on, you know you love me, {authorname}."
   
 # Used if a command times out.
 warn_timedout:
-  - "Your command timed out."
-  - "I got bored waiting, so I timed out your command."
-  - "I can't wait for your response forever! Command timed out."
+  - "You took too long, I got bored and went to eat some hay. Your command timed out."
+  - "I'm a busy rabbit you know, you can't keep me here forever. (Your command timed out)"
+  - "I'm gonna go have a snack, let me know when you're actually ready. (Your command timed out)"
 
 # === INFORMATION ===
 
 # Used when pls quit is used.
 quit_deaths:
-  - "Not again! Why must you do this again!"
-  - "I'm already asleep, this changes nothing..."
-  - "What? Drop the lightbulb? Okay..."
-  - "Yay, lunch break!"
-  - "What, just because I had one drink? Boo..."
-  - "You're not safe, you know..."
-  - "Bathroom break!"
+  - "Okay! (flops over)"
+  - "Okay! (honk shoo honk shoo honk shoo)"
+  - "Wh-What? I was already asleep..."
+  - "Yippee! Greens!"
+  - "Litterbox time!"
+  - "Ooh, can I get some parsley then?"
+  - "Time to wedge myself between Pancake & Blackberry."
 
 # Used in pls errors when there are no errors.
 errors_noerrors:
-  - "You don't have any errors yet."
-  - "I haven't seen any errors happen yet..."
+  - "Scanning... I see nothing. Brush me."
+  - "Everything's dandy! What's dandy?"
 
 # Used with pls hello.
 hello_hello:
-  - "Helloooooo."
-  - "Hello. What's up?"
-  - "...Wha?"
+  - "*nose twitch*"
+  - "*looks up sleepily... slowly lowers head back down*"
+  - "*splayed out af*"
 
 # === COMPONENTS ===
 
