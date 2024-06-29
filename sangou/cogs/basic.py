@@ -50,7 +50,7 @@ class Basic(Cog):
         await ctx.send(
             f"**Your IP is:** {random.choice(range(1,256))}.{random.choice(range(1,256))}.{random.choice(range(1,256))}.{random.choice(range(1,256))}"
         )
-''' # spam
+'''
 
     @commands.command(aliases=["temp"])
     async def temperature(
