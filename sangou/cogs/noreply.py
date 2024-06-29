@@ -328,14 +328,14 @@ class Reply(Cog):
             preference == "pleasereplyping"
             and refmessage.author not in message.mentions
         ):
-            await message.add_reaction("<:pleasereplyping:1238670344777367623>")
+            await message.add_reaction("<:pleasereplyping:1256722700563513467> ")
             pokemsg = await message.reply(content=refmessage.author.mention)
             await self.bot.await_message(message.channel, refmessage.author, 86400)
             return await pokemsg.delete()
 
         # If reply pinged at all...
         elif preference == "noreplyping" and refmessage.author in message.mentions:
-            await message.add_reaction("<:noreplyping:1238670343871397898>")
+            await message.add_reaction("<:noreplyping:1256722699162488874>")
             await wrap_violation(message)
             return
 
@@ -353,7 +353,7 @@ class Reply(Cog):
                 int(message.created_at.timestamp()) - 30
                 <= self.timers[message.guild.id][refmessage.author.id]
             ):
-                await message.add_reaction("<:waitbeforereplyping:1238670345234419765>")
+                await message.add_reaction("<:waitbeforereplyping:1256722701410893935>")
                 await wrap_violation(message)
             return
 
