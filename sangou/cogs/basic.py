@@ -718,7 +718,10 @@ class Basic(Cog):
             help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
             help_embed.add_field(name="Image Hosting", value="Use `pls rehost`, `pls imgur`, or `pls catbox` with an attachment or link to host that attachment forever. Please respect the service.", inline=False)
             help_embed.add_field(name="Join Graph", value="`pls joingraph` shows a graph of users who have joined.", inline=False)
-            help_embed.add_field(name="Join Score", value=" `pls joinscore` shows when you joined in comparison to other users.", inline=False)
+            help_embed.add_field(name="Join Score", value="`pls joinscore` shows when you joined in comparison to other users.", inline=False)
+            help_embed.add_field(name="Server Information", value="`pls server` displays the server's info.", inline=False)
+            help_embed.add_field(name="Rule Snippets", value="`pls rule` will display a list of rule snippets. You can individually call them with their names, `pls rule [name]`. Useful for people who are confused about the rules!")
+            help_embed.add_field(name="Staff List", value="`pls staff` will show all active staff.")
             return await ctx.reply(embed=help_embed,mention_author=False)
         else:
             botcommand = self.bot.get_command(command)
