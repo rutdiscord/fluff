@@ -122,9 +122,9 @@ err_membernotfound:
 # Used if you try to use a dangerous command on yourself.
 # {authorname} = Name of message author.
 warn_targetself:
-  - "{angry} For the sake of everyone else, {authorname}, don't do this to yourself!"
-  - "{unamused} {authorname}, you're a test subject, but this isn't safe..."
-  - "{normal} {authorname}, I'm not doing that."
+  - "For the sake of everyone else, {authorname}, don't do this to yourself!"
+  - "{authorname}, you're a test subject, but this isn't safe..."
+  - "{authorname}, I'm not doing that."
 
 # Used if you try to use a dangerous command on himself.
 # {authorname} = Name of message author.
