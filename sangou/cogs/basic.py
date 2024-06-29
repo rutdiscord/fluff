@@ -37,8 +37,7 @@ class Basic(Cog):
         await ctx.send(
             f"Hello {ctx.author.display_name}! Have you drank your Soylent Green today?"
         )
-
-'''
+    '''
     @commands.command(aliases=["whatsmyip", "myip"])
     async def whatismyip(self, ctx):
         """This is a totally legitimate IP grabber.
@@ -50,8 +49,8 @@ class Basic(Cog):
         await ctx.send(
             f"**Your IP is:** {random.choice(range(1,256))}.{random.choice(range(1,256))}.{random.choice(range(1,256))}.{random.choice(range(1,256))}"
         )
-'''
-
+    '''
+    '''
     @commands.command(aliases=["temp"])
     async def temperature(
         self,
@@ -94,7 +93,7 @@ class Basic(Cog):
                 content=msg,
                 mention_author=False,
             )
-
+    '''
     @commands.command(aliases=["whatsmyid", "myid"])
     async def whatismyid(self, ctx):
         """This just gives you your User ID.
@@ -104,8 +103,7 @@ class Basic(Cog):
 
         No arguments."""
         await ctx.send(str(ctx.author.id))
-
-'''
+    '''
     @commands.command()
     async def clapifier(self, ctx, *, content):
         """lol 👏 lmao 👏
@@ -119,9 +117,9 @@ class Basic(Cog):
                 content.split()
             )
         )
-''' # also spam
+    '''
 
-'''
+    '''
     @commands.cooldown(1, 10, type=commands.BucketType.user)
     @commands.bot_has_permissions(add_reactions=True, embed_links=True)
     @commands.command(aliases=["search"])
@@ -200,8 +198,7 @@ class Basic(Cog):
                 content=content(),
                 allowed_mentions=allowed_mentions,
             )
-''' # just google it...?
-'''
+
     @commands.bot_has_permissions(add_reactions=True, embed_links=True)
     @commands.command(aliases=["yt"])
     async def youtube(self, ctx, *, query: str):
@@ -267,7 +264,7 @@ class Basic(Cog):
                 content=f"https://www.youtube.com/watch?v={content()}",
                 allowed_mentions=allowed_mentions,
             )
-
+''' # spam and just google/search it on youtube with 42 instead..
     @commands.bot_has_permissions(add_reactions=True)
     @commands.command()
     async def trivia(self, ctx):
@@ -326,7 +323,7 @@ class Basic(Cog):
             await msg.edit(content=post, allowed_mentions=allowed_mentions)
         except:
             await ctx.send("Unspecified error.")
-''' # potential spam
+
     @commands.command()
     async def hug(self, ctx):
         """This gives you a hug.
