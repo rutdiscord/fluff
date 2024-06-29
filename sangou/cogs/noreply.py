@@ -328,7 +328,7 @@ class Reply(Cog):
             preference == "pleasereplyping"
             and refmessage.author not in message.mentions
         ):
-            await message.add_reaction("<:pleasereplyping:1256722700563513467> ")
+            await message.add_reaction("<:pleasereplyping:1256722700563513467>")
             pokemsg = await message.reply(content=refmessage.author.mention)
             await self.bot.await_message(message.channel, refmessage.author, 86400)
             return await pokemsg.delete()
