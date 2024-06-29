@@ -174,7 +174,7 @@ class Reply(Cog):
         override = self.check_override(ctx.message)
         if override:
             return await ctx.reply(
-                content="<:sangouspeak:1182927625161809931> You already have an indicator role, you don't need to set your preferences here.",
+                content="You already have an indicator role, you don't need to set your preferences here.",
                 mention_author=False,
             )
 
@@ -195,7 +195,7 @@ class Reply(Cog):
 
             pleaseping = "🔘" if profile["replypref"] == "pleasereplyping" else "⚫"
             embed.add_field(
-                name="<:pleasereplyping:1256413910664220702> Please Reply Ping",
+                name="<:pleasereplyping:1256722700563513467> Please Reply Ping",
                 value=pleaseping
                 + " Indicates that you would like to be pinged in replies.",
                 inline=False,
@@ -205,7 +205,7 @@ class Reply(Cog):
                 "🔘" if profile["replypref"] == "waitbeforereplyping" else "⚫"
             )
             embed.add_field(
-                name="<:waitbeforereplyping:1256413894189256734> Wait Before Reply Ping",
+                name="<:waitbeforereplyping:1256722701410893935> Wait Before Reply Ping",
                 value=waitbeforeping
                 + " Indicates that you would only like to be pinged after some time has passed.",
                 inline=False,
@@ -213,7 +213,7 @@ class Reply(Cog):
 
             noping = "🔘" if profile["replypref"] == "noreplyping" else "⚫"
             embed.add_field(
-                name="<:noreplyping:1256413872638656585> No Reply Ping",
+                name="<:noreplyping:1256722699162488874> No Reply Ping",
                 value=noping
                 + " Indicates that you do not wish to be reply pinged whatsoever.",
                 inline=False,
@@ -223,9 +223,9 @@ class Reply(Cog):
 
         reacts = [
             "🤷",
-            "<:pleasereplyping:1256413910664220702>",
-            "<:waitbeforereplyping:1256413894189256734>",
-            "<:noreplyping:1256413872638656585>",
+            "<:pleasereplyping:1256722700563513467>",
+            "<:waitbeforereplyping:1256722701410893935>",
+            "<:noreplyping:1256722699162488874>",
         ]
         configmsg = await ctx.reply(embed=embed, mention_author=False)
         for react in reacts:
