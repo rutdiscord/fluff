@@ -201,6 +201,7 @@ class Basic(Cog):
                 allowed_mentions=allowed_mentions,
             )
 ''' # just google it...?
+'''
     @commands.bot_has_permissions(add_reactions=True, embed_links=True)
     @commands.command(aliases=["yt"])
     async def youtube(self, ctx, *, query: str):
@@ -325,7 +326,7 @@ class Basic(Cog):
             await msg.edit(content=post, allowed_mentions=allowed_mentions)
         except:
             await ctx.send("Unspecified error.")
-
+''' # potential spam
     @commands.command()
     async def hug(self, ctx):
         """This gives you a hug.
