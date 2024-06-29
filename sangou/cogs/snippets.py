@@ -18,14 +18,14 @@ class Snippets(Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.group(aliases=["snip"], invoke_without_command=True)
-    async def snippet(self, ctx, *, name=None):
+    async def rule(self, ctx, *, name=None):
         """This displays staff defined tags.
 
         Using this command by itself will show a list of tags.
-        Giving a name will post that snippet in the chat.
+        Giving a name will post that rule snippet in the chat.
 
         - `name`
-        The name of the snippet to post. Optional."""
+        The name of the rule snippet to post. Optional."""
         snippets = get_guildfile(ctx.guild.id, "snippets")
         if not name:
             embed = stock_embed(self.bot)
@@ -72,10 +72,10 @@ class Snippets(Cog):
     @commands.check(isadmin)
     @snippet.command()
     async def create(self, ctx, name, *, contents):
-        """This creates a new snippet.
+        """This creates a new rule snippet.
 
         You can set the `contents` to be the name of another
-        snippet to create an alias to that snippet. See the
+        rule snippet to create an alias to that snippet. See the
         [documentation](https://3gou.0ccu.lt/as-a-moderator/the-snippet-system/) for more details.
 
         - `name`
