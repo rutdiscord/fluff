@@ -785,8 +785,9 @@ class Basic(Cog):
         test_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
         
         test_embed.add_field(name="Muting & Unmuting Users", value="""I can mute users! I don't use slash commands to provide a simple alternative to Smol/Tol for mobile moderation. When I mute users, I create multiple channels so nothing gets messy. I do this automatically. To mute users, you can use `pls toss`, `pls mute`, or `pls roleban`. To unmute users, you can use `pls untoss`, `pls unmute`, or `pls unroleban`.""", inline=True)
-        
         test_embed.add_field(name="Archiving & Closing Sessions", value="""When a muted session is done, please remember to archive with `pls archive`! This is handled by a separate bot for Various Reasons, but it's here for posterity. Then close the muted channel with `pls close`.""", inline=True)
+        test_embed.add_field(name="Namefixing & Dehoisting", value="""If somebody has a name with unmentionable characters, you can easily fix it with pls fixname. If somebody is purposefully hoisting themselves on the userlist, you can dehoist them with pls dehoist.""", inline=True)
+        test_embed
         await ctx.reply(embed=test_embed)
 
     @commands.bot_has_permissions(embed_links=True)
@@ -834,9 +835,6 @@ class Basic(Cog):
     async def ping(self, ctx):
         """This shows the bot's ping to Discord.
 
-        RTT = Round-trip time.
-        GW = Ping to Gateway.
-
         No arguments."""
         before = time.monotonic()
         tmp = await ctx.reply("⌛", mention_author=False)
@@ -844,7 +842,7 @@ class Basic(Cog):
         rtt_ms = (after - before) * 1000
         gw_ms = self.bot.latency * 1000
 
-        message_text = f":ping_pong:\nrtt: `{rtt_ms:.1f}ms`\ngw: `{gw_ms:.1f}ms`"
+        message_text = f":ping_pong:\nrRound-Time Trip (Message-to-Response): `{rtt_ms:.1f}ms`\n Gateway (Discord Websocket): `{gw_ms:.1f}ms`"
         self.bot.log.info(message_text)
         await tmp.edit(content=message_text)
 
