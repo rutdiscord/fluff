@@ -784,7 +784,7 @@ class Basic(Cog):
         test_embed = stock_embed(self.bot)
         test_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
         
-        test_embed.add_field(name="Muting and Unmuting Users", value="""I can mute users! I don't use slash commands to provide a simple alternative to Smol/Tol for mobile moderation. When I mute users, I create multiple channels so nothing gets messy. I do this automatically.
+        test_embed.add_field(name="Muting & Unmuting Users", value="""I can mute users! I don't use slash commands to provide a simple alternative to Smol/Tol for mobile moderation. When I mute users, I create multiple channels so nothing gets messy. I do this automatically.
 To mute users, you can use `pls toss`, `pls mute`, or `pls roleban`.
 To unmute users, you can use `pls untoss`, `pls unmute`, or `pls unroleban`.""", inline=True)
         
