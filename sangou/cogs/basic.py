@@ -785,7 +785,7 @@ class Basic(Cog):
         test_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
         test_embed.add_field(name="horse", value="horse", inline=True)
         test_embed.add_field(name="horsing around 2", value="horsing 2", inline=True)
-        test_embed.add_field(name="horsing around 3", value="4", inline=True)
+        test_embed.add_field(name="horsing around 3", value="4", inline=False)
         test_embed.add_field(name="horse 2", value="6", inline=True)
         await ctx.reply(embed=test_embed)
 
