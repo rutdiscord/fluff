@@ -171,15 +171,7 @@ properties:
         type: 
           - boolean
           - "null"
-      burstreactsenable:
-        type: 
-          - boolean
-          - "null"
       autoreadableenable:
-        type: 
-          - boolean
-          - "null"
-      paidforprofileeffectsenable:
         type: 
           - boolean
           - "null"

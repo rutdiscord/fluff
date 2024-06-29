@@ -81,7 +81,7 @@ class Reply(Cog):
             ):
                 return await message.reply(
                     content="**Do not reply ping users who do not wish to be pinged.**\n"
-                    + "As you are new, this first time will not be a violation.",
+                    + "Be mindful of others' preferences. Thank you!",
                     file=discord.File("assets/noreply.png"),
                     mention_author=True,
                 )

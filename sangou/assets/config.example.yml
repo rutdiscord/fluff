@@ -84,13 +84,8 @@ reaction:
   embedenable:
   # If the bot may translate messages using reacted flags.
   translateenable:
-  # If the bot may autodelete super reactions.
-  burstreactsenable:
   # If the bot may automatically adjust names to be readable.
   autoreadableenable:
-  # If the bot may randomly laugh at users who have profile effects.
-  # Some people get mad at this feature's existence for some reason.
-  paidforprofileeffectsenable:
   
 roles:
   # Any potential roles to be used with "pls role" should be put here.

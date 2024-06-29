@@ -2,19 +2,21 @@
 
 # By default, Sangou will fill in any word wrapped in {} with a shorthand from here.
 shorthands:
-    normal: <:sangouspeak:1182927625161809931>
-    angry: <:sangoubaka:1182927626919223376>
-    unamused: <:sangoubruh:1182927627388989491>
-    cry: <:sangoucry:1182927628802469958>
-    dizzy: <:sangoudizzy:1182927629695860757>
-    sleep: <:sangousleep:1182927635706298438>
-    drunk: <:sangoudrunk:1182927630736044132>
-    eat: <:sangoueat:1182927631977558086>
-    fear: <:sangoufear:1182927633290379304>
-    smug: <:sangouhehe:1182927835460026448>
-    huh: <:sangouhuh:1182927894989783101>
-    love: <:sangoulove:1182927665028661310>
-
+#   normal: <:sangouspeak:1182927625161809931>
+#   angry: <:sangoubaka:1182927626919223376>
+#   unamused: <:sangoubruh:1182927627388989491>
+#   cry: <:sangoucry:1182927628802469958>
+#   dizzy: <:sangoudizzy:1182927629695860757>
+#   sleep: <:sangousleep:1182927635706298438>
+#   drunk: <:sangoudrunk:1182927630736044132>
+#   eat: <:sangoueat:1182927631977558086>
+#   fear: <:sangoufear:1182927633290379304>
+#   smug: <:sangouhehe:1182927835460026448>
+#   huh: <:sangouhuh:1182927894989783101>
+#   love: <:sangoulove:1182927665028661310>
+  noping: <:noreplyping:1256413872638656585>
+  plsping: <:pleasereplyping:1256413910664220702>
+  waitping: <:waitbeforereplyping:1256413894189256734>
 # A list of things that Sangou will "listen" to.
 # For example, "Listening to the validity of trans people".
 games:
@@ -53,67 +55,67 @@ games:
 
 # A generic error message.
 err_generic:
-  - "{cry} I'm sorry! Something broke! I let Ren know about it!"
-  - "{dizzy} Something broke while I was doing that... I let Ren know..."
+  - "I'm sorry! Something broke! I let Ren know about it!"
+  - "Something broke while I was doing that... I let Ren know..."
 
 # An error message for commands that can be used in servers only.
 err_serversonly:
-  - "{huh} Hey, you have to do this in a server... I don't know what server you want..."
+  - "Hey, you have to do this in a server... I don't know what server you want..."
 
 # An error message for commands that can be used in DMs only.
 err_dmsonly:
-  - "{normal} You can only do this in DMs, you know."
+  - "You can only do this in DMs, you know."
 
 # An error message for if Sangou cannot understand the quotes in a command.
 err_quotes:
-  - "{dizzy} I didn't get that, your quotes are off..."
-  - "{angry} Hey, check your quotes! I can't work with this input..."
+  - "I didn't get that, your quotes are off..."
+  - "Hey, check your quotes! I can't work with this input..."
 
 # An error message for unauthorized users missing a specific role.
 err_role:
-  - "{angry} No, I'm not listening to you! You don't have the role you need for that."
-  - "{sleep} Nope. Didn't hear that. I can only hear people with a role saying that."
+  - "No, I'm not listening to you! You don't have the role you need for that."
+  - "{Nope. Didn't hear that. I can only hear people with a role saying that."
 
 # An error message for when the bot is missing permissions.
 err_perms:
-  - "{huh} I can't do that, I don't have the permissions for that. I need these."
-  - "{fear} I tried, but it didn't work! It told me I needed these permissions..."
-  - "{unamused} How am I supposed to do that without permissions... I need these."
+  - "I can't do that, I don't have the permissions for that. I need these."
+  - "I tried, but it didn't work! It told me I needed these permissions..."
+  - "How am I supposed to do that without permissions... I need these."
 
 # An error message for when a command is on cooldown.
 err_cooldown:
-  - "{dizzy} Hey, slow down, I can't go that fast... Give me "
-  - "{angry} Stop trying to overwork me, I'm on a cooldown... Try again in "
-  - "{smug} Sure, I'll get to that... in "
+  - "Hey, slow down, I can't go that fast... Give me "
+  - "Stop trying to overwork me, I'm on a cooldown... Try again in "
+  - "Sure, I'll get to that... in "
 
 # An error message for when a command is missing an attachment.
 err_noattachment:
-  - "{huh} You didn't give me an attachment to work with..."
-  - "{angry} It's not funny, I need an attachment to work with."
-  - "{unamused} W-With what attachment?"
+  - "You didn't give me an attachment to work with..."
+  - "It's not funny, I need an attachment to work with."
+  - "W-With what attachment?"
 
 # A generic error message for failed checks. Used for manager commands mostly.
 err_checkfail:
-  - "{normal} Lalala, I can't hear you. You're unauthorized."
-  - "{sleep} ...Huh? Who are you? You can't ask me to do that."
-  - "{unamused} Why am I going to do that for you...? I don't know you."
+  - "Lalala, I can't hear you. You're unauthorized."
+  - "...Huh? Who are you? You can't ask me to do that."
+  - "Why am I going to do that for you...? I don't know you."
 
 # An error message for if the bot needs to DM you, but cannot.
 err_dmfail:
-  - "{fear} I can't do that, you won't let me DM you! Check your DM settings..."
-  - "{unamused} Hey, I can't DM you... check your settings first."
+  - "I can't do that, you won't let me DM you! Check your DM settings..."
+  - "Hey, I can't DM you... check your settings first."
 
 # An error message for if a user given does not exist.
 err_usernotfound:
-  - "{huh} I don't know who that user is..."
-  - "{normal} Discord API says that's not a user."
-  - "{unamused} Hey, that isn't a user. It doesn't exist."
+  - "I don't know who that user is..."
+  - "Discord API says that's not a user."
+  - "Hey, that isn't a user. It doesn't exist."
 
 # An error message for if a user given is not on the server.
 err_membernotfound:
-  - "{normal} That's not a member on this server."
-  - "{huh} You either gave me something wrong, or that member isn't on this server..."
-  - "{normal} I looked, that's not a member here."
+  - "That's not a member on this server."
+  - "You either gave me something wrong, or that member isn't on this server..."
+  - "I looked, that's not a member here."
 
 # === WARNINGS ===
 
@@ -133,36 +135,36 @@ warn_targetbot:
   
 # Used if a command times out.
 warn_timedout:
-  - "{normal} Your command timed out."
-  - "{sleep} I got bored waiting, so I timed out your command."
-  - "{angry} I can't wait for your response forever! Command timed out."
+  - "Your command timed out."
+  - "I got bored waiting, so I timed out your command."
+  - "I can't wait for your response forever! Command timed out."
 
 # === INFORMATION ===
 
 # Used when pls quit is used.
 quit_deaths:
-  - "{cry} Not again! Why must you do this again!"
-  - "{sleep} I'm already asleep, this changes nothing..."
-  - "{huh} What? Drop the lightbulb? Okay..."
-  - "{eat} Yay, lunch break!"
-  - "{drunk} What, just because I had one drink? Boo..."
-  - "{smug} You're not safe, you know..."
-  - "{normal} Bathroom break!"
+  - "Not again! Why must you do this again!"
+  - "I'm already asleep, this changes nothing..."
+  - "What? Drop the lightbulb? Okay..."
+  - "Yay, lunch break!"
+  - "What, just because I had one drink? Boo..."
+  - "You're not safe, you know..."
+  - "Bathroom break!"
 
 # Used in pls errors when there are no errors.
 errors_noerrors:
-  - "{eat} You don't have any errors yet."
-  - "{sleep} I haven't seen any errors happen yet..."
+  - "You don't have any errors yet."
+  - "I haven't seen any errors happen yet..."
 
 # Used with pls hello.
 hello_hello:
-  - "{normal} Helloooooo."
-  - "{eat} Hello. What's up?"
-  - "{sleep} ...Wha?"
+  - "Helloooooo."
+  - "Hello. What's up?"
+  - "...Wha?"
 
 # === COMPONENTS ===
 
 # Used for messages with embeds.
 embed_msg:
-  - "{normal} If you can't see this, check your message link settings."
-  - "{eat} Here's your embed. Check your settings if you can't see it."
+  - "If you can't see this, check your message link settings."
+  - "Here's your embed. Check your settings if you can't see it."
