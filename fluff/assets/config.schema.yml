@@ -36,31 +36,13 @@ properties:
           - string
           - "null"
         minimum: 100000000000000000
-      exstaffrole:
-        type:
-          - integer
-          - string
-          - "null"
-        minimum: 100000000000000000
       botrole:
         type:
           - integer
           - string
           - "null"
         minimum: 100000000000000000
-      raidrole:
-        type:
-          - integer
-          - string
-          - "null"
-        minimum: 100000000000000000
       staffchannel:
-        type:
-          - integer
-          - string
-          - "null"
-        minimum: 100000000000000000
-      watchchannel:
         type:
           - integer
           - string
@@ -74,20 +56,16 @@ properties:
         type: 
           - string
           - "null"
-      noreplythreshold:
-        type: 
-          - integer
-          - "null"
-  toss:
+  mute:
     type: object
     properties:
-      tossrole:
+      muterole:
         type:
           - integer
           - string
           - "null"
         minimum: 100000000000000000
-      tosscategory:
+      mutecategory:
         type:
           - integer
           - string
@@ -99,7 +77,7 @@ properties:
           - string
           - "null"
         minimum: 100000000000000000
-      tosschannels:
+      mutechannels:
         type: 
           - array
           - "null"
@@ -108,109 +86,17 @@ properties:
             - integer
             - string
           minimum: 100000000000000000
-      tosstopic:
+      mutetopic:
         type: 
-          - string
-          - "null"
-  surveyr:
-    type: object
-    properties:
-      surveychannel:
-        type:
-          - integer
-          - string
-          - "null"
-        minimum: 100000000000000000
-      startingcase:
-        type: 
-          - integer
-          - "null"
-      loggingtypes:
-        type: 
-          - array
-          - "null"
-        items:
-          enum:
-            - ban
-            - unban
-            - kick
-            - softban
-            - timeout
-            - promotion
-            - demotion
-      loggingroles:
-        type: 
-          - array
-          - "null"
-        items:
-          type:
-            - integer
-            - string
-          minimum: 100000000000000000
-  cotd:
-    type: object
-    properties:
-      cotdrole:
-        type:
-          - integer
-          - string
-          - "null"
-        minimum: 100000000000000000
-      cotdname:
-        type:
           - string
           - "null"
   reaction:
     type: object
     properties:
-      embedenable:
-        type: 
-          - boolean
-          - "null"
-      translateenable:
-        type: 
-          - boolean
-          - "null"
       autoreadableenable:
         type: 
           - boolean
           - "null"
-  roles:
-    type: 
-      - array
-      - "null"
-    items:
-      type: object
-      properties:
-        name:
-          type: string
-        role:
-          type:
-            - integer
-            - string
-          minimum: 100000000000000000
-        days:
-          type: 
-            - integer
-            - "null"
-        blacklisted:
-          type: 
-            - array
-            - "null"
-          items:
-            type:
-              - integer
-              - string
-            minimum: 100000000000000000
-        required:
-          type: 
-            - array
-            - "null"
-          items:
-            type:
-              - integer
-              - string
-            minimum: 100000000000000000
   overrides:
     type: 
       - array
@@ -233,5 +119,5 @@ properties:
     type: object
     properties:
       version:
-        const: 8
+        const: 9
         

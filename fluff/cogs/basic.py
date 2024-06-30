@@ -254,8 +254,8 @@ class Basic(Cog):
 `pls reply [message link] [text]` will make me repeat what you said, replying to somebody else.
 `pls react [message link] [emoji]` will make me react to someone's message with an emote. I can only use emotes I have access to!
 `pls typing [channel] [duration]` will make me look like I'm typing in a channel for however long you set.""")
-        embed2.add_field(name="Latency Checking", value="""If I'm slow, you can check my ping with `pls ping`.""", inline=True)
         embed2.add_field(name="Rule Snippets", value="""If you need to call up a specific rule, you can use `pls rule [rulename]`. You can check the list of rule snippets with `pls rule`. You can create new rule snippets with `pls rule create`. You can delete a rule snippet with `pls rule delete`.""", inline=True)
+        embed2.add_field(name="Latency Checking", value="""If I'm slow, you can check my ping with `pls ping`.""", inline=True)
         await sympage(self.bot, ctx, [embed1, embed2], ["1️⃣","2️⃣"])
 
     @commands.command()

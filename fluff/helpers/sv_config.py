@@ -47,8 +47,8 @@ def fill_config(sid):
 
         # * to 4.
         if config["metadata"]["version"] < 4:
-            del config["toss"]["drivefolder"]
-            config["toss"]["tosstopic"] = None
+            del config["mute"]["drivefolder"]
+            config["mute"]["mutetopic"] = None
 
         # * to 5.
         if config["metadata"]["version"] < 5:
@@ -84,7 +84,7 @@ def fill_config(sid):
 
         # * to 8.
         if config["metadata"]["version"] < 8:
-            config["toss"]["notificationchannel"] = config["staff"]["staffchannel"]
+            config["mute"]["notificationchannel"] = config["staff"]["staffchannel"]
 
         set_raw_config(sid, config)
 
