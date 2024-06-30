@@ -519,9 +519,6 @@ class ModMute(Cog):
             notify_channel = self.bot.pull_channel(
                 ctx.guild, get_config(ctx.guild.id, "staff", "staffchannel")
             )
-        logging_channel = self.bot.pull_channel(
-            ctx.guild, get_config(ctx.guild.id, "logging", "modlog")
-        )
         mutes = get_mutefile(ctx.guild.id, "mutes")
 
         if mutes[ctx.channel.name]["muted"]:
@@ -534,14 +531,6 @@ class ModMute(Cog):
             embed.description = f"`#{ctx.channel.name}`'s session was closed by {ctx.author.mention} ({ctx.author.id})."
             embed.color = ctx.author.color
             embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
-
-
-            channel = notify_channel if notify_channel else logging_channel
-            if channel:
-                await channel.send(embed=embed)
-            else:
-                await ctx.message.add_reaction("📦")
-                await asyncio.sleep(5)
 
         del mutes[ctx.channel.name]
         set_mutefile(ctx.guild.id, "mutes", json.dumps(mutes))
