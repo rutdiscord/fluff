@@ -550,7 +550,7 @@ class ModMute(Cog):
             user = ""
 
             if users:
-                firstuser = users[0].name + users[0].id
+                firstuser = f'{users[0].name} {users[0].id}'
             else:
                 firstuser = f'unspecified (logged by {ctx.author.name})'
 
