@@ -163,8 +163,8 @@ class Basic(Cog):
             help_embed.add_field(name="Join Graph", value="`pls joingraph` shows a graph of users who have joined.", inline=False)
             help_embed.add_field(name="Join Score", value="`pls joinscore` shows when you joined in comparison to other users.", inline=False)
             help_embed.add_field(name="Rule Snippets", value="`pls rule` will display a list of rule snippets. You can individually call them with their names, `pls rule [name]`. Useful for people who are confused about the rules!")
-            help_embed.add_field(name="Ping Preferences", value="`pls pingconfig` will allow you to change your ping preferences, AKA whether you'd like to be pinged always, never, or after a delay.")
-            help_embed.add_field(name="Staff List", value="`pls staff` will show all active staff.", inline=False)
+            help_embed.add_field(name="Ping Preferences", value="`pls pingconfig` will allow you to change your ping preferences, AKA whether you'd like to be pinged always, never, or after a delay.", inline=False)
+            help_embed.add_field(name="Staff List", value="`pls staff` will show all active staff.")
             return await ctx.reply(embed=help_embed,mention_author=False)
         else:
             botcommand = self.bot.get_command(command)
@@ -229,6 +229,24 @@ class Basic(Cog):
 
     @commands.command()
     @commands.check(ismod)
+    async def staffhelp(self, ctx):
+        '''
+        TODO: Seriously fix this up
+        '''
+        embed1 = stock_embed(self.bot)
+        embed1.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
+        embed1.color = 0xce7398
+        embed1.add_field(name="Kicking", value="""Use `pls kick` to kick users. If you add a reason to the end, the user will be DMed the reason. (This is useful for users who didn't respond in muted!)""", inline=False)
+        embed1.add_field(name="Banning & Unbanning", value="""This information is here for posterity. Trial staff are unable to use these commands.
+`pls ban` will ban users. If you add a reason to this, the user will be DMed the reason. The user will also be DMed the ban appeal form.
+`pls dban` or `pls bandel` with a variable from 0-7 (referring to days) at the end will ban a user and purge their messages from the last x days. You may also provide a reason. It will be DMed to them. 
+`pls massban` can be used with user IDs to massban. It will not DM the users.
+`pls unban` unbans a user. The reason can't be sent to the user. 
+`pls sban` bans a user without DMing them the reason.""", inline=False)
+
+        embed1.add_field(name="Muting & Unmuting Users", value="""I can mute users! I don't use slash commands to provide a simple alternative to Smol/Tol for mobile moderation. When I mute users, I create multiple channels so nothing gets messy. I do this automatically. To mute users, you can use `pls toss`, `pls mute`, or `pls roleban`. To unmute users, you can use `pls untoss`, `pls unmute`, or `pls unroleban`.""", inline=True)
+        embed1.add_field(name="Archiving & Closing Sessions", value="""When a muted session is done, please remember to archive with `pls archive`! This is handled by a separate bot for Various Reasons, but it's here for posterity. Then close the muted channel with `pls close`.""", inline=True)
+        embed1.add_field(name="Namefixing & Dehoisting", value="""If somebody has a name with unmentionable characters, you can easily fix it with `pls fixname`. If somebody is purposefully hoisting themselves on the userlist, you can dehoist them with `pls dehoist`.""", inline=True)
 
         embed2 = stock_embed(self.bot)
         embed2.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
@@ -240,20 +258,6 @@ class Basic(Cog):
         embed2.add_field(name="Latency Checking", value="""If I'm slow, you can check my ping with `pls ping`.""", inline=True)
         await sympage(self.bot, ctx, [embed1, embed2], ["1️⃣","2️⃣"])
 
-    @commands.command(aliases=["p"])
-    async def ping(self, ctx):
-        """This shows the bot's ping to Discord.
-
-        No arguments."""
-        before = time.monotonic()
-        tmp = await ctx.reply("⌛", mention_author=False)
-        after = time.monotonic()
-        rtt_ms = (after - before) * 1000
-        gw_ms = self.bot.latency * 1000
-
-        message_text = f":ping_pong:\nRound-Time Trip (Message-to-Response): `{rtt_ms:.1f}ms`\n Gateway (Discord Websocket): `{gw_ms:.1f}ms`"
-        self.bot.log.info(message_text)
-        await tmp.edit(content=message_text)
 
     @commands.cooldown(1, 5, type=commands.BucketType.default)
     @commands.bot_has_permissions(attach_files=True)
