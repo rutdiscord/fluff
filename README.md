@@ -1,5 +1,5 @@
 <p align="center">
-    <a href="https://3gou.0ccu.lt"><picture><img width="150px" src="https://raw.githubusercontent.com/dfault-user/fluff/master/sangou/assets/fluff.png"></picture></a>
+    <a href="https://3gou.0ccu.lt"><picture><img width="150px" src="https://github.com/dfault-user/fluff/blob/master/fluff/assets/fluff.png"></picture></a>
 </p>
 <p align="center"><i>Fluff</i></p>
 
@@ -17,7 +17,7 @@ Fluff is currently not available for public use, but self-hosting instructions a
 - Install [pipenv](https://pipenv.pypa.io/en/latest/).
 - Use `pipenv install` in the root folder, where `Pipfile` is.
 - Copy `config.example.py` to `config.py`, and fill it out with your bot information.
-- Enter `pipenv shell`, `cd sangou`, then `python __init__.py`.
+- Enter `pipenv shell`, `cd fluff`, then `python __init__.py`.
 - Congratulations.
 
 I will not help you if you wish to use a `requirements.txt`. It is much easier to just use `pipenv`.
