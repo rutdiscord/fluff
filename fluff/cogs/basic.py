@@ -235,7 +235,6 @@ class Basic(Cog):
         test_embed.add_field(name="Archiving & Closing Sessions", value="""When a muted session is done, please remember to archive with `pls archive`! This is handled by a separate bot for Various Reasons, but it's here for posterity. Then close the muted channel with `pls close`.""", inline=True)
         test_embed.add_field(name="Namefixing & Dehoisting", value="""If somebody has a name with unmentionable characters, you can easily fix it with `pls fixname`. If somebody is purposefully hoisting themselves on the userlist, you can dehoist them with `pls dehoist`.""", inline=True)
         test_embed.add_field(name="Rule Snippets", value="""If you need to call up a specific rule, you can use `pls rule [rulename]`. You can check the list of rule snippets with `pls rule`. You can create new rule snippets with `pls rule create`. You can delete a rule snippet with `pls rule delete`.""", inline=True)
-        test_embed.add_field(name="Latency Checking", value="""If I'm slow, you can check my ping with `pls ping`.""", inline=True)
         test_embed.add_field(name="Kicking", value="""Use `pls kick` to kick users. If you add a reason to the end, the user will be DMed the reason. (This is useful for users who didn't respond in muted!)""")
         test_embed.add_field(name="Banning & Unbanning", value="""This information is here for posterity. Trial staff are unable to use these commands.
 `pls ban` will ban users. If you add a reason to this, the user will be DMed the reason. The user will also be DMed the ban appeal form.
@@ -247,7 +246,7 @@ class Basic(Cog):
 `pls reply [message link] [text]` will make me repeat what you said, replying to somebody else.
 `pls react [message link] [emoji]` will make me react to someone's message with an emote. I can only use emotes I have access to!
 `pls typing [channel] [duration]` will make me look like I'm typing in a channel for however long you set.""")
-        
+        test_embed.add_field(name="Latency Checking", value="""If I'm slow, you can check my ping with `pls ping`.""", inline=True)
         await ctx.reply(embed=test_embed)
 
     @commands.command()
