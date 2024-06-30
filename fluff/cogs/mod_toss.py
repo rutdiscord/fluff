@@ -31,9 +31,6 @@ class ModMute(Cog):
         self.nocfgmsg = "Muting isn't enabled in this server."
 
     def enabled(self, g):
-        print(self.bot.pull_role(g, get_config(g.id, "mute", "muterole")),
-                self.bot.pull_category(g, get_config(g.id, "mute", "mutecategory")),
-                get_config(g.id, "mute", "mutechannels"))
         return all(
             (
                 self.bot.pull_role(g, get_config(g.id, "mute", "muterole")),
