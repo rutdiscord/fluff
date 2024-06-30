@@ -549,9 +549,14 @@ class ModMute(Cog):
                     users.append(user)
             user = ""
 
+            if users:
+                firstuser = users[0].name + users[0].id
+            else:
+                firstuser = f'unspecified (logged by {ctx.author.name})'
+
             filename = (
                 ctx.message.created_at.astimezone().strftime("%Y-%m-%d")
-                + f" {ctx.channel.name} {ctx.channel.id}"
+                + f" {firstuser}"
             )
             reply = (
                 f"📕 I've archived that as: `{filename}.txt`\nThis mute session had the following users:\n- "

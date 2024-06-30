@@ -31,7 +31,7 @@ async def upload(ctx, filename, dotzip):
             "title": filename + ".txt",
         }
     )
-    with open(filename, encoding='utf-8') as file:
+    with open(f"{filename}.txt", encoding='utf-8') as file:
         f.SetContentString(file.read())
         f.Upload()
     
