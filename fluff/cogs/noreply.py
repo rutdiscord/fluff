@@ -221,67 +221,6 @@ class Reply(Cog):
             if not preference:
                 return
 
-        async def wrap_violation(message):
-            try:
-                await self.add_violation(message)
-                return
-            except discord.errors.Forbidden:
-                if not (
-                    message.channel.permissions_for(message.guild.me).add_reactions
-                    and message.channel.permissions_for(
-                        message.guild.me
-                    ).manage_messages
-                    and message.channel.permissions_for(
-                        message.guild.me
-                    ).moderate_members
-                ):
-                    return
-
-                await message.author.timeout(datetime.timedelta(minutes=10))
-                return await message.reply(
-                    content=f"**Congratulations, {message.author.mention}, you absolute dumbass.**\nAs your reward for blocking me to disrupt my function, here is a time out, just for you.",
-                    mention_author=True,
-                )
-            except discord.errors.NotFound:
-                return await message.reply(
-                    content=f"{message.author.mention} immediately deleted their own message.\n{message.author.display_name} now has `{self.violations[message.guild.id][message.author.id]}` violation(s).",
-                    mention_author=True,
-                )
-
-        # If not reply pinged...
-        if (
-            preference == "pleasereplyping"
-            and refmessage.author not in message.mentions
-        ):
-            await message.add_reaction("<:pleasereplyping:1256722700563513467>")
-            pokemsg = await message.reply(content=refmessage.author.mention,mention_author=False)
-            await self.bot.await_message(message.channel, refmessage.author, 86400)
-            return await pokemsg.delete()
-
-        # If reply pinged at all...
-        elif preference == "noreplyping" and refmessage.author in message.mentions:
-            await message.add_reaction("<:noreplyping:1256722699162488874>")
-            await wrap_violation(message)
-            return
-
-        # If reply pinged in a window of time...
-        elif (
-            preference == "waitbeforereplyping"
-            and refmessage.author in message.mentions
-        ):
-            if message.guild.id not in self.timers:
-                self.timers[message.guild.id] = {}
-            self.timers[message.guild.id][refmessage.author.id] = int(
-                refmessage.created_at.timestamp()
-            )
-            if (
-                int(message.created_at.timestamp()) - 30
-                <= self.timers[message.guild.id][refmessage.author.id]
-            ):
-                await message.add_reaction("<:waitbeforereplyping:1256722701410893935>")
-                await wrap_violation(message)
-            return
-
     @tasks.loop(hours=24)
     async def counttimer(self):
         await self.bot.wait_until_ready()
