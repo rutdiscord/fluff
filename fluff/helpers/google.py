@@ -23,7 +23,7 @@ async def upload(ctx, filename, dotzip):
     '''Upload a log to Google Drive'''
     credentials = authenticate()
     drive = GoogleDrive(credentials)
-    folder = get_config(ctx.server.id, 'drive', 'folder')
+    folder = get_config(ctx.guild.id, 'drive', 'folder')
 
     f = drive.CreateFile(
         {
