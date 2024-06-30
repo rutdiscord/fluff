@@ -58,5 +58,9 @@ overrides:
   #     - 259199371361517569
   #   restrict: false          # Whether to allow (false) or restrict this command to (true) these roles.
 
+drive:
+  folder:
+  # Set the ID of the Google Drive folder that the file should be uploaded to.
+
 metadata:
-  version: 9
+  version: 10

@@ -116,8 +116,13 @@ properties:
             minimum: 100000000000000000
         restrict:
           type: boolean
+  drive:
+    type: object
+    properties:
+      folder:
+        type: string
   metadata:
     type: object
     properties:
       version:
-        const: 9
+        const: 10

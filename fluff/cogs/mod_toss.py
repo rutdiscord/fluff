@@ -617,7 +617,6 @@ class ModMute(Cog):
         await ctx.channel.delete(reason="Fluff Mute")
         return
 
-
     @Cog.listener()
     async def on_member_update(self, before, after):
         await self.bot.wait_until_ready()
