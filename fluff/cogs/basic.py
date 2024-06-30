@@ -163,7 +163,7 @@ class Basic(Cog):
             help_embed.add_field(name="Join Graph", value="`pls joingraph` shows a graph of users who have joined.", inline=False)
             help_embed.add_field(name="Join Score", value="`pls joinscore` shows when you joined in comparison to other users.", inline=False)
             help_embed.add_field(name="Rule Snippets", value="`pls rule` will display a list of rule snippets. You can individually call them with their names, `pls rule [name]`. Useful for people who are confused about the rules!")
-            help_embed.add_field(name="Ping Preferences, value=`pls pingconfig` will allow you to change your ping preferences, AKA whether you'd like to be pinged always, never, or after a delay.")
+            help_embed.add_field(name="Ping Preferences", value="`pls pingconfig` will allow you to change your ping preferences, AKA whether you'd like to be pinged always, never, or after a delay.")
             help_embed.add_field(name="Staff List", value="`pls staff` will show all active staff.", inline=False)
             return await ctx.reply(embed=help_embed,mention_author=False)
         else:
