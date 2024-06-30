@@ -23,6 +23,7 @@ pydub = "*"
 diff-match-patch = "*"
 jsonschema = "*"
 emoji = "*"
+pydrive = "*"
 
 [dev-packages]
 
