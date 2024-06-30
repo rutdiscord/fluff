@@ -405,7 +405,6 @@ class ModMute(Cog):
         )
         output = ""
         invalid = []
-        print(users)
         for us in users:
             if us.id == self.bot.application_id:
                 output += "\n" + random_msg(
