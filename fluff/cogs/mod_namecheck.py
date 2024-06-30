@@ -22,7 +22,7 @@ class ModNamecheck(Cog):
     @commands.bot_has_permissions(manage_nicknames=True)
     @commands.check(ismod)
     @commands.guild_only()
-    @commands.command()
+    @commands.command(aliases=["namefix"])
     async def fixname(self, ctx, target: discord.Member):
         """This cleans unicode from a username.
 
