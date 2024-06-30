@@ -213,7 +213,7 @@ class ModMute(Cog):
     )
     @commands.check(ismod)
     @commands.guild_only()
-    @commands.command(aliases=["roleban", "mute"])
+    @commands.command(aliases=["roleban", "toss"])
     async def mute(self, ctx, users: commands.Greedy[discord.Member]):
         """This mutes a user.
 
