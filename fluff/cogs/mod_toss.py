@@ -83,7 +83,7 @@ class ModMute(Cog):
         for channel in mutes:
             if channel == "LEFTGUILD":
                 continue
-            if str(member.id) in mutes[channel]["tossed"]:
+            if str(member.id) in mutes[channel]["muted"]:
                 session = channel
                 break
         return session
@@ -99,7 +99,7 @@ class ModMute(Cog):
         for c in get_config(guild.id, "mute", "mutechannels"):
             if c not in [g.name for g in guild.channels]:
                 if c not in mutes:
-                    mutes[c] = {"tossed": {}, "untossed": [], "left": []}
+                    mutes[c] = {"muted": {}, "unmuted": [], "left": []}
                     set_mutefile(guild.id, "mutes", json.dumps(mutes))
 
                 overwrites = {
@@ -140,7 +140,7 @@ class ModMute(Cog):
                 roles.append(rx)
 
         mutes = get_mutefile(user.guild.id, "mutes")
-        mutes[mute_channel.name]["tossed"][str(user.id)] = [role.id for role in roles]
+        mutes[mute_channel.name]["muted"][str(user.id)] = [role.id for role in roles]
         set_mutefile(user.guild.id, "mutes", json.dumps(mutes))
 
         await user.add_roles(mute_role, reason="User muted.")
@@ -182,7 +182,7 @@ class ModMute(Cog):
 
         for c in channels:
             if c in [g.name for g in ctx.guild.channels]:
-                if c not in mutes or not mutes[c]["tossed"]:
+                if c not in mutes or not mutes[c]["muted"]:
                     embed.add_field(
                         name=f"🟡 #{c}",
                         value="__Empty__\n> Please close the channel.",
@@ -194,7 +194,7 @@ class ModMute(Cog):
                             f"> {self.username_system(user)}"
                             for user in [
                                 await self.bot.fetch_user(str(u))
-                                for u in mutes[c]["tossed"].keys()
+                                for u in mutes[c]["muted"].keys()
                             ]
                         ]
                     )
@@ -351,7 +351,7 @@ class ModMute(Cog):
 
         if errors and notify_channel:
             return await notify_channel.send(
-                f"Error in mute command from {ctx.author.mention}...\n- Some users could not be tossed.\n```diff"
+                f"Error in mute command from {ctx.author.mention}...\n- Some users could not be muted.\n```diff"
                 + errors
                 + "\n```\n"
             )
@@ -381,7 +381,7 @@ class ModMute(Cog):
     @commands.bot_has_permissions(manage_roles=True, manage_channels=True)
     @commands.check(ismod)
     @commands.guild_only()
-    @commands.command(aliases=["unroleban", "unmute"])
+    @commands.command(aliases=["unroleban", "untoss"])
     async def unmute(self, ctx, users: commands.Greedy[discord.Member] = None):
         """This unmutes a user.
 
@@ -401,7 +401,7 @@ class ModMute(Cog):
         if not users:
             users = [
                 ctx.guild.get_member(int(u))
-                for u in mutes[ctx.channel.name]["tossed"].keys()
+                for u in mutes[ctx.channel.name]["muted"].keys()
             ]
 
         notify_channel = self.bot.pull_channel(
@@ -427,7 +427,7 @@ class ModMute(Cog):
                     "warn_targetself", authorname=ctx.author.name
                 )
             elif (
-                str(us.id) not in mutes[ctx.channel.name]["tossed"]
+                str(us.id) not in mutes[ctx.channel.name]["muted"]
                 and mute_role not in us.roles
             ):
                 output += "\n" + f"{self.username_system(us)} is not muted."
@@ -444,10 +444,10 @@ class ModMute(Cog):
 
         for us in users:
             self.busy = True
-            roles = mutes[ctx.channel.name]["tossed"][str(us.id)]
-            if us.id not in mutes[ctx.channel.name]["untossed"]:
-                mutes[ctx.channel.name]["untossed"].append(us.id)
-            del mutes[ctx.channel.name]["tossed"][str(us.id)]
+            roles = mutes[ctx.channel.name]["muted"][str(us.id)]
+            if us.id not in mutes[ctx.channel.name]["unmuted"]:
+                mutes[ctx.channel.name]["unmuted"].append(us.id)
+            del mutes[ctx.channel.name]["muted"][str(us.id)]
 
             if roles:
                 roles = [ctx.guild.get_role(r) for r in roles]
@@ -532,7 +532,7 @@ class ModMute(Cog):
         )
         mutes = get_mutefile(ctx.guild.id, "mutes")
 
-        if mutes[ctx.channel.name]["tossed"]:
+        if mutes[ctx.channel.name]["muted"]:
             return await ctx.reply(
                 content="You must unmute everyone first!", mention_author=True
             )
@@ -571,8 +571,8 @@ class ModMute(Cog):
                 return
 
             mutes = get_tossfile(after.guild.id, "mutes")
-            mutes[session]["untossed"].append(after.id)
-            del mutes[session]["tossed"][str(after.id)]
+            mutes[session]["unmuted"].append(after.id)
+            del mutes[session]["muted"][str(after.id)]
             set_mutefile(after.guild.id, "mutes", json.dumps(mutes))
 
     @Cog.listener()
