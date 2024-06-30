@@ -607,7 +607,7 @@ class ModMute(Cog):
                     inline=True,
                 )
             
-            await upload(ctx, filename, dotzip)
+            await upload(ctx, f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}/{filename}", dotzip)
 
         del mutes[ctx.channel.name]
         set_mutefile(ctx.guild.id, "mutes", json.dumps(mutes))

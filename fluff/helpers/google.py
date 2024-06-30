@@ -19,7 +19,7 @@ async def authenticate():
     gauth.credentials = credentials
     return gauth
 
-async def upload(ctx, filename, dotzip):
+async def upload(ctx, file_path_no_ext, dotzip):
     '''Upload a log to Google Drive'''
     credentials = authenticate()
     drive = GoogleDrive(credentials)
@@ -28,10 +28,10 @@ async def upload(ctx, filename, dotzip):
     f = drive.CreateFile(
         {
             "parents": [{"kind": "drive#fileLink", "id": folder}],
-            "title": filename + ".txt",
+            "title": file_path_no_ext + ".txt",
         }
     )
-    with open(f"{filename}.txt", encoding='utf-8') as file:
+    with open(f"{file_path_no_ext}.txt", encoding='utf-8') as file:
         f.SetContentString(file.read())
         f.Upload()
     
@@ -39,7 +39,7 @@ async def upload(ctx, filename, dotzip):
         f_zip = drive.CreateFile(
             {
                 "parents": [{"kind": "drive#fileLink", "id": folder}],
-                "title": filename + " (files).zip",
+                "title": file_path_no_ext + " (files).zip",
             }
         )
         f_zip.content = dotzip
