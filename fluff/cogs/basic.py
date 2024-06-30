@@ -160,10 +160,16 @@ class Basic(Cog):
             help_embed = stock_embed(self.bot)
             help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
             help_embed.add_field(name="Image Hosting", value="Use `pls rehost`, `pls imgur`, or `pls catbox` with an attachment or link to host that attachment forever. Please respect the service.", inline=False)
+            help_embed.add_field(name="Staff List", value="`pls staff` will show all active staff.")
             help_embed.add_field(name="Join Graph", value="`pls joingraph` shows a graph of users who have joined.", inline=False)
             help_embed.add_field(name="Join Score", value="`pls joinscore` shows when you joined in comparison to other users.", inline=False)
             help_embed.add_field(name="Rule Snippets", value="`pls rule` will display a list of rule snippets. You can individually call them with their names, `pls rule [name]`. Useful for people who are confused about the rules!")
-            help_embed.add_field(name="Staff List", value="`pls staff` will show all active staff.")
+            help_embed.add_field(name="Ping Preferences", value="`pls pingconfig` will allow you to change your ping preferences, AKA whether you'd like to be pinged always, never, or after a delay.", inline=False)
+            help_embed.add_field(name="Rolling the Dice", value="`pls choose [options separated by spaces]` will choose something at random for you.", inline=False)
+            help_embed.add_field(name="Timer", value="`pls timer [duration in minutes, max 60]` I will start a timer for you and ping you when it's done. By default I will set it for 5 minutes.", inline=False)
+            help_embed.add_field(name="User Avy", value="`pls avy [user]` will tell me to post your avatar. Without any user specified, I will post your current avatar.", inline=False)
+            help_embed.add_field(name="Server Avy", value="`pls avy server` will tell me to post the avatar of the server.", inline=False)
+            help_embed.add_field(name="About Me", value="`pls about` shows my info!")
             return await ctx.reply(embed=help_embed,mention_author=False)
         else:
             botcommand = self.bot.get_command(command)
@@ -257,30 +263,6 @@ class Basic(Cog):
         embed2.add_field(name="Latency Checking", value="""If I'm slow, you can check my ping with `pls ping`.""", inline=True)
         await sympage(self.bot, ctx, [embed1, embed2], ["1️⃣","2️⃣"])
 
-    @commands.command()
-    async def jump(self, ctx):
-        """This posts a link to the first message in the channel.
-
-        Not much more to it.
-
-        No arguments."""
-        async for message in ctx.channel.history(oldest_first=True):
-            return await ctx.reply(content=message.jump_url, mention_author=False)
-
-    @commands.command(aliases=["p"])
-    async def ping(self, ctx):
-        """This shows the bot's ping to Discord.
-
-        No arguments."""
-        before = time.monotonic()
-        tmp = await ctx.reply("⌛", mention_author=False)
-        after = time.monotonic()
-        rtt_ms = (after - before) * 1000
-        gw_ms = self.bot.latency * 1000
-
-        message_text = f":ping_pong:\nRound-Time Trip (Message-to-Response): `{rtt_ms:.1f}ms`\n Gateway (Discord Websocket): `{gw_ms:.1f}ms`"
-        self.bot.log.info(message_text)
-        await tmp.edit(content=message_text)
 
     @commands.cooldown(1, 5, type=commands.BucketType.default)
     @commands.bot_has_permissions(attach_files=True)

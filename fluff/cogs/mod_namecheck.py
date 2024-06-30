@@ -37,7 +37,7 @@ class ModNamecheck(Cog):
         await target.edit(nick=newname, reason="Namecheck")
         return await ctx.reply(
             content=f"""Successfully fixed **{oldname}**, changing it to `{newname}`. 
-			Please review rule 6! Your nickname must be at least partially typable using a standard QWERTY keyboard.""",
+Please review rule 6! Your nickname must be at least partially typable using a standard QWERTY keyboard.""",
             mention_author=False,
         )
 
