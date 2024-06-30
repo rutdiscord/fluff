@@ -1,5 +1,5 @@
 <p align="center">
-    <a href="https://3gou.0ccu.lt"><picture><img width="150px" src="https://raw.githubusercontent.com/dfault-user/fluff/master/sangou/assets/fluff.png"></picture></a>
+    <a href="https://3gou.0ccu.lt"><picture><img width="150px" src="https://raw.githubusercontent.com/dfault-user/fluff/master/flaff/assets/fluff.png"></picture></a>
 </p>
 <p align="center"><i>Fluff</i></p>
 
