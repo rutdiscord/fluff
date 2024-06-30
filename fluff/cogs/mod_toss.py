@@ -125,7 +125,7 @@ class ModMute(Cog):
                         guild, get_config(guild.id, "mute", "mutecategory")
                     ),
                     overwrites=overwrites,
-                    topic=get_config(guild.id, "mute", "mutedtopic"),
+                    topic=get_config(guild.id, "mute", "mutetopic"),
                 )
 
                 return mute_channel
