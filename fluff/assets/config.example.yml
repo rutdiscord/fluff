@@ -41,7 +41,7 @@ mute:
   mutechannels:
 
   # The topic for each muted channel.
-  mutedtopic:
+  mutetopic:
 
 
 reaction:

@@ -213,43 +213,6 @@ def watch_userlog(sid, uid, issuer, watch_state, tracker_thread=None, tracker_ms
     return
 
 
-# Surveyr Features
-
-
-def new_survey(sid, uid, mid, iid, reason, event):
-    surveys = get_guildfile(sid, "surveys")
-
-    cid = (
-        get_config(sid, "surveyr", "startingcase")
-        if len(surveys.keys()) == 0
-        else int(list(surveys)[-1]) + 1
-    )
-
-    timestamp = int(datetime.datetime.now().timestamp())
-    sv_data = {
-        "type": event,
-        "reason": reason,
-        "timestamp": timestamp,
-        "target_id": uid,
-        "issuer_id": iid,
-        "post_id": mid,
-    }
-    surveys[str(cid)] = sv_data
-    set_guildfile(sid, "surveys", json.dumps(surveys))
-    return cid, timestamp
-
-
-def edit_survey(sid, cid, iid, reason, event):
-    surveys = get_guildfile(sid, "surveys")
-
-    surveys[str(cid)]["type"] = event
-    surveys[str(cid)]["reason"] = reason
-    surveys[str(cid)]["issuer_id"] = iid
-
-    set_guildfile(sid, "surveys", json.dumps(surveys))
-    return cid
-
-
 # Dishtimer Features
 
 
