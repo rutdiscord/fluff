@@ -608,7 +608,7 @@ class Mod(Cog):
     async def typing(
         self,
         ctx,
-        channel: typing.Union[discord.abc.GuildChannel, discord.Thread],
+        channel: discord.abc.GuildChannel,
         duration: int,
     ):
         """This makes the bot type in a channel for some time.
