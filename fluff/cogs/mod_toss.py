@@ -248,9 +248,6 @@ class ModMute(Cog):
             notify_channel = self.bot.pull_channel(
                 ctx.guild, get_config(ctx.guild.id, "staff", "staffchannel")
             )
-        modlog_channel = self.bot.pull_channel(
-            ctx.guild, get_config(ctx.guild.id, "logging", "modlog")
-        )
 
         errors = ""
         for us in users:
@@ -341,14 +338,6 @@ class ModMute(Cog):
                         inline=False,
                     )
                 await notify_channel.send(embed=embed)
-
-            if modlog_channel and modlog_channel != notify_channel:
-                embed = stock_embed(self.bot)
-                embed.color = discord.Color.from_str("#FF0000")
-                embed.title = "🚷 Mute"
-                embed.description = f"{us.mention} was muted by {ctx.author.mention} [`#{ctx.channel.name}`] [[Jump]({ctx.message.jump_url})]"
-                mod_embed(embed, us, ctx.author)
-                await modlog_channel.send(embed=embed)
 
         await ctx.message.add_reaction("🚷")
 
