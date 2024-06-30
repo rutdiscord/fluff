@@ -17,7 +17,7 @@ Fluff is currently not available for public use, but self-hosting instructions a
 - Install [pipenv](https://pipenv.pypa.io/en/latest/).
 - Use `pipenv install` in the root folder, where `Pipfile` is.
 - Copy `config.example.py` to `config.py`, and fill it out with your bot information.
-- Enter `pipenv shell`, `cd sangou`, then `python __init__.py`.
+- Enter `pipenv shell`, `cd fluff`, then `python __init__.py`.
 - Congratulations.
 
 I will not help you if you wish to use a `requirements.txt`. It is much easier to just use `pipenv`.
