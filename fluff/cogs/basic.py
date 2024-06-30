@@ -13,6 +13,7 @@ import zlib
 from datetime import datetime, timezone
 from discord.ext import commands
 from discord.ext.commands import Cog
+from helpers.checks import ismod
 from helpers.embeds import stock_embed, author_embed, sympage
 from helpers.datafiles import fill_profile
 from zoneinfo import ZoneInfo, available_timezones
@@ -227,6 +228,7 @@ class Basic(Cog):
             await ctx.reply(embed=embed, mention_author=False)
 
     @commands.command()
+    @commands.check(ismod)
     async def staffhelp(self, ctx):
         test_embed = stock_embed(self.bot)
         test_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
@@ -248,6 +250,7 @@ class Basic(Cog):
         test_embed.add_field(name="Rule Snippets", value="""If you need to call up a specific rule, you can use `pls rule [rulename]`. You can check the list of rule snippets with `pls rule`. You can create new rule snippets with `pls rule create`. You can delete a rule snippet with `pls rule delete`.""", inline=True)
         test_embed.add_field(name="Kicking", value="""Use `pls kick` to kick users. If you add a reason to the end, the user will be DMed the reason. (This is useful for users who didn't respond in muted!)""", inline=True)
         await ctx.reply(embed=test_embed)
+
     @commands.command()
     async def jump(self, ctx):
         """This posts a link to the first message in the channel.
