@@ -135,7 +135,7 @@ class ModLocks(Cog):
                 '**Do not** bring the topic to other channels or risk action taken. This includes "What happened?" messages.'
             )
         
-        ctx.send(context=public_msg)
+        await ctx.send(content=public_msg)
 
     @commands.bot_has_permissions(manage_channels=True)
     @commands.check(ismod)
