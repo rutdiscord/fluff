@@ -536,8 +536,7 @@ class Mod(Cog):
     async def speak(
         self,
         ctx,
-        channel: typing.Union[discord.abc.GuildChannel, discord.Thread],
-        *,
+        channel: discord.abc.GuildChannel,
         text: str,
     ):
         """This makes the bot repeat some text in a specific channel.
