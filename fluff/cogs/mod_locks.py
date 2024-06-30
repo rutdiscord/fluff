@@ -84,6 +84,14 @@ class ModLocks(Cog):
                 mention_author=False,
             )
 
+        public_msg = "🔒 Channel locked down. "
+        if not soft:
+            public_msg += (
+                "Only Staff may speak. "
+                '**Do not** bring the topic to other channels or risk action taken. This includes "What happened?" messages.'
+            )
+        
+        await ctx.reply(public_msg, mention_author=false)
         # Take a snapshot of current channel state before making any changes
         if ctx.guild.id not in self.snapshots:
             self.snapshots[ctx.guild.id] = {}
@@ -127,15 +135,6 @@ class ModLocks(Cog):
 
         await self.unlock_for_staff(channel, ctx.author)
         await self.unlock_for_bots(channel, ctx.author)
-
-        public_msg = "🔒 Channel locked down. "
-        if not soft:
-            public_msg += (
-                "Only Staff may speak. "
-                '**Do not** bring the topic to other channels or risk action taken. This includes "What happened?" messages.'
-            )
-        
-        await ctx.send(content=public_msg)
 
     @commands.bot_has_permissions(manage_channels=True)
     @commands.check(ismod)
