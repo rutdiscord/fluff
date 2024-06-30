@@ -1,3 +1,4 @@
+---
 type: object
 properties:
   logging:
@@ -49,11 +50,11 @@ properties:
           - "null"
         minimum: 100000000000000000
       rulesurl:
-        type: 
+        type:
           - string
           - "null"
       appealurl:
-        type: 
+        type:
           - string
           - "null"
   mute:
@@ -78,7 +79,7 @@ properties:
           - "null"
         minimum: 100000000000000000
       mutechannels:
-        type: 
+        type:
           - array
           - "null"
         items:
@@ -87,18 +88,18 @@ properties:
             - string
           minimum: 100000000000000000
       mutetopic:
-        type: 
+        type:
           - string
           - "null"
   reaction:
     type: object
     properties:
       autoreadableenable:
-        type: 
+        type:
           - boolean
           - "null"
   overrides:
-    type: 
+    type:
       - array
       - "null"
     items:
@@ -120,4 +121,3 @@ properties:
     properties:
       version:
         const: 9
-        
