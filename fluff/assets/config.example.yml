@@ -48,7 +48,7 @@ reaction:
   # If the bot may automatically adjust names to be readable.
   autoreadableenable:
   
- overrides:
+overrides:
   # To override a command for use with more roles than allowed by default,
   # or to restrict a command to certain roles, configure it here.
   # Please see the following example.
