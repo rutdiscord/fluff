@@ -602,7 +602,7 @@ class ModMute(Cog):
                     inline=True,
                 )
             
-            upload(ctx, filename, dotzip)
+            await upload(ctx, filename, dotzip)
 
         del mutes[ctx.channel.name]
         set_mutefile(ctx.guild.id, "mutes", json.dumps(mutes))
