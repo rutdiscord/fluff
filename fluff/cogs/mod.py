@@ -368,7 +368,7 @@ class Mod(Cog):
                 mention_author=False,
             )
         deleted = len(await channel.purge(limit=limit))
-        await ctx.send(f"🚮 `{deleted}` messages purged.", delete_after=5)
+        await ctx.send(f"<a:bunnytrashjump:1256812177768185878> `{deleted}` messages purged.", delete_after=5)
 
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
@@ -390,7 +390,7 @@ class Mod(Cog):
             return any((m.author.bot, m.author.discriminator == "0000"))
 
         deleted = len(await channel.purge(limit=limit, check=is_bot))
-        await ctx.send(f"🚮 `{deleted}` bot messages purged.", delete_after=5)
+        await ctx.send(f"<a:bunnytrashjump:1256812177768185878> `{deleted}` bot messages purged.", delete_after=5)
 
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
@@ -420,7 +420,7 @@ class Mod(Cog):
             return target.id == m.author.id
 
         deleted = len(await channel.purge(limit=limit, check=is_mentioned))
-        await ctx.send(f"🚮 `{deleted}` messages from {target} purged.", delete_after=5)
+        await ctx.send(f"<a:bunnytrashjump:1256812177768185878> `{deleted}` messages from {target} purged.", delete_after=5)
 
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
@@ -451,7 +451,7 @@ class Mod(Cog):
 
         deleted = len(await channel.purge(limit=limit, check=contains))
         await ctx.send(
-            f"🚮 `{deleted}` messages containing `{string}` purged.", delete_after=5
+            f"<a:bunnytrashjump:1256812177768185878> `{deleted}` messages containing `{string}` purged.", delete_after=5
         )
 
     @commands.bot_has_permissions(manage_messages=True)
@@ -481,7 +481,7 @@ class Mod(Cog):
             )
 
         deleted = len(await channel.purge(limit=limit, check=has_emote))
-        await ctx.send(f"🚮 `{deleted}` emotes purged.", delete_after=5)
+        await ctx.send(f"<a:bunnytrashjump:1256812177768185878> `{deleted}` emotes purged.", delete_after=5)
 
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
@@ -504,7 +504,7 @@ class Mod(Cog):
             return any((m.embeds, m.attachments, m.stickers))
 
         deleted = len(await channel.purge(limit=limit, check=has_embed))
-        await ctx.send(f"🚮 `{deleted}` embeds purged.", delete_after=5)
+        await ctx.send(f"<a:bunnytrashjump:1256812177768185878> `{deleted}` embeds purged.", delete_after=5)
 
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
@@ -528,7 +528,7 @@ class Mod(Cog):
             if msg.reactions:
                 deleted += 1
                 await msg.clear_reactions()
-        await ctx.send(f"🚮 `{deleted}` reactions purged.", delete_after=5)
+        await ctx.send(f"<a:bunnytrashjump:1256812177768185878> `{deleted}` reactions purged.", delete_after=5)
 
     @commands.check(isadmin)
     @commands.guild_only()
