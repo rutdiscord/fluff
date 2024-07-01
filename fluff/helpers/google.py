@@ -1,6 +1,7 @@
 # This Helper contains code from Archiver, which was made by Roadcrosser.
 # 🖤 If by any chance you're reading, we all miss you.
 # https://github.com/Roadcrosser/archiver
+import os.path
 import httplib2
 
 from pydrive2.auth import GoogleAuth
@@ -19,19 +20,20 @@ def authenticate():
     gauth.credentials = credentials
     return gauth
 
-async def upload(ctx, file_path_no_ext, dotzip):
+async def upload(ctx, filename, file_path, dotzip):
     '''Upload a log to Google Drive'''
     credentials = authenticate()
     drive = GoogleDrive(credentials)
     folder = get_config(ctx.guild.id, 'drive', 'folder')
+    full_path = os.path.join(file_path, filename, '.txt')
 
     f = drive.CreateFile(
         {
             "parents": [{"kind": "drive#fileLink", "id": folder}],
-            "title": file_path_no_ext + ".txt",
+            "title": f'{filename}.txt',
         }
     )
-    with open(f"{file_path_no_ext}.txt", encoding='utf-8') as file:
+    with open(f"{full_path}.txt", encoding='utf-8') as file:
         f.SetContentString(file.read())
         f.Upload()
     
@@ -39,7 +41,7 @@ async def upload(ctx, file_path_no_ext, dotzip):
         f_zip = drive.CreateFile(
             {
                 "parents": [{"kind": "drive#fileLink", "id": folder}],
-                "title": file_path_no_ext + " (files).zip",
+                "title":  f"{filename} (files).zip",
             }
         )
         f_zip.content = dotzip
