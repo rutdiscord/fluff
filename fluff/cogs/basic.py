@@ -28,6 +28,23 @@ class Basic(Cog):
         self.bot = bot
         matplotlib.use("agg")
 
+    def check_mod_category(ctx):
+        if ctx.channel.category and ctx.channel.category.id == '360563735363846144':
+            return True
+
+    @commands.command()
+    @commands.check(ismod)
+    @commands.check(check_mod_category)
+    async def drive(self, ctx):
+        """This spits out the Undertale Discord's Google Drive, but only if you're a mod."""
+        if not ctx.ismod and not ctx.check_mod_category:
+            return await ctx.reply(
+                content="You're either not a mod or you're using this in the wrong category."
+            )
+        await ctx.send(
+            f"https://drive.google.com/drive/folders/0B7weGRL72yVXUWJ3TEZ1NUd5QW8?usp=sharing"
+        )
+
     @commands.command()
     async def choose(self, ctx, *options):
         """This will choose something at random for you.
