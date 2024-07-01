@@ -34,14 +34,10 @@ class Basic(Cog):
     @commands.check(ismodcat)
     async def drive(self, ctx):
         """This spits out the Undertale Discord's Google Drive, but only if you're a mod."""
-        if not ctx.ismod and not ctx.ismodcat:
-            return await ctx.reply(
-                content="You're either not a mod or you're using this in the wrong category."
-            )
-        
-        await ctx.reply(
-            f"https://drive.google.com/drive/folders/{get_config(ctx.guild.id, 'drive', 'folder')}?usp=sharing"
+        return await ctx.reply(
+            content="You're either not a mod or you're using this in the wrong category."
         )
+
 
     @commands.command()
     async def choose(self, ctx, *options):
