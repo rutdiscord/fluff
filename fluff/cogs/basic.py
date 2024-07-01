@@ -29,14 +29,14 @@ class Basic(Cog):
         self.bot = bot
         matplotlib.use("agg")
 
+
+    '''
+    TODO: stop this from being stupid
+    '''
     @commands.command()
     @commands.check(ismod)
     async def drive(self, ctx):
         """This spits out the Undertale Discord's Google Drive, but only if you're a mod."""
-        if not ctx.ismod:
-            return await ctx.reply(
-                content="You're not a mod! Stop bothering me."
-            )
         await ctx.send(
             f"https://drive.google.com/drive/folders/0B7weGRL72yVXUWJ3TEZ1NUd5QW8?usp=sharing"
         )
