@@ -689,57 +689,67 @@ class ModMute(Cog):
 
             # If no session found, create a new muted session
             if not session_found:
+                addition = False
                 mute_channel = await self.new_session(member.guild)
                 await self.perform_mute(member, None, mute_channel)
                 await mute_channel.set_permissions(member, read_messages=True)
+               
+                mutes = get_mutefile(member.guild.id, "mutes")
+                if mute_channel.name not in mutes:
+                    mutes[mute_channel.name] = {"muted": {}, "unmuted": [], "left": []}
+                mutes[mute_channel.name]["muted"][str(member.id)] = [r.id for r in member.roles if r != mute_role]
+                set_mutefile(member.guild.id,"mutes", json.dumps(mutes))
 
-            mutes = get_mutefile(member.guild.id, "mutes")
-            if mute_channel.name not in mutes:
-                mutes[mute_channel.name] = {"muted": {}, "unmuted": [], "left": []}
-            mutes[mute_channel.name]["muted"][str(member.id)] = [r.id for r in member.roles if r != mute_role]
-            set_mutefile(member.guild.id, "mutes", json.dumps(mutes))
-
-            mute_userlog(
-                member.guild.id,
-                member.id,
-                None,
-                None,
-                mute_channel.id,
-            )
-
-            notify_channel = self.bot.pull_channel(
-                member.guild, get_config(member.guild.id, "mute", "notificationchannel")
-            )
-            if not notify_channel:
                 notify_channel = self.bot.pull_channel(
-                    member.guild, get_config(member.guild.id, "staff", "staffchannel")
+                    member.guild, get_config(member.guild.id, "mute", "notificationchannel")
                 )
+                if not notify_channel:
+                    notify_channel = self.bot.pull_channel(
+                        member.guild, get_config(member.guild.id, "staff", "staffchannel")
+                    )
 
-            if notify_channel:
-                embed = stock_embed(self.bot)
-                author_embed(embed, member, True)
-                embed.color = discord.Color.orange() 
-                embed.title = "🚷 Auto-mute"
-                embed.description = f"{member.mention} was previously kicked for being silent in muted and has rejoined. They have been automatically muted, see [`#{mute_channel.name}`]"
-                createdat_embed(embed, member)
-                joinedat_embed(embed, member)
-                embed.add_field(
-                    name="Previous Roles",
-                    value="None",
-                    inline=False,
-                )
+                    if notify_channel:
+                        embed = stock_embed(self.bot)
+                        author_embed(embed, member, True)
+                        embed.color = discord.Color.orange() 
+                        embed.title = "🚷 Auto-Mute"
+                        embed.description = f"{member.mention} was previously kicked for being silent in muted and has rejoined. They have been automatically muted, see [`#{mute_channel.name}`]"
+                        createdat_embed(embed, member)
+                        joinedat_embed(embed, member)
+                        embed.add_field(
+                            name="Previous Roles",
+                            value="None",
+                            inline=False,
+                        )
 
-                try:
-                    await notify_channel.send(embed=embed)
-                except discord.HTTPException as e:
-                    print(f"HTTP error while sending embed to {notify_channel}: {e}")
-                except Exception as e:
-                    print(f"Failed to send embed to {notify_channel}: {e}")
-                
-            # Start timer - example using message edits for countdown
-            mute_pings = member.mention
-            timer_msg = await mute_channel.send(f"{mute_pings}\nYou were muted by {self.bot.pacify_name(member.display_name)}.\n> *For reference, this means a Staff member wishes to speak with you one on one! This does not necessarily mean you are in trouble. This session will be archived for Staff only once completed.*")
-            await timer_msg.edit(content="🫳⏰", delete_after=5)
+                        try:
+                            await notify_channel.send(embed=embed)
+                        except discord.HTTPException as e:
+                            print(f"HTTP error while sending embed to {notify_channel}: {e}")
+                        except Exception as e:
+                            print(f"Failed to send embed to {notify_channel}: {e}")
+                    
+                    if not addition:
+                        mute_pings = member.mention
+                        await mute_channel.send(
+                            f"{mute_pings}\nYou are muted! You were previously muted and were kicked for not responding. Welcome back.\n"
+                            '> *For reference, being muted means a Staff member wishes to speak with you one on one. This does not necessarily mean you are in trouble. This session will be archived for Staff only once completed.*\n'
+                            '<@244328249801310219> You\'ve got another one!'
+                        )
+
+                        def check(m):
+                            return m.author == member and m.channel == mute_channel
+
+                        try:
+                            await self.bot.wait_for("message", timeout=300, check=check)
+                        except asyncio.TimeoutError:
+                            pokemsg = await mute_channel.send(member.mention)
+                            await pokemsg.edit(content="⏰", delete_after=5)
+                        except discord.NotFound:
+                            return
+                        else:
+                            pokemsg = await mute_channel.send(member.mention)
+                            await pokemsg.edit(content="🫳⏰", delete_after=5)
 
 async def setup(bot):
     await bot.add_cog(ModMute(bot))
