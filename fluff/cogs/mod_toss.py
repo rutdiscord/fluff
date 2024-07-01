@@ -3,24 +3,25 @@ import discord
 import json
 import os
 import asyncio
-import random
+# import random
 import zipfile
-from datetime import datetime, timezone, timedelta
+# from datetime import datetime, timezone, timedelta
 from discord.ext import commands
 from discord.ext.commands import Cog
-from io import BytesIO
+# from io import BytesIO
 from helpers.checks import ismod
-from helpers.datafiles import add_userlog, mute_userlog, get_mutefile, set_mutefile
+from helpers.datafiles import mute_userlog, get_mutefile, set_mutefile
 from helpers.placeholders import random_msg
-from helpers.archive import log_channel, get_members
+from helpers.archive import log_channel
 from helpers.embeds import (
     stock_embed,
-    mod_embed,
+    # mod_embed,
     author_embed,
     createdat_embed,
     joinedat_embed,
 )
 from helpers.sv_config import get_config
+from helpers.google import upload
 
 
 class ModMute(Cog):
@@ -356,7 +357,7 @@ class ModMute(Cog):
                 return m.author in users and m.channel == mute_channel
 
             try:
-                msg = await self.bot.wait_for("message", timeout=300, check=check)
+                await self.bot.wait_for("message", timeout=300, check=check)
             except asyncio.TimeoutError:
                 pokemsg = await mute_channel.send(ctx.author.mention)
                 await pokemsg.edit(content="⏰", delete_after=5)
@@ -496,7 +497,7 @@ class ModMute(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command()
-    async def close(self, ctx):
+    async def close(self, ctx, archive=True):
         """This closes a mute session.
 
         Please refer to the tossing section of the [documentation](https://3gou.0ccu.lt/as-a-moderator/the-tossing-system/)."""
@@ -515,25 +516,111 @@ class ModMute(Cog):
             notify_channel = self.bot.pull_channel(
                 ctx.guild, get_config(ctx.guild.id, "staff", "staffchannel")
             )
+        logging_channel = self.bot.pull_channel(
+            ctx.guild, get_config(ctx.guild.id, "logging", "modlog")
+        )
         mutes = get_mutefile(ctx.guild.id, "mutes")
 
         if mutes[ctx.channel.name]["muted"]:
             return await ctx.reply(
                 content="You must unmute everyone first!", mention_author=True
             )
-        else:
-            embed = stock_embed(self.bot)
-            embed.title = "Muted Session Closed (Fluff)"
-            embed.description = f"`#{ctx.channel.name}`'s session was closed by {ctx.author.mention} ({ctx.author.id})."
-            embed.color = ctx.author.color
-            embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
+
+        embed = stock_embed(self.bot)
+        embed.title = "Muted Session Closed (Fluff)"
+        embed.description = f"`#{ctx.channel.name}`'s session was closed by {ctx.author.mention} ({ctx.author.id})."
+        embed.color = ctx.author.color
+        embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
+        
+        if archive:
+            async with ctx.channel.typing():
+                dotraw, dotzip = await log_channel(
+                    self.bot, ctx.channel, zip_files=True
+                )
+
+            users = []
+            for uid in (
+                mutes[ctx.channel.name]["unmuted"] + mutes[ctx.channel.name]["left"]
+            ):
+                if self.bot.get_user(uid):
+                    users.append(self.bot.get_user(uid))
+                else:
+                    user = await self.bot.fetch_user(uid)
+                    users.append(user)
+            user = ""
+
+            if users:
+                firstuser = f'{users[0].name} {users[0].id}'
+            else:
+                firstuser = f'unspecified (logged by {ctx.author.name})'
+
+            filename = (
+                ctx.message.created_at.astimezone().strftime("%Y-%m-%d")
+                + f" {firstuser}"
+            )
+            reply = (
+                f"📕 I've archived that as: `{filename}.txt`\nThis mute session had the following users:\n- "
+                + "\n- ".join([f"{self.username_system(u)} ({u.id})" for u in users])
+            )
+            dotraw += f"\n{ctx.message.created_at.astimezone().strftime('%Y/%m/%d %H:%M')} {self.bot.user} [BOT]\n{reply}"
+
+            if not os.path.exists(
+                f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}"
+            ):
+                os.makedirs(
+                    f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}"
+                )
+            with open(
+                f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}/{filename}.txt",
+                "w", encoding='UTF-8'
+            ) as filetxt:
+                filetxt.write(dotraw)
+            if dotzip:
+                with open(
+                    f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}/{filename} (files).zip",
+                    "wb",
+                ) as filezip:
+                    filezip.write(dotzip.getbuffer())
+
+            # embed = stock_embed(self.bot)
+            # embed.title = "Mute Session Closed (Fluff)"
+            # embed.description = f"`#{ctx.channel.name}`'s session was closed by {ctx.author.mention} ({ctx.author.id})."
+            # embed.color = ctx.author.color
+            # embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
+
+            embed.add_field(
+                name="🗒️ Text",
+                value=f"{filename}.txt\n"
+                + "`"
+                + str(len(dotraw.split("\n")))
+                + "` lines, "
+                + f"`{len(dotraw.split())}` words, "
+                + f"`{len(dotraw)}` characters.",
+                inline=True,
+            )
+            if dotzip:
+                embed.add_field(
+                    name="📁 Files",
+                    value=f"{filename} (files).zip"
+                    + "\n"
+                    + f"`{len(zipfile.ZipFile(dotzip, 'r', zipfile.ZIP_DEFLATED).namelist())}` files in the zip file.",
+                    inline=True,
+                )
+            
+            await upload(ctx, filename, f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}/", dotzip)
 
         del mutes[ctx.channel.name]
         set_mutefile(ctx.guild.id, "mutes", json.dumps(mutes))
 
-        await ctx.channel.delete(reason="Fluff Toss")
-        return
+        channel = notify_channel if notify_channel else logging_channel
+        if channel:
+            await channel.send(embed=embed)
+        else:
+            await ctx.message.add_reaction("📦")
+            await asyncio.sleep(5)
 
+        await ctx.channel.delete(reason="Fluff Mute")
+        return
 
     @Cog.listener()
     async def on_member_update(self, before, after):
@@ -547,7 +634,7 @@ class ModMute(Cog):
             if not session:
                 return
 
-            mutes = get_tossfile(after.guild.id, "mutes")
+            mutes = get_mutefile(after.guild.id, "mutes")
             mutes[session]["unmuted"].append(after.id)
             del mutes[session]["muted"][str(after.id)]
             set_mutefile(after.guild.id, "mutes", json.dumps(mutes))
