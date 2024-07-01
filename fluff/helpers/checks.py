@@ -45,6 +45,9 @@ async def isowner(ctx, layered=False):
 
     return ctx.guild.owner.id == ctx.author.id
 
+def check_mod_category(ctx):
+    if ctx.channel.category and ctx.channel.category.id == '360563735363846144':
+        return True
 
 async def isadmin(ctx, layered=False):
     if not layered:
