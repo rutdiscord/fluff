@@ -31,7 +31,6 @@ class Basic(Cog):
 
     @commands.command()
     @commands.check(ismod)
-    @commands.check(ismodcat)
     async def drive(self, ctx):
         """This spits out the Undertale Discord's Google Drive, but only if you're a mod."""
         return await ctx.reply(
