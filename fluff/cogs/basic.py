@@ -13,7 +13,7 @@ import zlib
 from datetime import datetime, timezone
 from discord.ext import commands
 from discord.ext.commands import Cog
-from helpers.checks import ismod
+from helpers.checks import ismod, ismodcat
 from helpers.embeds import stock_embed, author_embed, sympage
 from helpers.datafiles import fill_profile
 from zoneinfo import ZoneInfo, available_timezones
@@ -30,7 +30,7 @@ class Basic(Cog):
 
     @commands.command()
     @commands.check(ismod)
-    @commands.check(check_mod_category)
+    @commands.check(ismodcat)
     async def drive(self, ctx):
         """This spits out the Undertale Discord's Google Drive, but only if you're a mod."""
         if not ctx.ismod and not ctx.check_mod_category:
