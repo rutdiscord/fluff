@@ -375,7 +375,7 @@ class ModMute(Cog):
     async def unmute(self, ctx, users: commands.Greedy[discord.Member] = None):
         """This unmutes a user.
 
-        Please refer to the muteing section of the [documentation](https://3gou.0ccu.lt/as-a-moderator/the-tossing-system/).
+        Please refer to the muting section of the [documentation](https://3gou.0ccu.lt/as-a-moderator/the-tossing-system/).
 
         - `users`
         The users to unmute. Optional."""
