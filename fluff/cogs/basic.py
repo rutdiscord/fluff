@@ -16,6 +16,7 @@ from discord.ext.commands import Cog
 from helpers.checks import ismod, ismodcat
 from helpers.embeds import stock_embed, author_embed, sympage
 from helpers.datafiles import fill_profile
+from helpers.sv_config import get_config
 from zoneinfo import ZoneInfo, available_timezones
 import aiohttp
 import re as ren
@@ -33,12 +34,13 @@ class Basic(Cog):
     @commands.check(ismodcat)
     async def drive(self, ctx):
         """This spits out the Undertale Discord's Google Drive, but only if you're a mod."""
-        if not ctx.ismod and not ctx.check_mod_category:
+        if not ctx.ismod and not ctx.ismodcat:
             return await ctx.reply(
                 content="You're either not a mod or you're using this in the wrong category."
             )
-        await ctx.send(
-            f"https://drive.google.com/drive/folders/0B7weGRL72yVXUWJ3TEZ1NUd5QW8?usp=sharing"
+        
+        await ctx.reply(
+            f'https://drive.google.com/drive/folders/{get_config(ctx.guild.id, 'drive', 'folder') or "UNCONFIGURED"}?usp=sharing'
         )
 
     @commands.command()
