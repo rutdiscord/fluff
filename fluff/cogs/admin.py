@@ -30,7 +30,7 @@ class Admin(Cog):
         self.loaded_exception = ()
 
     @commands.check(ismanager)
-    @commands.command(name="exit", aliases=["quit", "bye"])
+    @commands.command(name="exit", aliases=["quit", "kill"])
     async def _exit(self, ctx):
         """This shuts down the bot.
 
