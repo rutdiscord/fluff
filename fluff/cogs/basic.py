@@ -13,7 +13,7 @@ import zlib
 from datetime import datetime, timezone
 from discord.ext import commands
 from discord.ext.commands import Cog
-from helpers.checks import ismod, ismodcat
+from helpers.checks import ismod
 from helpers.embeds import stock_embed, author_embed, sympage
 from helpers.datafiles import fill_profile
 from helpers.sv_config import get_config
