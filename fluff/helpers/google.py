@@ -25,7 +25,7 @@ async def upload(ctx, filename, file_path, dotzip):
     credentials = authenticate()
     drive = GoogleDrive(credentials)
     folder = get_config(ctx.guild.id, 'drive', 'folder')
-    full_path = os.path.join(file_path, filename, '.txt')
+    full_path = os.path.join(file_path, f'{filename}.txt')
 
     f = drive.CreateFile(
         {
