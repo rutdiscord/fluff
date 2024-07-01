@@ -623,6 +623,21 @@ class ModMute(Cog):
         return
 
     @Cog.listener()
+    async def on_member_remove(self, member):
+        await self.bot.wait_until_ready()
+        if not self.enabled(member.guild):
+            return
+        
+        mutes = get_mutefile(member.guild.id, "mutes")
+        for data in mutes.values():
+            if str(member.id) in data["muted"]:
+                del data["muted"][str(member.id)]
+                if member.id not in data["unmuted"]:
+                    data["unmuted"].append(member.id)
+                set_mutefile(member.guild.id, "mutes", json.dumps(mutes))
+                break
+
+    @Cog.listener()
     async def on_member_update(self, before, after):
         await self.bot.wait_until_ready()
         if not self.enabled(after.guild):
