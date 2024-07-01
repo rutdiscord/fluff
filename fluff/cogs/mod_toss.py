@@ -631,9 +631,16 @@ class ModMute(Cog):
         mutes = get_mutefile(member.guild.id, "mutes")
         for data in mutes.values():
             if str(member.id) in data["muted"]:
+                # User isn't muted anymore
                 del data["muted"][str(member.id)]
-                if member.id not in data["unmuted"]:
-                    data["unmuted"].append(member.id)
+                # Mark user as having left this specific session
+                if str(member.id) not in data["left"]:
+                    data["left"].append(str(member.id))
+                # Mark user has having left the guild
+                if "LEFTGUILD" not in mutes:
+                   mutes["LEFTGUILD"] = []
+                if str(member.id) not in mutes["LEFTGUILD"]:
+                    mutes["LEFTGUILD"].append(str(member.id))
                 set_mutefile(member.guild.id, "mutes", json.dumps(mutes))
                 break
 
@@ -672,6 +679,7 @@ class ModMute(Cog):
         await self.bot.wait_until_ready()
         if not self.enabled(member.guild):
             return
+            
         notify_channel = self.bot.pull_channel(
             member.guild, get_config(member.guild.id, "mute", "notificationchannel")
         )
@@ -683,7 +691,7 @@ class ModMute(Cog):
         mutes = get_mutefile(member.guild.id, "mutes")
         mutechannel = None
 
-        if "LEFTGUILD" in mutes and str(member.id) in mutes["LEFTGUILD"]:
+        if "LEFTGUILD" in mutes and str(str(member.id)) in mutes["LEFTGUILD"]:
             for channel in mutes:
                 if "left" in mutes[channel] and member.id in mutes[channel]["left"]:
                     mutechannel = discord.utils.get(
@@ -698,7 +706,7 @@ class ModMute(Cog):
                 mutes[mutechannel.name]["muted"][str(member.id)] = mutes[
                     "LEFTGUILD"
                 ][str(member.id)]
-                mutes[mutechannel.name]["left"].remove(member.id)
+                mutes[mutechannel.name]["left"].remove(str(member.id))
             else:
                 mutechannel = await self.new_session(member.guild)
                 failed_roles, previous_roles = await self.perform_mute(
