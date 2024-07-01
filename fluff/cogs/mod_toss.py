@@ -666,95 +666,74 @@ class ModMute(Cog):
             del mutes[channel.name]
             set_mutefile(channel.guild.id, "mutes", json.dumps(mutes))
 
-    # When a member is kicked for being silent while muted and rejoins, this creates a new muted session for them
+
     @Cog.listener()
     async def on_member_join(self, member):
         await self.bot.wait_until_ready()
         if not self.enabled(member.guild):
             return
-        
-        await asyncio.sleep(5)  # Wait for 5 seconds
-
-        mute_role = self.bot.pull_role(
-            member.guild, get_config(member.guild.id, "mute", "muterole")
+        notify_channel = self.bot.pull_channel(
+            member.guild, get_config(member.guild.id, "mute", "notificationchannel")
         )
-        if mute_role in member.roles:
-            # Check if there's already an active muted session for this member
-            mutes = get_mutefile(member.guild.id, "mutes")
-            session_found = False
-            for channel_name, data in mutes.items():
-                if str(member.id) in data["muted"]:
-                    session_found = True
-                    break
+        if not notify_channel:
+            notify_channel = self.bot.pull_channel(
+                member.guild, get_config(member.guild.id, "staff", "staffchannel")
+            )
 
-            # If no session found, create a new muted session
-            if not session_found:
-                addition = False
-                mute_channel = await self.new_session(member.guild)
-                await self.perform_mute(member, None, mute_channel)
-                await mute_channel.set_permissions(member, read_messages=True)
-               
-                if mute_channel.name not in mutes:
-                    mutes[mute_channel.name] = {"muted": {}, "unmuted": [], "left": []}
+        mutes = get_mutefile(member.guild.id, "mutes")
+        mutechannel = None
 
-                    print(f"Before updating JSON: {json.dumps(mutes, indent=2)}")
-
-                    roles = [r.id for r in member.roles if r != mute_role and r != member.guild.default_role]
-                    mutes[mute_channel.name]["muted"][str(member.id)] = roles
-                    set_mutefile(member.guild.id, "mutes", json.dumps(mutes))
-
-                    print(f"After updating JSON: {json.dumps(mutes, indent=2)}")
-
-                notify_channel = self.bot.pull_channel(
-                    member.guild, get_config(member.guild.id, "mute", "notificationchannel")
-                )
-                if not notify_channel:
-                    notify_channel = self.bot.pull_channel(
-                        member.guild, get_config(member.guild.id, "staff", "staffchannel")
+        if "LEFTGUILD" in mutes and str(member.id) in mutes["LEFTGUILD"]:
+            for channel in mutes:
+                if "left" in mutes[channel] and member.id in mutes[channel]["left"]:
+                    mutechannel = discord.utils.get(
+                        member.guild.channels, name=channel
                     )
+                    break
+            if mutechannel:
+                muterole = self.bot.pull_role(
+                    member.guild, get_config(member.guild.id, "mute", "muterole")
+                )
+                await member.add_roles(muterole, reason="User muted.")
+                mutes[mutechannel.name]["muted"][str(member.id)] = mutes[
+                    "LEFTGUILD"
+                ][str(member.id)]
+                mutes[mutechannel.name]["left"].remove(member.id)
+            else:
+                mutechannel = await self.new_session(member.guild)
+                failed_roles, previous_roles = await self.perform_mute(
+                    member, member.guild.me, mutechannel
+                )
+                mutes = get_mutefile(member.guild.id, "mutes")
+                mutes[mutechannel.name]["mutes"][str(member.id)] = mutes[
+                    "LEFTGUILD"
+                ][str(member.id)]
+        else:
+            return
 
-                    if notify_channel:
-                        embed = stock_embed(self.bot)
-                        author_embed(embed, member, True)
-                        embed.color = discord.Color.orange() 
-                        embed.title = "🚷 Auto-Mute"
-                        embed.description = f"{member.mention} was previously kicked for being silent in muted and has rejoined. They have been automatically muted, see [`#{mute_channel.name}`]"
-                        createdat_embed(embed, member)
-                        joinedat_embed(embed, member)
-                        embed.add_field(
-                            name="Previous Roles",
-                            value="None",
-                            inline=False,
-                        )
+        del mutes["LEFTGUILD"][str(member.id)]
+        if not mutes["LEFTGUILD"]:
+            del mutes["LEFTGUILD"]
+        set_mutefile(member.guild.id, "mutes", json.dumps(mutes))
 
-                        try:
-                            await notify_channel.send(embed=embed)
-                        except discord.HTTPException as e:
-                            print(f"HTTP error while sending embed to {notify_channel}: {e}")
-                        except Exception as e:
-                            print(f"Failed to send embed to {notify_channel}: {e}")
-                    
-                    if not addition:
-                        mute_pings = member.mention
-                        await mute_channel.send(
-                            f"{mute_pings}\nYou are muted! You were previously muted and were kicked for not responding. Welcome back.\n"
+        await mutechannel.set_permissions(member, read_messages=True)
+        mutemsg = await mutechannel.send(
+            content=f"🔁{self.username_system(member)}\nYou are muted! You were previously muted and were kicked for not responding. Welcome back.\n"
                             '> *For reference, being muted means a Staff member wishes to speak with you one on one. This does not necessarily mean you are in trouble. This session will be archived for Staff only once completed.*\n'
                             '<@244328249801310219> You\'ve got another one!'
-                        )
-
-                        def check(m):
-                            return m.author == member and m.channel == mute_channel
-
-                        try:
-                            await self.bot.wait_for("message", timeout=300, check=check)
-                        except asyncio.TimeoutError:
-                            pokemsg = await mute_channel.send(member.mention)
-                            await pokemsg.edit(content="⏰", delete_after=5)
-                        except discord.NotFound:
-                            return
-                        else:
-                            pokemsg = await mute_channel.send(member.mention)
-                            await pokemsg.edit(content="🫳⏰", delete_after=5)
+        )
+        if notify_channel:
+            mutemsg = await notify_channel.send(
+                content=f"🔁 {self.username_system(member)} ({member.id}) was previously kicked for being silent in muted and has rejoined. They have been automatically muted, see {toss_channel.mention}"
+            )
+        mute_userlog(
+            member.guild.id,
+            member.id,
+            member.guild.me,
+            mutemsg.jump_url,
+            mutechannel.id,
+        )
+        return                            
 
 async def setup(bot):
     await bot.add_cog(ModMute(bot))
