@@ -672,6 +672,8 @@ class ModMute(Cog):
         await self.bot.wait_until_ready()
         if not self.enabled(member.guild):
             return
+        
+        await asyncio.sleep(5)  # Wait for 5 seconds
 
         mute_role = self.bot.pull_role(
             member.guild, get_config(member.guild.id, "mute", "muterole")
