@@ -697,9 +697,10 @@ class ModMute(Cog):
                 if mute_channel.name not in mutes:
                     mutes[mute_channel.name] = {"muted": {}, "unmuted": [], "left": []}
 
-                roles = [r.id for r in member.roles if r != mute_role and r != member.guild.default_role]
-                mutes[mute_channel.name]["muted"][str(member.id)] = roles
-                set_mutefile(member.guild.id, "mutes", json.dumps(mutes))
+                    roles = [r.id for r in member.roles if r != mute_role and r != member.guild.default_role]
+                    mutes[mute_channel.name]["muted"][str(member.id)] = roles
+                    set_mutefile(member.guild.id, "mutes", json.dumps(mutes))
+                    return
 
                 notify_channel = self.bot.pull_channel(
                     member.guild, get_config(member.guild.id, "mute", "notificationchannel")
