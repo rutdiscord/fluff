@@ -724,7 +724,7 @@ class ModMute(Cog):
         )
         if notify_channel:
             mutemsg = await notify_channel.send(
-                content=f"🔁 {self.username_system(member)} ({member.id}) was previously kicked for being silent in muted and has rejoined. They have been automatically muted, see {toss_channel.mention}"
+                content=f"🔁 {self.username_system(member)} ({member.id}) was previously kicked for being silent in muted and has rejoined. They have been automatically muted, see {mutechannel.mention}"
             )
         mute_userlog(
             member.guild.id,
