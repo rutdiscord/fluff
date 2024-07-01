@@ -722,7 +722,18 @@ class ModMute(Cog):
                         value="None",
                         inline=False,
                     )
-                    await notify_channel.send(embed=embed)
+
+                    try:
+                        await notify_channel.send(embed=embed)
+                    except discord.HTTPException as e:
+                        print(f"HTTP error while sending embed to {notify_channel}: {e}")
+                    except Exception as e:
+                        print(f"Failed to send embed to {notify_channel}: {e}")
+                    
+                # Start timer - example using message edits for countdown
+                mute_pings = member.mention
+                timer_msg = await mute_channel.send(f"{mute_pings}\nYou were muted by {self.bot.pacify_name(member.display_name)}.\n> *For reference, this means a Staff member wishes to speak with you one on one! This does not necessarily mean you are in trouble. This session will be archived for Staff only once completed.*")
+                await timer_msg.edit(content="🫳⏰", delete_after=5)
 
 async def setup(bot):
     await bot.add_cog(ModMute(bot))
