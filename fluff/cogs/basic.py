@@ -40,7 +40,7 @@ class Basic(Cog):
             )
         
         await ctx.reply(
-            f'https://drive.google.com/drive/folders/{get_config(ctx.guild.id, 'drive', 'folder') or "UNCONFIGURED"}?usp=sharing'
+            f'https://drive.google.com/drive/folders/{get_config(ctx.guild.id, 'drive', 'folder')}?usp=sharing'
         )
 
     @commands.command()
