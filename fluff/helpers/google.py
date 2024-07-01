@@ -12,7 +12,7 @@ from helpers.sv_config import get_config
 def authenticate():
     '''Return Google oAuth credentials'''
     credentials = ServiceAccountCredentials.from_json_keyfile_name(
-        "./fluff/data/service_account.json", "https://www.googleapis.com/auth/drive"
+        "./data/service_account.json", "https://www.googleapis.com/auth/drive"
     )
     credentials.authorize(httplib2.Http())
     gauth = GoogleAuth()
