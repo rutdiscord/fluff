@@ -3,8 +3,8 @@
 # https://github.com/Roadcrosser/archiver
 import httplib2
 
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
+from pydrive2.auth import GoogleAuth
+from pydrive2.drive import GoogleDrive
 from oauth2client.service_account import ServiceAccountCredentials
 
 from helpers.sv_config import get_config

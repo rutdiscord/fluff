@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "b9600bf379306b6ea12e3a7d1a9757de155522998b1b19d6e16e9f85a4936af3"
+            "sha256": "1478cb7fe3969bce0ecb4558346251b2ecc5e2dd65c53eb95092e1d33bb9adfe"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -1298,13 +1298,14 @@
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3, 3.4'",
             "version": "==3.20.0"
         },
-        "pydrive": {
+        "pydrive2": {
             "hashes": [
-                "sha256:5b94e971430722eb5c40a090f21df46b32e51399d747c1511796f63f902d1095",
-                "sha256:83890dcc2278081c6e3f6a8da1f8083e25de0bcc8eb7c91374908c5549a20787"
+                "sha256:21aea7da27635c2c3f7050e020206191f3b0305c6550315e6e8e3dd526f8b531",
+                "sha256:5699f24cf13907d9556f1c6c33a913c9fcb4441c1b999a6204affc2d4d793aea"
             ],
             "index": "pypi",
-            "version": "==1.3.1"
+            "markers": "python_version >= '3.8'",
+            "version": "==1.19.0"
         },
         "pydub": {
             "hashes": [
@@ -1324,6 +1325,14 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==2.8.0"
+        },
+        "pyopenssl": {
+            "hashes": [
+                "sha256:17ed5be5936449c5418d1cd269a1a9e9081bc54c17aed272b45856a3d3dc86ad",
+                "sha256:cabed4bfaa5df9f1a16c0ef64a0cb65318b5cd077a7eda7d6970131ca2f41a6f"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==24.1.0"
         },
         "pyparsing": {
             "hashes": [
