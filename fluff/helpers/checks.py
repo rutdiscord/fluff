@@ -45,10 +45,6 @@ async def isowner(ctx, layered=False):
 
     return ctx.guild.owner.id == ctx.author.id
 
-async def ismodcat(ctx):
-    if ctx.channel.category.id == 360563735363846144:
-        return True
-
 async def isadmin(ctx, layered=False):
     if not layered:
         if await ismanager(ctx, True):
