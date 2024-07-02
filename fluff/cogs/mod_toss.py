@@ -691,16 +691,6 @@ async def on_member_join(self, member):
         
         mutes = get_mutefile(member.guild.id, "mutes")
         mutechannel = None
-<<<<<<< HEAD
-
-        if "LEFTGUILD" in mutes and str(str(member.id)) in mutes["LEFTGUILD"]:
-            for channel in mutes:
-                if "left" in mutes[channel] and member.id in mutes[channel]["left"]:
-                    mutechannel = discord.utils.get(
-                        member.guild.channels, name=channel
-                    )
-                    break
-=======
         
         if "LEFTGUILD" in mutes and str(member.id) in mutes["LEFTGUILD"]:
             for channel_name, data in mutes.items():
@@ -709,16 +699,11 @@ async def on_member_join(self, member):
                     if mutechannel:
                         break
             
->>>>>>> parent of 02ed3d5 (Revert "literally just chatgpt nonsense")
             if mutechannel:
                 muterole = self.bot.pull_role(
                     member.guild, int(get_config(member.guild.id, "mute", "muterole"))
                 )
                 await member.add_roles(muterole, reason="User muted.")
-<<<<<<< HEAD
-                mutes[mutechannel.name]["muted"] .append(str(member.id))
-                [str(member.id)]
-=======
                 
                 # Ensure mutes[channel_name] and its keys are initialized
                 if mutechannel.name not in mutes:
@@ -735,7 +720,6 @@ async def on_member_join(self, member):
                     mutes[mutechannel.name]["left"] = []
 
                 mutes[mutechannel.name]["muted"].append(str(member.id))
->>>>>>> parent of 02ed3d5 (Revert "literally just chatgpt nonsense")
                 mutes[mutechannel.name]["left"].remove(str(member.id))
             else:
                 mutechannel = await self.new_session(member.guild)
@@ -743,9 +727,6 @@ async def on_member_join(self, member):
                     member, member.guild.me, mutechannel
                 )
                 mutes = get_mutefile(member.guild.id, "mutes")
-<<<<<<< HEAD
-                mutes[mutechannel.name]["muted"] .append(str(member.id))
-=======
                 
                 # Ensure mutes[channel_name] and its keys are initialized
                 if mutechannel.name not in mutes:
@@ -758,7 +739,6 @@ async def on_member_join(self, member):
                     mutes[mutechannel.name]["muted"] = []
 
                 mutes[mutechannel.name]["muted"].append(str(member.id))
->>>>>>> parent of 02ed3d5 (Revert "literally just chatgpt nonsense")
         else:
             return
         
