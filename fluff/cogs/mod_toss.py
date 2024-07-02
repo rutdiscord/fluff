@@ -630,6 +630,8 @@ class ModMute(Cog):
         
         mutes = get_mutefile(member.guild.id, "mutes")
         for data in mutes.values():
+            if "muted" not in data:
+                continue
             if str(member.id) in data["muted"]:
                 # User isn't muted anymore
                 del data["muted"][str(member.id)]
@@ -681,11 +683,11 @@ class ModMute(Cog):
             return
             
         notify_channel = self.bot.pull_channel(
-            member.guild, get_config(member.guild.id, "mute", "notificationchannel")
+            member.guild, int(get_config(ctx.guild.id, "mute", "notificationchannel"))
         )
         if not notify_channel:
             notify_channel = self.bot.pull_channel(
-                member.guild, get_config(member.guild.id, "staff", "staffchannel")
+                member.guild, int(get_config(member.guild.id, "staff", "staffchannel"))
             )
 
         mutes = get_mutefile(member.guild.id, "mutes")
@@ -700,7 +702,7 @@ class ModMute(Cog):
                     break
             if mutechannel:
                 muterole = self.bot.pull_role(
-                    member.guild, get_config(member.guild.id, "mute", "muterole")
+                    member.guild, int(get_config(member.guild.id, "mute", "muterole"))
                 )
                 await member.add_roles(muterole, reason="User muted.")
                 mutes[mutechannel.name]["muted"][str(member.id)] = mutes[
