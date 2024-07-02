@@ -676,22 +676,22 @@ class ModMute(Cog):
             set_mutefile(channel.guild.id, "mutes", json.dumps(mutes))
 
 
-    @Cog.listener()
-    async def on_member_join(self, member):
-        await self.bot.wait_until_ready()
-        if not self.enabled(member.guild):
-            return
-            
-        notify_channel = self.bot.pull_channel(
-            member.guild, int(get_config(member.guild.id, "mute", "notificationchannel"))
-        )
-        if not notify_channel:
-            notify_channel = self.bot.pull_channel(
-                member.guild, int(get_config(member.guild.id, "staff", "staffchannel"))
-            )
-
+@Cog.listener()
+async def on_member_join(self, member):
+    await self.bot.wait_until_ready()
+    if not self.enabled(member.guild):
+        return
+    
+    try:
+        notify_channel_id = get_config(member.guild.id, "mute", "notificationchannel")
+        if notify_channel_id is None:
+            notify_channel_id = get_config(member.guild.id, "staff", "staffchannel")
+        
+        notify_channel = self.bot.pull_channel(member.guild, int(notify_channel_id))
+        
         mutes = get_mutefile(member.guild.id, "mutes")
         mutechannel = None
+<<<<<<< HEAD
 
         if "LEFTGUILD" in mutes and str(str(member.id)) in mutes["LEFTGUILD"]:
             for channel in mutes:
@@ -700,13 +700,42 @@ class ModMute(Cog):
                         member.guild.channels, name=channel
                     )
                     break
+=======
+        
+        if "LEFTGUILD" in mutes and str(member.id) in mutes["LEFTGUILD"]:
+            for channel_name, data in mutes.items():
+                if isinstance(data, dict) and "left" in data and str(member.id) in data["left"]:
+                    mutechannel = discord.utils.get(member.guild.channels, name=channel_name)
+                    if mutechannel:
+                        break
+            
+>>>>>>> parent of 02ed3d5 (Revert "literally just chatgpt nonsense")
             if mutechannel:
                 muterole = self.bot.pull_role(
                     member.guild, int(get_config(member.guild.id, "mute", "muterole"))
                 )
                 await member.add_roles(muterole, reason="User muted.")
+<<<<<<< HEAD
                 mutes[mutechannel.name]["muted"] .append(str(member.id))
                 [str(member.id)]
+=======
+                
+                # Ensure mutes[channel_name] and its keys are initialized
+                if mutechannel.name not in mutes:
+                    mutes[mutechannel.name] = {"muted": [], "left": []}
+                if "muted" not in mutes[mutechannel.name]:
+                    mutes[mutechannel.name]["muted"] = []
+                if "left" not in mutes[mutechannel.name]:
+                    mutes[mutechannel.name]["left"] = []
+
+                # Ensure muted and left are lists
+                if not isinstance(mutes[mutechannel.name]["muted"], list):
+                    mutes[mutechannel.name]["muted"] = []
+                if not isinstance(mutes[mutechannel.name]["left"], list):
+                    mutes[mutechannel.name]["left"] = []
+
+                mutes[mutechannel.name]["muted"].append(str(member.id))
+>>>>>>> parent of 02ed3d5 (Revert "literally just chatgpt nonsense")
                 mutes[mutechannel.name]["left"].remove(str(member.id))
             else:
                 mutechannel = await self.new_session(member.guild)
@@ -714,25 +743,47 @@ class ModMute(Cog):
                     member, member.guild.me, mutechannel
                 )
                 mutes = get_mutefile(member.guild.id, "mutes")
+<<<<<<< HEAD
                 mutes[mutechannel.name]["muted"] .append(str(member.id))
+=======
+                
+                # Ensure mutes[channel_name] and its keys are initialized
+                if mutechannel.name not in mutes:
+                    mutes[mutechannel.name] = {"muted": [], "left": []}
+                if "muted" not in mutes[mutechannel.name]:
+                    mutes[mutechannel.name]["muted"] = []
+
+                # Ensure muted is a list
+                if not isinstance(mutes[mutechannel.name]["muted"], list):
+                    mutes[mutechannel.name]["muted"] = []
+
+                mutes[mutechannel.name]["muted"].append(str(member.id))
+>>>>>>> parent of 02ed3d5 (Revert "literally just chatgpt nonsense")
         else:
             return
-
+        
+        # Ensure LEFTGUILD is a dictionary
+        if not isinstance(mutes["LEFTGUILD"], dict):
+            mutes["LEFTGUILD"] = {}
+            
         del mutes["LEFTGUILD"][str(member.id)]
         if not mutes["LEFTGUILD"]:
             del mutes["LEFTGUILD"]
         set_mutefile(member.guild.id, "mutes", json.dumps(mutes))
-
+        
         await mutechannel.set_permissions(member, read_messages=True)
+        
         mutemsg = await mutechannel.send(
             content=f"🔁{self.username_system(member)}\nYou are muted! You were previously muted and were kicked for not responding. Welcome back.\n"
-                            '> *For reference, being muted means a Staff member wishes to speak with you one on one. This does not necessarily mean you are in trouble. This session will be archived for Staff only once completed.*\n'
-                            '<@244328249801310219> You\'ve got another one!'
+                    '> *For reference, being muted means a Staff member wishes to speak with you one on one. This does not necessarily mean you are in trouble. This session will be archived for Staff only once completed.*\n'
+                    '<@244328249801310219> You\'ve got another one!'
         )
+        
         if notify_channel:
-            mutemsg = await notify_channel.send(
+            await notify_channel.send(
                 content=f"🔁 {self.username_system(member)} ({member.id}) was previously kicked for being silent in muted and has rejoined. They have been automatically muted, see {mutechannel.mention}"
             )
+        
         mute_userlog(
             member.guild.id,
             member.id,
@@ -740,7 +791,10 @@ class ModMute(Cog):
             mutemsg.jump_url,
             mutechannel.id,
         )
-        return                            
+    except Exception as e:
+        print(f"Error in on_member_join: {e}")
+        print(f"Error in on_member_join: {e}")
+        raise
 
 async def setup(bot):
     await bot.add_cog(ModMute(bot))
