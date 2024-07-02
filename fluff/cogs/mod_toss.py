@@ -683,7 +683,7 @@ class ModMute(Cog):
             return
             
         notify_channel = self.bot.pull_channel(
-            member.guild, int(get_config(ctx.guild.id, "mute", "notificationchannel"))
+            member.guild, int(get_config(member.guild.id, "mute", "notificationchannel"))
         )
         if not notify_channel:
             notify_channel = self.bot.pull_channel(
