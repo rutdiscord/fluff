@@ -705,9 +705,8 @@ class ModMute(Cog):
                     member.guild, int(get_config(member.guild.id, "mute", "muterole"))
                 )
                 await member.add_roles(muterole, reason="User muted.")
-                mutes[mutechannel.name]["muted"][str(member.id)] = mutes[
-                    "LEFTGUILD"
-                ][str(member.id)]
+                mutes[mutechannel.name]["muted"] .append(str(member.id))
+                [str(member.id)]
                 mutes[mutechannel.name]["left"].remove(str(member.id))
             else:
                 mutechannel = await self.new_session(member.guild)
@@ -715,9 +714,7 @@ class ModMute(Cog):
                     member, member.guild.me, mutechannel
                 )
                 mutes = get_mutefile(member.guild.id, "mutes")
-                mutes[mutechannel.name]["mutes"][str(member.id)] = mutes[
-                    "LEFTGUILD"
-                ][str(member.id)]
+                mutes[mutechannel.name]["mutes"] .append(str(member.id))
         else:
             return
 
