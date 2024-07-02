@@ -693,7 +693,7 @@ class ModMute(Cog):
         mutes = get_mutefile(member.guild.id, "mutes")
         mutechannel = None
 
-        if "LEFTGUILD" in mutes and (str(member.id)) in mutes["LEFTGUILD"]:
+        if "LEFTGUILD" in mutes and str(str(member.id)) in mutes["LEFTGUILD"]:
             for channel in mutes:
                 if "left" in mutes[channel] and member.id in mutes[channel]["left"]:
                     mutechannel = discord.utils.get(
@@ -724,24 +724,15 @@ class ModMute(Cog):
         set_mutefile(member.guild.id, "mutes", json.dumps(mutes))
 
         await mutechannel.set_permissions(member, read_messages=True)
-
-        try:
-            mutemsg = await mutechannel.send(
-                content=f"🔁{self.username_system(member)}\nYou are muted! You were previously muted and were kicked for not responding. Welcome back.\n"
-                                '> *For reference, being muted means a Staff member wishes to speak with you one on one. This does not necessarily mean you are in trouble. This session will be archived for Staff only once completed.*\n'
-                                '<@244328249801310219> You\'ve got another one!'
-            )
-        except Exception as e:
-            print(f"Failed to send message in muted channel: {e}")
-
+        mutemsg = await mutechannel.send(
+            content=f"🔁{self.username_system(member)}\nYou are muted! You were previously muted and were kicked for not responding. Welcome back.\n"
+                            '> *For reference, being muted means a Staff member wishes to speak with you one on one. This does not necessarily mean you are in trouble. This session will be archived for Staff only once completed.*\n'
+                            '<@244328249801310219> You\'ve got another one!'
+        )
         if notify_channel:
-            try:
-                mutemsg = await notify_channel.send(
-                        content=f"🔁 {self.username_system(member)} ({member.id}) was previously kicked for being silent in muted and has rejoined. They have been automatically muted, see {mutechannel.mention}"
-                    )
-            except Exception as e:
-                print(f"Failed to send notification message: {e}")
-
+            mutemsg = await notify_channel.send(
+                content=f"🔁 {self.username_system(member)} ({member.id}) was previously kicked for being silent in muted and has rejoined. They have been automatically muted, see {mutechannel.mention}"
+            )
         mute_userlog(
             member.guild.id,
             member.id,
