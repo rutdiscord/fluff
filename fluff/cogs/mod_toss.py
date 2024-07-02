@@ -693,7 +693,7 @@ class ModMute(Cog):
         mutes = get_mutefile(member.guild.id, "mutes")
         mutechannel = None
 
-        if "LEFTGUILD" in mutes and str(str(member.id)) in mutes["LEFTGUILD"]:
+        if "LEFTGUILD" in mutes and (str(member.id)) in mutes["LEFTGUILD"]:
             for channel in mutes:
                 if "left" in mutes[channel] and member.id in mutes[channel]["left"]:
                     mutechannel = discord.utils.get(
@@ -701,20 +701,43 @@ class ModMute(Cog):
                     )
                     break
             if mutechannel:
-                muterole = self.bot.pull_role(
-                    member.guild, int(get_config(member.guild.id, "mute", "muterole"))
-                )
+                muterole = self.bot.pull_role(member.guild, int(get_config(member.guild.id, "mute", "muterole")))
                 await member.add_roles(muterole, reason="User muted.")
-                mutes[mutechannel.name]["muted"] .append(str(member.id))
-                [str(member.id)]
+                
+                # Ensure mutes[mutechannel.name] and its sub-keys are initialized
+                if mutechannel.name not in mutes:
+                    mutes[mutechannel.name] = {"muted": [], "left": []}
+                if "muted" not in mutes[mutechannel.name]:
+                    mutes[mutechannel.name]["muted"] = []
+                if "left" not in mutes[mutechannel.name]:
+                    mutes[mutechannel.name]["left"] = []
+
+                # Ensure muted and left are lists
+                if not isinstance(mutes[mutechannel.name]["muted"], list):
+                    mutes[mutechannel.name]["muted"] = []
+                if not isinstance(mutes[mutechannel.name]["left"], list):
+                    mutes[mutechannel.name]["left"] = []
+
+                mutes[mutechannel.name]["muted"].append(str(member.id))
                 mutes[mutechannel.name]["left"].remove(str(member.id))
             else:
                 mutechannel = await self.new_session(member.guild)
-                failed_roles, previous_roles = await self.perform_mute(
-                    member, member.guild.me, mutechannel
-                )
+                failed_roles, previous_roles = await self.perform_mute(member, member.guild.me, mutechannel)
                 mutes = get_mutefile(member.guild.id, "mutes")
-                mutes[mutechannel.name]["muted"] .append(str(member.id))
+                
+                # Ensure mutes[mutechannel.name] and its sub-keys are initialized
+                if mutechannel.name not in mutes:
+                    mutes[mutechannel.name] = {"muted": [], "left": []}
+                if "muted" not in mutes[mutechannel.name]:
+                    mutes[mutechannel.name]["muted"] = []
+                if "left" not in mutes[mutechannel.name]:
+                    mutes[mutechannel.name]["left"] = []
+
+                # Ensure muted is a list
+                if not isinstance(mutes[mutechannel.name]["muted"], list):
+                    mutes[mutechannel.name]["muted"] = []
+
+                mutes[mutechannel.name]["muted"].append(str(member.id))
         else:
             return
 
