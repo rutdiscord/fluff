@@ -640,10 +640,16 @@ class ModMute(Cog):
                     data["left"].append(str(member.id))
                 # Mark user has having left the guild
                 if "LEFTGUILD" not in mutes:
-                   mutes["LEFTGUILD"] = []
+                    mutes["LEFTGUILD"] = {}
                 if str(member.id) not in mutes["LEFTGUILD"]:
-                    mutes["LEFTGUILD"].append(str(member.id))
-                set_mutefile(member.guild.id, "mutes", json.dumps(mutes))
+                    roles = []
+                    for rx in member.roles:
+                        if rx != member.guild.default_role and rx != self.bot.pull_role(
+                    member.guild, int(get_config(member.guild.id, "mute", "muterole"))
+                ):
+                            roles.append(rx)
+
+                mutes["LEFTGUILD"][str(member.id)] = [role.id for role in roles]
                 break
 
     @Cog.listener()
@@ -714,7 +720,7 @@ class ModMute(Cog):
                     member, member.guild.me, mutechannel
                 )
                 mutes = get_mutefile(member.guild.id, "mutes")
-                mutes[mutechannel.name]["muted"] .append(str(member.id))
+                mutes[mutechannel.name]["muted"].append(str(member.id))
         else:
             return
 
