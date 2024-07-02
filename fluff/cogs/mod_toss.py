@@ -639,10 +639,10 @@ class ModMute(Cog):
                 if str(member.id) not in data["left"]:
                     data["left"].append(str(member.id))
                 # Mark user has having left the guild
-                if "LEFTGUILD" not in mutes:
-                   mutes["LEFTGUILD"] = []
-                if str(member.id) not in mutes["LEFTGUILD"]:
-                    mutes["LEFTGUILD"].append(str(member.id))
+                if "left" not in mutes:
+                   mutes["left"] = []
+                if str(member.id) not in mutes["left"]:
+                    mutes["left"].append(str(member.id))
                 set_mutefile(member.guild.id, "mutes", json.dumps(mutes))
                 break
 
