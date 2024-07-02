@@ -714,7 +714,7 @@ class ModMute(Cog):
                     member, member.guild.me, mutechannel
                 )
                 mutes = get_mutefile(member.guild.id, "mutes")
-                mutes[mutechannel.name]["muted"] .append(str(member.id))
+                mutes[mutechannel.name]["mutes"] .append(str(member.id))
         else:
             return
 
