@@ -111,13 +111,13 @@ class Snippets(Cog):
     @commands.check(isadmin)
     @rule.command()
     async def delete(self, ctx, name):
-        """This deletes a snippet
+        """This deletes a rule snippet.
 
         The name can be an alias as well. See the
         [documentation](https://3gou.0ccu.lt/as-a-moderator/the-snippet-system/) for more details.
 
         - `name`
-        The name of the snippet to delete."""
+        The name of the rule snippet to delete."""
         snippets = get_guildfile(ctx.guild.id, "snippets")
         if name.lower() not in snippets:
             return await ctx.reply(
@@ -131,6 +131,22 @@ class Snippets(Cog):
             mention_author=False,
         )
 
+    @commands.check(isadmin)
+    @rule.command()
+    async def edit(self, ctx, name, *, new_content):
+        """This edits a rule snippet."""
+        snippets = get_guildfile(ctx.guild.id, "snippets")
+        if name.lower() not in snippets:
+            return await ctx.reply(
+                content=f"`{name.lower()}` is not a snippet.",
+                mention_author=False,
+            )
+        snippets[name.lower()] = new_content
+        set_guildfile(ctx.guild.id, "snippets", json.dumps(snippets))
+        await ctx.reply(
+            content=f"'{name.lower()}' has been edited.",
+            mention_author=False
+        )
 
 async def setup(bot):
     await bot.add_cog(Snippets(bot))
