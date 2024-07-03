@@ -806,7 +806,7 @@ class ModToss(Cog):
 
         await toss_channel.set_permissions(member, read_messages=True)
         tossmsg = await toss_channel.send(
-            content=f"🔁 {self.username_system(member)} rejoined while tossed."
+            content=f"🔁 {self.username_system(member)} rejoined while tossed.\n{get_config(member.guild.id, "toss", "tossmsg_rejoin")}"
         )
         if notify_channel:
             tossmsg = await notify_channel.send(

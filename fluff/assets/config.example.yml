@@ -49,6 +49,9 @@ toss:
   # Message for tosses
   tossmsg: 
 
+  # Message for tosses on rejoin
+  tossmsg_rejoin:
+
 
 reaction:
   # If the bot may automatically adjust names to be readable.

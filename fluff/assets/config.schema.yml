@@ -95,6 +95,10 @@ properties:
         type:
           - string
           - "null"
+      tossmsg_rejoin:
+        type:
+          - string
+          - "null"
   reaction:
     type: object
     properties:
@@ -129,4 +133,4 @@ properties:
     type: object
     properties:
       version:
-        const: 12
+        const: 13
