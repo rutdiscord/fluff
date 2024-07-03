@@ -509,10 +509,6 @@ class ModToss(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command()
-    @commands.bot_has_permissions(embed_links=True, add_reactions=True)
-    @commands.check(ismod)
-    @commands.guild_only()
-    @commands.command()
     async def close(self, ctx, archive=True):
         """This closes a mute session.
 
