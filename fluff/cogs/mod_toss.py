@@ -860,22 +860,22 @@ class ModToss(Cog):
         if toss_channel:
             await toss_channel.send(out)
 
-    @Cog.listener()
-    async def on_member_update(self, before, after):
-        await self.bot.wait_until_ready()
-        if not self.enabled(after.guild):
-            return
-        while self.busy:
-            await asyncio.sleep(1)
-        if self.is_rolebanned(before) and not self.is_rolebanned(after):
-            session = self.get_session(after)
-            if not session:
-                return
+    # @Cog.listener()
+    # async def on_member_update(self, before, after):
+    #     await self.bot.wait_until_ready()
+    #     if not self.enabled(after.guild):
+    #         return
+    #     while self.busy:
+    #         await asyncio.sleep(1)
+    #     if self.is_rolebanned(before) and not self.is_rolebanned(after):
+    #         session = self.get_session(after)
+    #         if not session:
+    #             return
 
-            tosses = get_tossfile(after.guild.id, "tosses")
-            tosses[session]["untossed"].append(after.id)
-            del tosses[session]["tossed"][str(after.id)]
-            set_tossfile(after.guild.id, "tosses", json.dumps(tosses))
+    #         tosses = get_tossfile(after.guild.id, "tosses")
+    #         tosses[session]["untossed"].append(after.id)
+    #         del tosses[session]["tossed"][str(after.id)]
+    #         set_tossfile(after.guild.id, "tosses", json.dumps(tosses))
 
     @Cog.listener()
     async def on_guild_channel_delete(self, channel):
