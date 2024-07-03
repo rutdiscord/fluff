@@ -515,7 +515,7 @@ class ModToss(Cog):
         Please refer to the tossing section of the [documentation](https://3gou.0ccu.lt/as-a-moderator/the-tossing-system/)."""
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
-        if ctx.channel.name not in get_config(ctx.guild.id, "mute", "mutechannels"):
+        if ctx.channel.name not in get_config(ctx.guild.id, "toss", "tosschannels"):
             return await ctx.reply(
                 content="This command must be run inside of a muted channel.",
                 mention_author=False,
