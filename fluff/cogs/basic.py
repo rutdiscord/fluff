@@ -279,6 +279,23 @@ class Basic(Cog):
         embed2.add_field(name="Latency Checking", value="""If I'm slow, you can check my ping with `pls ping`.""", inline=True)
         await sympage(self.bot, ctx, [embed1, embed2], ["1️⃣","2️⃣"])
 
+    @commands.command(aliases=["p"])
+    async def ping(self, ctx):
+        """This shows the bot's ping to Discord.
+
+        RTT = Round-trip time.
+        GW = Ping to Gateway.
+
+        No arguments."""
+        before = time.monotonic()
+        tmp = await ctx.reply("⌛", mention_author=False)
+        after = time.monotonic()
+        rtt_ms = (after - before) * 1000
+        gw_ms = self.bot.latency * 1000
+
+        message_text = f":ping_pong:\nRound-Time Trip (Receive-to-Response): `{rtt_ms:.1f}ms`\nGateway (Connection to Discord): `{gw_ms:.1f}ms`"
+        self.bot.log.info(message_text)
+        await tmp.edit(content=message_text)
 
     @commands.cooldown(1, 5, type=commands.BucketType.default)
     @commands.bot_has_permissions(attach_files=True)
