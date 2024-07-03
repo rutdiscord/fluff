@@ -3,19 +3,18 @@ import discord
 import json
 import os
 import asyncio
-# import random
+import random
 import zipfile
-# from datetime import datetime, timezone, timedelta
+from datetime import datetime, timezone, timedelta
 from discord.ext import commands
 from discord.ext.commands import Cog
-# from io import BytesIO
+from io import BytesIO
 from helpers.checks import ismod
 from helpers.datafiles import mute_userlog, get_mutefile, set_mutefile
 from helpers.placeholders import random_msg
 from helpers.archive import log_channel
 from helpers.embeds import (
     stock_embed,
-    # mod_embed,
     author_embed,
     createdat_embed,
     joinedat_embed,
@@ -164,7 +163,7 @@ class ModMute(Cog):
     @commands.guild_only()
     @commands.command(aliases=["tossed", "session"])
     async def sessions(self, ctx):
-        """This shows the open mute sessions.
+        """This shows the open muted sessions.
 
         Use this in a mute channel to show who's in it.
 
@@ -246,6 +245,9 @@ class ModMute(Cog):
             notify_channel = self.bot.pull_channel(
                 ctx.guild, get_config(ctx.guild.id, "staff", "staffchannel")
             )
+        modlog_channel = self.bot.pull_channel(
+            ctx.guild, get_config(ctx.guild.id, "logging", "modlog")
+        )
 
         errors = ""
         for us in users:
@@ -309,7 +311,7 @@ class ModMute(Cog):
                 embed = stock_embed(self.bot)
                 author_embed(embed, us, True)
                 embed.color = ctx.author.color
-                embed.title = "🚷 mute"
+                embed.title = "🚷 Mute"
                 embed.description = f"{us.mention} was muted by {ctx.author.mention} [`#{ctx.channel.name}`] [[Jump]({ctx.message.jump_url})]\n> This mute takes place in {mute_channel.mention}..."
                 createdat_embed(embed, us)
                 joinedat_embed(embed, us)
@@ -337,6 +339,14 @@ class ModMute(Cog):
                     )
                 await notify_channel.send(embed=embed)
 
+            if modlog_channel and modlog_channel != notify_channel:
+                embed = stock_embed(self.bot)
+                embed.color = discord.Color.from_str("#FF0000")
+                embed.title = "🚷 Toss"
+                embed.description = f"{us.mention} was muted by {ctx.author.mention} [`#{ctx.channel.name}`] [[Jump]({ctx.message.jump_url})]"
+                stock_embed(embed, us, ctx.author)
+                await modlog_channel.send(embed=embed)
+
         await ctx.message.add_reaction("🚷")
 
         if errors and notify_channel:
@@ -357,7 +367,7 @@ class ModMute(Cog):
                 return m.author in users and m.channel == mute_channel
 
             try:
-                await self.bot.wait_for("message", timeout=300, check=check)
+                msg = await self.bot.wait_for("message", timeout=300, check=check)
             except asyncio.TimeoutError:
                 pokemsg = await mute_channel.send(ctx.author.mention)
                 await pokemsg.edit(content="⏰", delete_after=5)
@@ -406,6 +416,7 @@ class ModMute(Cog):
         )
         output = ""
         invalid = []
+
         for us in users:
             if us.id == self.bot.application_id:
                 output += "\n" + random_msg(
@@ -547,7 +558,7 @@ class ModMute(Cog):
                 else:
                     user = await self.bot.fetch_user(uid)
                     users.append(user)
-            user = ""
+            user = f""
 
             if users:
                 firstuser = f'{users[0].name} {users[0].id}'
@@ -591,7 +602,7 @@ class ModMute(Cog):
             embed.add_field(
                 name="🗒️ Text",
                 value=f"{filename}.txt\n"
-                + "`"
+                + f"`"
                 + str(len(dotraw.split("\n")))
                 + "` lines, "
                 + f"`{len(dotraw.split())}` words, "
@@ -627,24 +638,39 @@ class ModMute(Cog):
         await self.bot.wait_until_ready()
         if not self.enabled(member.guild):
             return
-        
+
+        session = self.get_session(member)
+        if not session:
+            return
+
         mutes = get_mutefile(member.guild.id, "mutes")
-        for data in mutes.values():
-            if "muted" not in data:
-                continue
-            if str(member.id) in data["muted"]:
-                # User isn't muted anymore
-                del data["muted"][str(member.id)]
-                # Mark user as having left this specific session
-                if str(member.id) not in data["left"]:
-                    data["left"].append(str(member.id))
-                # Mark user has having left the guild
-                if "LEFTGUILD" not in mutes:
-                   mutes["LEFTGUILD"] = []
-                if str(member.id) not in mutes["LEFTGUILD"]:
-                    mutes["LEFTGUILD"].append(str(member.id))
-                set_mutefile(member.guild.id, "mutes", json.dumps(mutes))
-                break
+        if "LEFTGUILD" not in mutes:
+            mutes["LEFTGUILD"] = {}
+        mutes["LEFTGUILD"][str(member.id)] = mutes[session]["muted"][str(member.id)]
+        mutes[session]["left"].append(member.id)
+        del mutes[session]["muted"][str(member.id)]
+        set_mutefile(member.guild.id, "mutes", json.dumps(mutes))
+
+        notify_channel = self.bot.pull_channel(
+            member.guild, get_config(member.guild.id, "mute", "notificationchannel")
+        )
+        if not notify_channel:
+            notify_channel = self.bot.pull_channel(
+                member.guild, get_config(member.guild.id, "staff", "staffchannel")
+            )
+        mutechannel = self.bot.pull_channel(member.guild, session)
+        try:
+            await member.guild.fetch_ban(member)
+            out = f"🔨 {self.username_system(member)} got banned while muted."
+        except discord.NotFound:
+            out = f"🚪 {self.username_system(member)} left while muted."
+        except discord.Forbidden:
+            out = f"❓ {self.username_system(member)} was removed from the server.\nI do not have Audit Log permissions to tell why."
+        if notify_channel:
+            await notify_channel.send(out)
+        if mutechannel:
+            await mutechannel.send(out)
+
 
     @Cog.listener()
     async def on_member_update(self, before, after):
@@ -680,7 +706,6 @@ class ModMute(Cog):
         await self.bot.wait_until_ready()
         if not self.enabled(member.guild):
             return
-            
         notify_channel = self.bot.pull_channel(
             member.guild, int(get_config(member.guild.id, "mute", "notificationchannel"))
         )
@@ -688,8 +713,10 @@ class ModMute(Cog):
             notify_channel = self.bot.pull_channel(
                 member.guild, int(get_config(member.guild.id, "staff", "staffchannel"))
             )
+
         mutes = get_mutefile(member.guild.id, "mutes")
         mutechannel = None
+
         if "LEFTGUILD" in mutes and str(str(member.id)) in mutes["LEFTGUILD"]:
             for channel in mutes:
                 if "left" in mutes[channel] and member.id in mutes[channel]["left"]:
@@ -711,7 +738,9 @@ class ModMute(Cog):
                     member, member.guild.me, mutechannel
                 )
                 mutes = get_mutefile(member.guild.id, "mutes")
-                mutes[mutechannel.name]["muted"] .append(str(member.id))
+                mutes[mutechannel.name]["muted"][str(member.id)] = mutes[
+                    "LEFTGUILD"
+                ][str(member.id)]
         else:
             return
 
