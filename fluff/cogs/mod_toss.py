@@ -367,7 +367,7 @@ class ModToss(Cog):
                 return m.author in users and m.channel == toss_channel
 
             try:
-                msg = await self.bot.wait_for("message", timeout=5, check=check)
+                msg = await self.bot.wait_for("message", timeout=300, check=check)
             except asyncio.TimeoutError:
                 pokemsg = await toss_channel.send(ctx.author.mention)
                 await pokemsg.edit(content="⏰", delete_after=5)
@@ -810,6 +810,23 @@ class ModToss(Cog):
         tossmsg = await toss_channel.send(
             content=f"🔁 {self.username_system(member)} rejoined while tossed.\n{get_config(member.guild.id, 'toss', 'tossmsg_rejoin')}"
         )
+
+        def check(m):
+                return m.author in tosses and m.channel == toss_channel
+        
+        try:
+            msg = await self.bot.wait_for("message", timeout=300, check=check)
+        except asyncio.TimeoutError:
+            pokemsg = await toss_channel.send(member.mention)
+            await pokemsg.edit(content="⏰", delete_after=5)
+        except discord.NotFound:
+            return
+        except asyncio.exceptions.CancelledError:
+            return
+        else:
+            pokemsg = await toss_channel.send(member.mention)
+            await pokemsg.edit(content="🫳⏰", delete_after=5)
+
         if notify_channel:
             tossmsg = await notify_channel.send(
                 content=f"🔁 {self.username_system(member)} ({member.id}) rejoined while tossed. Continuing in {toss_channel.mention}..."
