@@ -121,7 +121,7 @@ class ModToss(Cog):
                     )
                 toss_channel = await guild.create_text_channel(
                     c,
-                    reason="Sangou Toss",
+                    reason="Fluff Toss",
                     category=self.bot.pull_category(
                         guild, get_config(guild.id, "toss", "tosscategory")
                     ),

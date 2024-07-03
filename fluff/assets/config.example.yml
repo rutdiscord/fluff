@@ -12,6 +12,9 @@
 # Will work like:
 # modrole: 259199371361517569
 
+logging:
+  modlog:
+
 staff:
   # The role ID for your admin role.
   adminrole: 
@@ -32,7 +35,7 @@ toss:
   # The role ID to add to users when muting a user.
   tossrole: 
   # The category ID for mute sessions to be created in.
-  mutecategory: 
+  tosscategory: 
   # The channel that the bot will send its mute notifications to.
   # If left blank, the bot will use the Staff channel instead.
   notificationchannel: 
