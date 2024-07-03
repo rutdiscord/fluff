@@ -867,6 +867,10 @@ class ModToss(Cog):
             return
         while self.busy:
             await asyncio.sleep(1)
+        for role in before.roles:
+            print(f'lol debug: {str(role)}')
+        for role in after.roles:
+            print(f'lol debug: {str(role)}')
         if self.is_rolebanned(before) and not self.is_rolebanned(after):
             session = self.get_session(after)
             if not session:
