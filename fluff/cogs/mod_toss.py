@@ -21,6 +21,7 @@ from helpers.embeds import (
     joinedat_embed,
 )
 from helpers.sv_config import get_config
+from helpers.google import upload
 
 
 class ModToss(Cog):
@@ -508,18 +509,19 @@ class ModToss(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command()
+    @commands.bot_has_permissions(embed_links=True, add_reactions=True)
+    @commands.check(ismod)
+    @commands.guild_only()
+    @commands.command()
     async def close(self, ctx, archive=True):
-        """This closes a toss session.
+        """This closes a mute session.
 
-        Please refer to the tossing section of the [documentation](https://3gou.0ccu.lt/as-a-moderator/the-tossing-system/).
-
-        - `archive`
-        Whether to archive the session or not. Optional."""
+        Please refer to the tossing section of the [documentation](https://3gou.0ccu.lt/as-a-moderator/the-tossing-system/)."""
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
-        if ctx.channel.name not in get_config(ctx.guild.id, "toss", "tosschannels"):
+        if ctx.channel.name not in get_config(ctx.guild.id, "mute", "mutechannels"):
             return await ctx.reply(
-                content="This command must be run inside of a toss channel.",
+                content="This command must be run inside of a muted channel.",
                 mention_author=False,
             )
 
@@ -533,13 +535,19 @@ class ModToss(Cog):
         logging_channel = self.bot.pull_channel(
             ctx.guild, get_config(ctx.guild.id, "logging", "modlog")
         )
-        tosses = get_tossfile(ctx.guild.id, "tosses")
+        mutes = get_tossfile(ctx.guild.id, "tosses")
 
-        if tosses[ctx.channel.name]["tossed"]:
+        if mutes[ctx.channel.name]["tossed"]:
             return await ctx.reply(
-                content="You must untoss everyone first!", mention_author=True
+                content="You must unmute everyone first!", mention_author=True
             )
 
+        embed = stock_embed(self.bot)
+        embed.title = "Muted Session Closed (Fluff)"
+        embed.description = f"`#{ctx.channel.name}`'s session was closed by {ctx.author.mention} ({ctx.author.id})."
+        embed.color = ctx.author.color
+        embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
+        
         if archive:
             async with ctx.channel.typing():
                 dotraw, dotzip = await log_channel(
@@ -548,7 +556,7 @@ class ModToss(Cog):
 
             users = []
             for uid in (
-                tosses[ctx.channel.name]["untossed"] + tosses[ctx.channel.name]["left"]
+                mutes[ctx.channel.name]["unmuted"] + mutes[ctx.channel.name]["left"]
             ):
                 if self.bot.get_user(uid):
                     users.append(self.bot.get_user(uid))
@@ -557,39 +565,44 @@ class ModToss(Cog):
                     users.append(user)
             user = f""
 
+            if users:
+                firstuser = f'{users[0].name} {users[0].id}'
+            else:
+                firstuser = f'unspecified (logged by {ctx.author.name})'
+
             filename = (
                 ctx.message.created_at.astimezone().strftime("%Y-%m-%d")
-                + f" {ctx.channel.name} {ctx.channel.id}"
+                + f" {firstuser}"
             )
             reply = (
-                f"📕 I've archived that as: `{filename}.txt`\nThis toss session had the following users:\n- "
+                f"📕 I've archived that as: `{filename}.txt`\nThis mute session had the following users:\n- "
                 + "\n- ".join([f"{self.username_system(u)} ({u.id})" for u in users])
             )
             dotraw += f"\n{ctx.message.created_at.astimezone().strftime('%Y/%m/%d %H:%M')} {self.bot.user} [BOT]\n{reply}"
 
             if not os.path.exists(
-                f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}"
+                f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}"
             ):
                 os.makedirs(
-                    f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}"
+                    f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}"
                 )
             with open(
-                f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}/{filename}.txt",
-                "w",
+                f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}/{filename}.txt",
+                "w", encoding='UTF-8'
             ) as filetxt:
                 filetxt.write(dotraw)
             if dotzip:
                 with open(
-                    f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}/{filename} (files).zip",
+                    f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}/{filename} (files).zip",
                     "wb",
                 ) as filezip:
                     filezip.write(dotzip.getbuffer())
 
-            embed = stock_embed(self.bot)
-            embed.title = "📦 Toss Session Closed"
-            embed.description = f"`#{ctx.channel.name}`'s session was closed by {ctx.author.mention} ({ctx.author.id})."
-            embed.color = ctx.author.color
-            embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
+            # embed = stock_embed(self.bot)
+            # embed.title = "Mute Session Closed (Fluff)"
+            # embed.description = f"`#{ctx.channel.name}`'s session was closed by {ctx.author.mention} ({ctx.author.id})."
+            # embed.color = ctx.author.color
+            # embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
 
             embed.add_field(
                 name="🗒️ Text",
@@ -609,18 +622,20 @@ class ModToss(Cog):
                     + f"`{len(zipfile.ZipFile(dotzip, 'r', zipfile.ZIP_DEFLATED).namelist())}` files in the zip file.",
                     inline=True,
                 )
+            
+            await upload(ctx, filename, f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}/", dotzip)
 
-            channel = notify_channel if notify_channel else logging_channel
-            if channel:
-                await channel.send(embed=embed)
-            else:
-                await ctx.message.add_reaction("📦")
-                await asyncio.sleep(5)
+        del mutes[ctx.channel.name]
+        set_tossfile(ctx.guild.id, "mutes", json.dumps(mutes))
 
-        del tosses[ctx.channel.name]
-        set_tossfile(ctx.guild.id, "tosses", json.dumps(tosses))
+        channel = notify_channel if notify_channel else logging_channel
+        if channel:
+            await channel.send(embed=embed)
+        else:
+            await ctx.message.add_reaction("📦")
+            await asyncio.sleep(5)
 
-        await ctx.channel.delete(reason="Sangou Toss")
+        await ctx.channel.delete(reason="Fluff Mute")
         return
 
     @Cog.listener()
