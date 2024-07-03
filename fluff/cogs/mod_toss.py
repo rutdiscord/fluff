@@ -535,9 +535,9 @@ class ModToss(Cog):
         logging_channel = self.bot.pull_channel(
             ctx.guild, get_config(ctx.guild.id, "logging", "modlog")
         )
-        mutes = get_tossfile(ctx.guild.id, "tosses")
+        tosses = get_tossfile(ctx.guild.id, "tosses")
 
-        if mutes[ctx.channel.name]["tossed"]:
+        if tosses[ctx.channel.name]["tossed"]:
             return await ctx.reply(
                 content="You must unmute everyone first!", mention_author=True
             )
@@ -556,7 +556,7 @@ class ModToss(Cog):
 
             users = []
             for uid in (
-                mutes[ctx.channel.name]["unmuted"] + mutes[ctx.channel.name]["left"]
+                tosses[ctx.channel.name]["untosses"] + tosses[ctx.channel.name]["left"]
             ):
                 if self.bot.get_user(uid):
                     users.append(self.bot.get_user(uid))
@@ -625,8 +625,8 @@ class ModToss(Cog):
             
             await upload(ctx, filename, f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}/", dotzip)
 
-        del mutes[ctx.channel.name]
-        set_tossfile(ctx.guild.id, "mutes", json.dumps(mutes))
+        del tosses[ctx.channel.name]
+        set_tossfile(ctx.guild.id, "tosses", json.dumps(tosses))
 
         channel = notify_channel if notify_channel else logging_channel
         if channel:
