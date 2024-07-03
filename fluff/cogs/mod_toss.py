@@ -557,7 +557,7 @@ class ModToss(Cog):
 
             users = []
             for uid in (
-                tosses[ctx.channel.name]["untosses"] + tosses[ctx.channel.name]["left"]
+                tosses[ctx.channel.name]["untossed"] + tosses[ctx.channel.name]["left"]
             ):
                 if self.bot.get_user(uid):
                     users.append(self.bot.get_user(uid))
