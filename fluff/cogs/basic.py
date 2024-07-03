@@ -265,7 +265,7 @@ class Basic(Cog):
 `pls sban` bans a user without DMing them the reason.""", inline=False)
 
         embed1.add_field(name="Muting & Unmuting Users", value="""I can mute users! I don't use slash commands to provide a simple alternative to Smol/Tol for mobile moderation. When I mute users, I create multiple channels so nothing gets messy. I do this automatically. To mute users, you can use `pls toss`, `pls mute`, or `pls roleban`. To unmute users, you can use `pls untoss`, `pls unmute`, or `pls unroleban`.""", inline=True)
-        embed1.add_field(name="Archiving & Closing Sessions", value="""When a muted session is done, please remember to archive with `pls archive`! This is handled by a separate bot for Various Reasons, but it's here for posterity. Then close the muted channel with `pls close`.""", inline=True)
+        embed1.add_field(name="Archiving & Closing Sessions", value="""When you're done with a session, close the muted channel with `pls close`. I will automatically send the archive to the Google Drive for you!""", inline=True)
         embed1.add_field(name="Namefixing & Dehoisting", value="""If somebody has a name with unmentionable characters, you can easily fix it with `pls fixname`. If somebody is purposefully hoisting themselves on the userlist, you can dehoist them with `pls dehoist`.""", inline=True)
 
         embed2 = stock_embed(self.bot)
