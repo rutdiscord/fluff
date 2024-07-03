@@ -657,6 +657,8 @@ class ModMute(Cog):
                     )
                     break
             if mutechannel:
+                if mutechannel.name not in mutes:
+                    mutes[mutechannel.name] = {"muted": {}, "left": []}
                 muterole = self.bot.pull_role(
                     member.guild, get_config(member.guild.id, "mute", "muterole")
                 )
@@ -671,6 +673,8 @@ class ModMute(Cog):
                     member, member.guild.me, mutechannel
                 )
                 mutes = get_mutefile(member.guild.id, "mutes")
+                if mutechannel.name not in mutes:
+                    mutes[mutechannel.name] = {"muted": {}, "left": []}
                 mutes[mutechannel.name]["muted"][str(member.id)] = mutes[
                     "LEFTGUILD"
                 ][str(member.id)]
@@ -681,10 +685,10 @@ class ModMute(Cog):
         if not mutes["LEFTGUILD"]:
             del mutes["LEFTGUILD"]
         set_mutefile(member.guild.id, "mutes", json.dumps(mutes))
-        
+
         await mutechannel.set_permissions(member, read_messages=True)
         mutemsg = await mutechannel.send(
-            content=f"🔁{self.username_system(member)}\nYou are muted! You were previously muted and were kicked for not responding. Welcome back.\n"
+            content=f"{self.username_system(member)} You are muted! You were previously muted and were kicked for not responding. Welcome back.\n"
                             '> *For reference, being muted means a Staff member wishes to speak with you one on one. This does not necessarily mean you are in trouble. This session will be archived for Staff only once completed.*\n'
                             '<@244328249801310219> You\'ve got another one!'
         )
