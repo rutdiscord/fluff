@@ -360,7 +360,7 @@ class ModToss(Cog):
         if not addition:
             toss_pings = ", ".join([us.mention for us in users])
             await toss_channel.send(
-                f"{toss_pings}\nYou were tossed by {self.bot.pacify_name(ctx.author.display_name)}.\n"
+                f"{toss_pings}\nYou were tossed by {self.bot.pacify_name(ctx.author.display_name)}.\n" \
                 f'{get_config(ctx.guild.id, 'toss', 'tossmsg')}'
             )
 
