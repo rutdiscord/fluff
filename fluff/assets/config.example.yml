@@ -28,9 +28,9 @@ staff:
   # the user upon being banned by the bot.
   appealurl: 
 
-mute:
+toss:
   # The role ID to add to users when muting a user.
-  muterole: 
+  tossrole: 
   # The category ID for mute sessions to be created in.
   mutecategory: 
   # The channel that the bot will send its mute notifications to.
@@ -38,10 +38,10 @@ mute:
   notificationchannel: 
   # The channel names that the bot will use when creating sessions.
   # You may only have up to 25.
-  mutechannels:
+  tosschannels:
 
   # The topic for each muted channel.
-  mutetopic:
+  tosstopic:
 
 
 reaction:

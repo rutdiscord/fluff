@@ -57,16 +57,16 @@ properties:
         type:
           - string
           - "null"
-  mute:
+  toss:
     type: object
     properties:
-      muterole:
+      tossrole:
         type:
           - integer
           - string
           - "null"
         minimum: 100000000000000000
-      mutecategory:
+      tosscategory:
         type:
           - integer
           - string
@@ -78,8 +78,8 @@ properties:
           - string
           - "null"
         minimum: 100000000000000000
-      mutechannels:
-        type:
+      tosschannels:
+        type: 
           - array
           - "null"
         items:
@@ -87,8 +87,8 @@ properties:
             - integer
             - string
           minimum: 100000000000000000
-      mutetopic:
-        type:
+      tosstopic:
+        type: 
           - string
           - "null"
   reaction:
@@ -125,4 +125,4 @@ properties:
     type: object
     properties:
       version:
-        const: 10
+        const: 11

@@ -84,26 +84,26 @@ def set_guildfile(serverid, filename, contents):
         f.write(contents)
 
 
-# mute Files
+# Toss Files
 
 
-def make_mutefile(serverid, filename):
-    if not os.path.exists(f"data/servers/{serverid}/mute"):
-        os.makedirs(f"data/servers/{serverid}/mute")
-    with open(f"data/servers/{serverid}/mute/{filename}.json", "w") as f:
+def make_tossfile(serverid, filename):
+    if not os.path.exists(f"data/servers/{serverid}/toss"):
+        os.makedirs(f"data/servers/{serverid}/toss")
+    with open(f"data/servers/{serverid}/toss/{filename}.json", "w") as f:
         f.write("{}")
         return json.loads("{}")
 
 
-def get_mutefile(serverid, filename):
-    if not os.path.exists(f"data/servers/{serverid}/mute/{filename}.json"):
-        make_mutefile(serverid, filename)
-    with open(f"data/servers/{serverid}/mute/{filename}.json", "r") as f:
+def get_tossfile(serverid, filename):
+    if not os.path.exists(f"data/servers/{serverid}/toss/{filename}.json"):
+        make_tossfile(serverid, filename)
+    with open(f"data/servers/{serverid}/toss/{filename}.json", "r") as f:
         return json.load(f)
 
 
-def set_mutefile(serverid, filename, contents):
-    with open(f"data/servers/{serverid}/mute/{filename}.json", "w") as f:
+def set_tossfile(serverid, filename, contents):
+    with open(f"data/servers/{serverid}/toss/{filename}.json", "w") as f:
         f.write(contents)
 
 
@@ -185,20 +185,20 @@ def add_userlog(sid, uid, issuer, reason, event_type):
     return len(userlogs[uid][event_type])
 
 
-def mute_userlog(sid, uid, issuer, mlink, cid):
+def toss_userlog(sid, uid, issuer, mlink, cid):
     userlogs, uid = fill_userlog(sid, uid)
 
-    mute_data = {
+    toss_data = {
         "issuer_id": issuer.id,
         "session_id": cid,
         "post_link": mlink,
         "timestamp": int(datetime.datetime.now().timestamp()),
     }
-    if "mutes" not in userlogs[uid]:
-        userlogs[uid]["mutes"] = []
-    userlogs[uid]["mutes"].append(mute_data)
+    if "tosses" not in userlogs[uid]:
+        userlogs[uid]["tosses"] = []
+    userlogs[uid]["tosses"].append(toss_data)
     set_guildfile(sid, "userlog", json.dumps(userlogs))
-    return len(userlogs[uid]["mutes"])
+    return len(userlogs[uid]["tosses"])
 
 
 def watch_userlog(sid, uid, issuer, watch_state, tracker_thread=None, tracker_msg=None):

@@ -10,32 +10,32 @@ from discord.ext import commands
 from discord.ext.commands import Cog
 from io import BytesIO
 from helpers.checks import ismod
-from helpers.datafiles import mute_userlog, get_mutefile, set_mutefile
+from helpers.datafiles import add_userlog, toss_userlog, get_tossfile, set_tossfile
 from helpers.placeholders import random_msg
-from helpers.archive import log_channel
+from helpers.archive import log_channel, get_members
 from helpers.embeds import (
     stock_embed,
+    mod_embed,
     author_embed,
     createdat_embed,
     joinedat_embed,
 )
 from helpers.sv_config import get_config
-from helpers.google import upload
 
 
-class ModMute(Cog):
+class ModToss(Cog):
     def __init__(self, bot):
         self.bot = bot
         self.busy = False
         self.spamcounter = {}
-        self.nocfgmsg = "Muting isn't enabled in this server."
+        self.nocfgmsg = "Tossing isn't enabled for this server."
 
     def enabled(self, g):
         return all(
             (
-                self.bot.pull_role(g, get_config(g.id, "mute", "muterole")),
-                self.bot.pull_category(g, get_config(g.id, "mute", "mutecategory")),
-                get_config(g.id, "mute", "mutechannels"),
+                self.bot.pull_role(g, get_config(g.id, "toss", "tossrole")),
+                self.bot.pull_category(g, get_config(g.id, "toss", "tosscategory")),
+                get_config(g.id, "toss", "tosschannels"),
             )
         )
 
@@ -59,13 +59,13 @@ class ModMute(Cog):
             for r in member.guild.roles
             if r
             == self.bot.pull_role(
-                member.guild, get_config(member.guild.id, "mute", "muterole")
+                member.guild, get_config(member.guild.id, "toss", "tossrole")
             )
         ]
         if roleban:
             if (
                 self.bot.pull_role(
-                    member.guild, get_config(member.guild.id, "mute", "muterole")
+                    member.guild, get_config(member.guild.id, "toss", "tossrole")
                 )
                 in member.roles
             ):
@@ -74,16 +74,16 @@ class ModMute(Cog):
                 return True
 
     def get_session(self, member):
-        mutes = get_mutefile(member.guild.id, "mutes")
-        if not mutes:
+        tosses = get_tossfile(member.guild.id, "tosses")
+        if not tosses:
             return None
         session = None
-        if "LEFTGUILD" in mutes and str(member.id) in mutes["LEFTGUILD"]:
+        if "LEFTGUILD" in tosses and str(member.id) in tosses["LEFTGUILD"]:
             session = False
-        for channel in mutes:
+        for channel in tosses:
             if channel == "LEFTGUILD":
                 continue
-            if str(member.id) in mutes[channel]["muted"]:
+            if str(member.id) in tosses[channel]["tossed"]:
                 session = channel
                 break
         return session
@@ -94,13 +94,13 @@ class ModMute(Cog):
             self.bot.pull_role(guild, get_config(guild.id, "staff", "adminrole")),
         ]
         bot_role = self.bot.pull_role(guild, get_config(guild.id, "staff", "botrole"))
-        mutes = get_mutefile(guild.id, "mutes")
+        tosses = get_tossfile(guild.id, "tosses")
 
-        for c in get_config(guild.id, "mute", "mutechannels"):
+        for c in get_config(guild.id, "toss", "tosschannels"):
             if c not in [g.name for g in guild.channels]:
-                if c not in mutes:
-                    mutes[c] = {"muted": {}, "unmuted": [], "left": []}
-                    set_mutefile(guild.id, "mutes", json.dumps(mutes))
+                if c not in tosses:
+                    tosses[c] = {"tossed": {}, "untossed": [], "left": []}
+                    set_tossfile(guild.id, "tosses", json.dumps(tosses))
 
                 overwrites = {
                     guild.default_role: discord.PermissionOverwrite(
@@ -118,32 +118,32 @@ class ModMute(Cog):
                     overwrites[staff_role] = discord.PermissionOverwrite(
                         read_messages=True
                     )
-                mute_channel = await guild.create_text_channel(
+                toss_channel = await guild.create_text_channel(
                     c,
-                    reason="Fluff Mute",
+                    reason="Sangou Toss",
                     category=self.bot.pull_category(
-                        guild, get_config(guild.id, "mute", "mutecategory")
+                        guild, get_config(guild.id, "toss", "tosscategory")
                     ),
                     overwrites=overwrites,
-                    topic=get_config(guild.id, "mute", "mutetopic"),
+                    topic=get_config(guild.id, "toss", "tosstopic"),
                 )
 
-                return mute_channel
+                return toss_channel
 
-    async def perform_mute(self, user, staff, mute_channel):
-        mute_role = self.bot.pull_role(
-            user.guild, get_config(user.guild.id, "mute", "muterole")
+    async def perform_toss(self, user, staff, toss_channel):
+        toss_role = self.bot.pull_role(
+            user.guild, get_config(user.guild.id, "toss", "tossrole")
         )
         roles = []
         for rx in user.roles:
-            if rx != user.guild.default_role and rx != mute_role:
+            if rx != user.guild.default_role and rx != toss_role:
                 roles.append(rx)
 
-        mutes = get_mutefile(user.guild.id, "mutes")
-        mutes[mute_channel.name]["muted"][str(user.id)] = [role.id for role in roles]
-        set_mutefile(user.guild.id, "mutes", json.dumps(mutes))
+        tosses = get_tossfile(user.guild.id, "tosses")
+        tosses[toss_channel.name]["tossed"][str(user.id)] = [role.id for role in roles]
+        set_tossfile(user.guild.id, "tosses", json.dumps(tosses))
 
-        await user.add_roles(mute_role, reason="User muted.")
+        await user.add_roles(toss_role, reason="User tossed.")
         fail_roles = []
         if roles:
             for rr in roles:
@@ -152,7 +152,7 @@ class ModMute(Cog):
                     roles.remove(rr)
             await user.remove_roles(
                 *roles,
-                reason=f"User muted by {staff} ({staff.id})",
+                reason=f"User tossed by {staff} ({staff.id})",
                 atomic=False,
             )
 
@@ -163,26 +163,26 @@ class ModMute(Cog):
     @commands.guild_only()
     @commands.command(aliases=["tossed", "session"])
     async def sessions(self, ctx):
-        """This shows the open muted sessions.
+        """This shows the open toss sessions.
 
-        Use this in a mute channel to show who's in it.
+        Use this in a toss channel to show who's in it.
 
         No arguments."""
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
         embed = stock_embed(self.bot)
-        embed.title = "👁‍🗨 Muted Sessions... (Fluff)"
+        embed.title = "👁‍🗨 Toss Channel Sessions..."
         embed.color = ctx.author.color
-        mutes = get_mutefile(ctx.guild.id, "mutes")
+        tosses = get_tossfile(ctx.guild.id, "tosses")
 
-        if ctx.channel.name in get_config(ctx.guild.id, "mute", "mutechannels"):
+        if ctx.channel.name in get_config(ctx.guild.id, "toss", "tosschannels"):
             channels = [ctx.channel.name]
         else:
-            channels = get_config(ctx.guild.id, "mute", "mutechannels")
+            channels = get_config(ctx.guild.id, "toss", "tosschannels")
 
         for c in channels:
             if c in [g.name for g in ctx.guild.channels]:
-                if c not in mutes or not mutes[c]["muted"]:
+                if c not in tosses or not tosses[c]["tossed"]:
                     embed.add_field(
                         name=f"🟡 #{c}",
                         value="__Empty__\n> Please close the channel.",
@@ -194,7 +194,7 @@ class ModMute(Cog):
                             f"> {self.username_system(user)}"
                             for user in [
                                 await self.bot.fetch_user(str(u))
-                                for u in mutes[c]["muted"].keys()
+                                for u in tosses[c]["tossed"].keys()
                             ]
                         ]
                     )
@@ -213,14 +213,14 @@ class ModMute(Cog):
     )
     @commands.check(ismod)
     @commands.guild_only()
-    @commands.command(aliases=["roleban", "toss"])
-    async def mute(self, ctx, users: commands.Greedy[discord.Member]):
-        """This mutes a user.
+    @commands.command(aliases=["roleban", "mute"])
+    async def toss(self, ctx, users: commands.Greedy[discord.Member]):
+        """This tosses a user.
 
         Please refer to the tossing section of the [documentation](https://3gou.0ccu.lt/as-a-moderator/the-tossing-system/).
 
         - `users`
-        The users to mute."""
+        The users to toss."""
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
 
@@ -230,16 +230,16 @@ class ModMute(Cog):
                 ctx.guild, get_config(ctx.guild.id, "staff", "adminrole")
             ),
         ]
-        mute_role = self.bot.pull_role(
-            ctx.guild, get_config(ctx.guild.id, "mute", "muterole")
+        toss_role = self.bot.pull_role(
+            ctx.guild, get_config(ctx.guild.id, "toss", "tossrole")
         )
-        if not any(staff_roles) or not mute_role:
+        if not any(staff_roles) or not toss_role:
             return await ctx.reply(
-                content="PLACEHOLDER no staff or muted role configured",
+                content="PLACEHOLDER no staff or toss role configured",
                 mention_author=False,
             )
         notify_channel = self.bot.pull_channel(
-            ctx.guild, get_config(ctx.guild.id, "mute", "notificationchannel")
+            ctx.guild, get_config(ctx.guild.id, "toss", "notificationchannel")
         )
         if not notify_channel:
             notify_channel = self.bot.pull_channel(
@@ -252,12 +252,12 @@ class ModMute(Cog):
         errors = ""
         for us in users:
             if us.id == ctx.author.id:
-                errors += f"\n- {self.username_system(us)}\n  You cannot mute yourself."
+                errors += f"\n- {self.username_system(us)}\n  You cannot toss yourself."
             elif us.id == self.bot.application_id:
-                errors += f"\n- {self.username_system(us)}\n  You cannot mute the bot."
-            elif self.get_session(us) and mute_role in us.roles:
+                errors += f"\n- {self.username_system(us)}\n  You cannot toss the bot."
+            elif self.get_session(us) and toss_role in us.roles:
                 errors += (
-                    f"\n- {self.username_system(us)}\n  This user is already muted."
+                    f"\n- {self.username_system(us)}\n  This user is already tossed."
                 )
             else:
                 continue
@@ -265,54 +265,54 @@ class ModMute(Cog):
         if not users:
             await ctx.message.add_reaction("🚫")
             return await notify_channel.send(
-                f"Error in mute command from {ctx.author.mention}...\n- Nobody was muted.\n```diff"
+                f"Error in toss command from {ctx.author.mention}...\n- Nobody was tossed.\n```diff"
                 + errors
                 + "\n```\n"
             )
 
-        if ctx.channel.name in get_config(ctx.guild.id, "mute", "mutechannels"):
+        if ctx.channel.name in get_config(ctx.guild.id, "toss", "tosschannels"):
             addition = True
-            mute_channel = ctx.channel
+            toss_channel = ctx.channel
         elif all(
             [
                 c in [g.name for g in ctx.guild.channels]
-                for c in get_config(ctx.guild.id, "mute", "mutechannels")
+                for c in get_config(ctx.guild.id, "toss", "tosschannels")
             ]
         ):
             await ctx.message.add_reaction("🚫")
             return await notify_channel.send(
-                f"Error in mute command from {ctx.author.mention}...\n- No muted channels available.\n```diff"
+                f"Error in toss command from {ctx.author.mention}...\n- No toss channels available.\n```diff"
                 + errors
                 + "\n```\n"
             )
         else:
             addition = False
-            mute_channel = await self.new_session(ctx.guild)
+            toss_channel = await self.new_session(ctx.guild)
 
         for us in users:
             try:
-                failed_roles, previous_roles = await self.perform_mute(
-                    us, ctx.author, mute_channel
+                failed_roles, previous_roles = await self.perform_toss(
+                    us, ctx.author, toss_channel
                 )
-                await mute_channel.set_permissions(us, read_messages=True)
+                await toss_channel.set_permissions(us, read_messages=True)
             except commands.MissingPermissions:
-                errors += f"\n- {self.username_system(us)}\n  Missing permissions to mute this user."
+                errors += f"\n- {self.username_system(us)}\n  Missing permissions to toss this user."
                 continue
 
-            mute_userlog(
+            toss_userlog(
                 ctx.guild.id,
                 us.id,
                 ctx.author,
                 ctx.message.jump_url,
-                mute_channel.id,
+                toss_channel.id,
             )
 
             if notify_channel:
                 embed = stock_embed(self.bot)
                 author_embed(embed, us, True)
                 embed.color = ctx.author.color
-                embed.title = "🚷 Mute"
-                embed.description = f"{us.mention} was muted by {ctx.author.mention} [`#{ctx.channel.name}`] [[Jump]({ctx.message.jump_url})]\n> This mute takes place in {mute_channel.mention}..."
+                embed.title = "🚷 Toss"
+                embed.description = f"{us.mention} was tossed by {ctx.author.mention} [`#{ctx.channel.name}`] [[Jump]({ctx.message.jump_url})]\n> This toss takes place in {toss_channel.mention}..."
                 createdat_embed(embed, us)
                 joinedat_embed(embed, us)
                 prevlist = []
@@ -323,7 +323,7 @@ class ModMute(Cog):
                 else:
                     prevlist = "None"
                 embed.add_field(
-                    name="Previous Roles",
+                    name="🎨 Previous Roles",
                     value=prevlist,
                     inline=False,
                 )
@@ -333,7 +333,7 @@ class ModMute(Cog):
                         faillist.append("<@&" + str(role.id) + ">")
                     faillist = ",".join(reversed(faillist))
                     embed.add_field(
-                        name="Failed Roles",
+                        name="🚫 Failed Roles",
                         value=faillist,
                         inline=False,
                     )
@@ -343,76 +343,76 @@ class ModMute(Cog):
                 embed = stock_embed(self.bot)
                 embed.color = discord.Color.from_str("#FF0000")
                 embed.title = "🚷 Toss"
-                embed.description = f"{us.mention} was muted by {ctx.author.mention} [`#{ctx.channel.name}`] [[Jump]({ctx.message.jump_url})]"
-                stock_embed(embed, us, ctx.author)
+                embed.description = f"{us.mention} was tossed by {ctx.author.mention} [`#{ctx.channel.name}`] [[Jump]({ctx.message.jump_url})]"
+                mod_embed(embed, us, ctx.author)
                 await modlog_channel.send(embed=embed)
 
         await ctx.message.add_reaction("🚷")
 
         if errors and notify_channel:
             return await notify_channel.send(
-                f"Error in mute command from {ctx.author.mention}...\n- Some users could not be muted.\n```diff"
+                f"Error in toss command from {ctx.author.mention}...\n- Some users could not be tossed.\n```diff"
                 + errors
                 + "\n```\n"
             )
 
         if not addition:
-            mute_pings = ", ".join([us.mention for us in users])
-            await mute_channel.send(
-                f"{mute_pings}\nYou were muted by {self.bot.pacify_name(ctx.author.display_name)}.\n"
-                '> *For reference, this means a Staff member wishes to speak with you one on one! This does not necessarily mean you are in trouble. This session will be archived for Staff only once completed.*'
+            toss_pings = ", ".join([us.mention for us in users])
+            await toss_channel.send(
+                f"{toss_pings}\nYou were tossed by {self.bot.pacify_name(ctx.author.display_name)}.\n"
+                '> *For your reference, a "toss" is where a Staff member wishes to speak with you, one on one. This session will be archived for Staff only once completed.*'
             )
 
             def check(m):
-                return m.author in users and m.channel == mute_channel
+                return m.author in users and m.channel == toss_channel
 
             try:
                 msg = await self.bot.wait_for("message", timeout=300, check=check)
             except asyncio.TimeoutError:
-                pokemsg = await mute_channel.send(ctx.author.mention)
+                pokemsg = await toss_channel.send(ctx.author.mention)
                 await pokemsg.edit(content="⏰", delete_after=5)
             except discord.NotFound:
                 return
             else:
-                pokemsg = await mute_channel.send(ctx.author.mention)
+                pokemsg = await toss_channel.send(ctx.author.mention)
                 await pokemsg.edit(content="🫳⏰", delete_after=5)
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.bot_has_permissions(manage_roles=True, manage_channels=True)
     @commands.check(ismod)
     @commands.guild_only()
-    @commands.command(aliases=["unroleban", "untoss"])
-    async def unmute(self, ctx, users: commands.Greedy[discord.Member] = None):
-        """This unmutes a user.
+    @commands.command(aliases=["unroleban", "unmute"])
+    async def untoss(self, ctx, users: commands.Greedy[discord.Member] = None):
+        """This untosses a user.
 
-        Please refer to the muting section of the [documentation](https://3gou.0ccu.lt/as-a-moderator/the-tossing-system/).
+        Please refer to the tossing section of the [documentation](https://3gou.0ccu.lt/as-a-moderator/the-tossing-system/).
 
         - `users`
-        The users to unmute. Optional."""
+        The users to untoss. Optional."""
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
-        if ctx.channel.name not in get_config(ctx.guild.id, "mute", "mutechannels"):
+        if ctx.channel.name not in get_config(ctx.guild.id, "toss", "tosschannels"):
             return await ctx.reply(
-                content="This command must be run inside of a muted channel.",
+                content="This command must be run inside of a toss channel.",
                 mention_author=False,
             )
 
-        mutes = get_mutefile(ctx.guild.id, "mutes")
+        tosses = get_tossfile(ctx.guild.id, "tosses")
         if not users:
             users = [
                 ctx.guild.get_member(int(u))
-                for u in mutes[ctx.channel.name]["muted"].keys()
+                for u in tosses[ctx.channel.name]["tossed"].keys()
             ]
 
         notify_channel = self.bot.pull_channel(
-            ctx.guild, get_config(ctx.guild.id, "mute", "notificationchannel")
+            ctx.guild, get_config(ctx.guild.id, "toss", "notificationchannel")
         )
         if not notify_channel:
             notify_channel = self.bot.pull_channel(
                 ctx.guild, get_config(ctx.guild.id, "staff", "staffchannel")
             )
-        mute_role = self.bot.pull_role(
-            ctx.guild, get_config(ctx.guild.id, "mute", "muterole")
+        toss_role = self.bot.pull_role(
+            ctx.guild, get_config(ctx.guild.id, "toss", "tossrole")
         )
         output = ""
         invalid = []
@@ -427,10 +427,10 @@ class ModMute(Cog):
                     "warn_targetself", authorname=ctx.author.name
                 )
             elif (
-                str(us.id) not in mutes[ctx.channel.name]["muted"]
-                and mute_role not in us.roles
+                str(us.id) not in tosses[ctx.channel.name]["tossed"]
+                and toss_role not in us.roles
             ):
-                output += "\n" + f"{self.username_system(us)} is not muted."
+                output += "\n" + f"{self.username_system(us)} is not already tossed."
             else:
                 continue
             users.remove(us)
@@ -438,16 +438,16 @@ class ModMute(Cog):
             return await ctx.reply(
                 output
                 + "\n\n"
-                + "There's nobody to unmute!",
+                + "There's nobody left to untoss, so nobody was untossed.",
                 mention_author=False,
             )
 
         for us in users:
             self.busy = True
-            roles = mutes[ctx.channel.name]["muted"][str(us.id)]
-            if us.id not in mutes[ctx.channel.name]["unmuted"]:
-                mutes[ctx.channel.name]["unmuted"].append(us.id)
-            del mutes[ctx.channel.name]["muted"][str(us.id)]
+            roles = tosses[ctx.channel.name]["tossed"][str(us.id)]
+            if us.id not in tosses[ctx.channel.name]["untossed"]:
+                tosses[ctx.channel.name]["untossed"].append(us.id)
+            del tosses[ctx.channel.name]["tossed"][str(us.id)]
 
             if roles:
                 roles = [ctx.guild.get_role(r) for r in roles]
@@ -456,23 +456,23 @@ class ModMute(Cog):
                         roles.remove(r)
                 await us.add_roles(
                     *roles,
-                    reason=f"Unmuted by {ctx.author} ({ctx.author.id})",
+                    reason=f"Untossed by {ctx.author} ({ctx.author.id})",
                     atomic=False,
                 )
             await us.remove_roles(
-                mute_role,
-                reason=f"Unmuted by {ctx.author} ({ctx.author.id})",
+                toss_role,
+                reason=f"Untossed by {ctx.author} ({ctx.author.id})",
             )
 
             await ctx.channel.set_permissions(us, overwrite=None)
 
-            output += "\n" + f"{self.username_system(us)} has been unmuted."
+            output += "\n" + f"{self.username_system(us)} has been untossed."
             if notify_channel:
                 embed = stock_embed(self.bot)
                 author_embed(embed, us)
                 embed.color = ctx.author.color
-                embed.title = "Unmute (Fluff)"
-                embed.description = f"{us.mention} was unmuted by {ctx.author.mention} [`#{ctx.channel.name}`]"
+                embed.title = "🚶 Untoss"
+                embed.description = f"{us.mention} was untossed by {ctx.author.mention} [`#{ctx.channel.name}`]"
                 createdat_embed(embed, us)
                 joinedat_embed(embed, us)
                 prevlist = []
@@ -483,23 +483,23 @@ class ModMute(Cog):
                 else:
                     prevlist = "None"
                 embed.add_field(
-                    name="Restored Roles",
+                    name="🎨 Restored Roles",
                     value=prevlist,
                     inline=False,
                 )
                 await notify_channel.send(embed=embed)
 
-        set_mutefile(ctx.guild.id, "mutes", json.dumps(mutes))
+        set_tossfile(ctx.guild.id, "tosses", json.dumps(tosses))
         self.busy = False
 
         if invalid:
             output += (
                 "\n\n"
-                + "I was unable to unmute these users: "
+                + "I was unable to untoss these users: "
                 + ", ".join([str(iv) for iv in invalid])
             )
 
-        if not mutes[ctx.channel.name]:
+        if not tosses[ctx.channel.name]:
             output += "\n\n" + "There is nobody left in this session."
 
         await ctx.reply(content=output, mention_author=False)
@@ -509,19 +509,22 @@ class ModMute(Cog):
     @commands.guild_only()
     @commands.command()
     async def close(self, ctx, archive=True):
-        """This closes a mute session.
+        """This closes a toss session.
 
-        Please refer to the tossing section of the [documentation](https://3gou.0ccu.lt/as-a-moderator/the-tossing-system/)."""
+        Please refer to the tossing section of the [documentation](https://3gou.0ccu.lt/as-a-moderator/the-tossing-system/).
+
+        - `archive`
+        Whether to archive the session or not. Optional."""
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
-        if ctx.channel.name not in get_config(ctx.guild.id, "mute", "mutechannels"):
+        if ctx.channel.name not in get_config(ctx.guild.id, "toss", "tosschannels"):
             return await ctx.reply(
-                content="This command must be run inside of a muted channel.",
+                content="This command must be run inside of a toss channel.",
                 mention_author=False,
             )
 
         notify_channel = self.bot.pull_channel(
-            ctx.guild, get_config(ctx.guild.id, "mute", "notificationchannel")
+            ctx.guild, get_config(ctx.guild.id, "toss", "notificationchannel")
         )
         if not notify_channel:
             notify_channel = self.bot.pull_channel(
@@ -530,19 +533,13 @@ class ModMute(Cog):
         logging_channel = self.bot.pull_channel(
             ctx.guild, get_config(ctx.guild.id, "logging", "modlog")
         )
-        mutes = get_mutefile(ctx.guild.id, "mutes")
+        tosses = get_tossfile(ctx.guild.id, "tosses")
 
-        if mutes[ctx.channel.name]["muted"]:
+        if tosses[ctx.channel.name]["tossed"]:
             return await ctx.reply(
-                content="You must unmute everyone first!", mention_author=True
+                content="You must untoss everyone first!", mention_author=True
             )
 
-        embed = stock_embed(self.bot)
-        embed.title = "Muted Session Closed (Fluff)"
-        embed.description = f"`#{ctx.channel.name}`'s session was closed by {ctx.author.mention} ({ctx.author.id})."
-        embed.color = ctx.author.color
-        embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
-        
         if archive:
             async with ctx.channel.typing():
                 dotraw, dotzip = await log_channel(
@@ -551,7 +548,7 @@ class ModMute(Cog):
 
             users = []
             for uid in (
-                mutes[ctx.channel.name]["unmuted"] + mutes[ctx.channel.name]["left"]
+                tosses[ctx.channel.name]["untossed"] + tosses[ctx.channel.name]["left"]
             ):
                 if self.bot.get_user(uid):
                     users.append(self.bot.get_user(uid))
@@ -560,44 +557,39 @@ class ModMute(Cog):
                     users.append(user)
             user = f""
 
-            if users:
-                firstuser = f'{users[0].name} {users[0].id}'
-            else:
-                firstuser = f'unspecified (logged by {ctx.author.name})'
-
             filename = (
                 ctx.message.created_at.astimezone().strftime("%Y-%m-%d")
-                + f" {firstuser}"
+                + f" {ctx.channel.name} {ctx.channel.id}"
             )
             reply = (
-                f"📕 I've archived that as: `{filename}.txt`\nThis mute session had the following users:\n- "
+                f"📕 I've archived that as: `{filename}.txt`\nThis toss session had the following users:\n- "
                 + "\n- ".join([f"{self.username_system(u)} ({u.id})" for u in users])
             )
             dotraw += f"\n{ctx.message.created_at.astimezone().strftime('%Y/%m/%d %H:%M')} {self.bot.user} [BOT]\n{reply}"
 
             if not os.path.exists(
-                f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}"
+                f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}"
             ):
                 os.makedirs(
-                    f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}"
+                    f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}"
                 )
             with open(
-                f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}/{filename}.txt",
-                "w", encoding='UTF-8'
+                f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}/{filename}.txt",
+                "w",
             ) as filetxt:
                 filetxt.write(dotraw)
             if dotzip:
                 with open(
-                    f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}/{filename} (files).zip",
+                    f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}/{filename} (files).zip",
                     "wb",
                 ) as filezip:
                     filezip.write(dotzip.getbuffer())
 
-            # embed = stock_embed(self.bot)
-            # embed.title = "Mute Session Closed (Fluff)"
-            # embed.description = f"`#{ctx.channel.name}`'s session was closed by {ctx.author.mention} ({ctx.author.id})."
-            # embed.color = ctx.author.color
-            # embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
+            embed = stock_embed(self.bot)
+            embed.title = "📦 Toss Session Closed"
+            embed.description = f"`#{ctx.channel.name}`'s session was closed by {ctx.author.mention} ({ctx.author.id})."
+            embed.color = ctx.author.color
+            embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
 
             embed.add_field(
                 name="🗒️ Text",
@@ -617,21 +609,142 @@ class ModMute(Cog):
                     + f"`{len(zipfile.ZipFile(dotzip, 'r', zipfile.ZIP_DEFLATED).namelist())}` files in the zip file.",
                     inline=True,
                 )
-            
-            await upload(ctx, filename, f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}/", dotzip)
 
-        del mutes[ctx.channel.name]
-        set_mutefile(ctx.guild.id, "mutes", json.dumps(mutes))
+            channel = notify_channel if notify_channel else logging_channel
+            if channel:
+                await channel.send(embed=embed)
+            else:
+                await ctx.message.add_reaction("📦")
+                await asyncio.sleep(5)
 
-        channel = notify_channel if notify_channel else logging_channel
-        if channel:
-            await channel.send(embed=embed)
-        else:
-            await ctx.message.add_reaction("📦")
-            await asyncio.sleep(5)
+        del tosses[ctx.channel.name]
+        set_tossfile(ctx.guild.id, "tosses", json.dumps(tosses))
 
-        await ctx.channel.delete(reason="Fluff Mute")
+        await ctx.channel.delete(reason="Sangou Toss")
         return
+
+    @Cog.listener()
+    async def on_message(self, message):
+        await self.bot.wait_until_ready()
+        if (
+            not message.guild
+            or message.author.bot
+            or not self.enabled(message.guild)
+            or self.is_rolebanned(message.author)
+            or self.get_session(message.author)
+            or self.bot.pull_role(
+                message.guild, get_config(message.guild.id, "staff", "modrole")
+            )
+            in message.author.roles
+            or self.bot.pull_role(
+                message.guild, get_config(message.guild.id, "staff", "adminrole")
+            )
+            in message.author.roles
+        ):
+            return
+
+        notify_channel = self.bot.pull_channel(
+            message.guild, get_config(message.guild.id, "toss", "notificationchannel")
+        )
+        if not notify_channel:
+            notify_channel = self.bot.pull_channel(
+                message.guild, get_config(message.guild.id, "staff", "staffchannel")
+            )
+        staff_roles = [
+            self.bot.pull_role(
+                message.guild, get_config(message.guild.id, "staff", "modrole")
+            ),
+            self.bot.pull_role(
+                message.guild, get_config(message.guild.id, "staff", "adminrole")
+            ),
+        ]
+
+        if message.author.id not in self.spamcounter:
+            self.spamcounter[message.author.id] = {}
+        if "original_message" not in self.spamcounter[message.author.id]:
+            self.spamcounter[message.author.id]["original_message"] = message
+            return
+
+        cutoff_ts = self.spamcounter[message.author.id][
+            "original_message"
+        ].created_at + timedelta(seconds=10)
+
+        if (
+            any(
+                (
+                    message.content
+                    == self.spamcounter[message.author.id]["original_message"].content,
+                    self.principal_period(message.content)
+                    == self.spamcounter[message.author.id]["original_message"].content,
+                )
+            )
+            and message.created_at < cutoff_ts
+        ):
+            if "spamcounter" not in self.spamcounter[message.author.id]:
+                self.spamcounter[message.author.id]["spamcounter"] = 1
+            else:
+                self.spamcounter[message.author.id]["spamcounter"] += 1
+            if self.spamcounter[message.author.id]["spamcounter"] == 5:
+                toss_channel = await self.new_session(message.guild)
+                failed_roles, previous_roles = await self.perform_toss(
+                    message.author, message.guild.me, toss_channel
+                )
+                await toss_channel.set_permissions(message.author, read_messages=True)
+                await toss_channel.send(
+                    content=f"{message.author.mention}, you were rolebanned for spamming."
+                )
+
+                toss_userlog(
+                    message.guild.id,
+                    message.author.id,
+                    message.guild.me,
+                    message.jump_url,
+                    toss_channel.id,
+                )
+                if notify_channel:
+                    embed = stock_embed(self.bot)
+                    author_embed(embed, message.author, True)
+                    embed.color = message.author.color
+                    embed.title = "🚷 Toss"
+                    embed.description = f"{self.username_system(message.author)} has been tossed for hitting 5 spam messages. {message.jump_url}\n> This toss takes place in {toss_channel.mention}..."
+                    createdat_embed(embed, message.author)
+                    joinedat_embed(embed, message.author)
+                    prevlist = []
+                    if len(previous_roles) > 0:
+                        for role in previous_roles:
+                            prevlist.append("<@&" + str(role.id) + ">")
+                        prevlist = ",".join(reversed(prevlist))
+                    else:
+                        prevlist = "None"
+                    embed.add_field(
+                        name="🎨 Previous Roles",
+                        value=prevlist,
+                        inline=False,
+                    )
+                    if failed_roles:
+                        faillist = []
+                        for role in previous_roles:
+                            faillist.append("<@&" + str(role.id) + ">")
+                        faillist = ",".join(reversed(faillist))
+                        embed.add_field(
+                            name="🚫 Failed Roles",
+                            value=faillist,
+                            inline=False,
+                        )
+                    await notify_channel.send(
+                        content=next(
+                            staff_role
+                            for staff_role in staff_roles
+                            if staff_role is not None
+                        ).mention,
+                        embed=embed,
+                    )
+                    await message.add_reaction("🚷")
+                    return
+        else:
+            self.spamcounter[message.author.id]["original_message"] = message
+            self.spamcounter[message.author.id]["spamcounter"] = 0
+            return
 
     @Cog.listener()
     async def on_member_join(self, member):
@@ -639,68 +752,66 @@ class ModMute(Cog):
         if not self.enabled(member.guild):
             return
         notify_channel = self.bot.pull_channel(
-            member.guild, get_config(member.guild.id, "mute", "notificationchannel")
+            member.guild, get_config(member.guild.id, "toss", "notificationchannel")
         )
         if not notify_channel:
             notify_channel = self.bot.pull_channel(
                 member.guild, get_config(member.guild.id, "staff", "staffchannel")
             )
 
-        mutes = get_mutefile(member.guild.id, "mutes")
-        mutechannel = None
+        tosses = get_tossfile(member.guild.id, "tosses")
+        toss_channel = None
 
-        if "LEFTGUILD" in mutes and str(member.id) in mutes["LEFTGUILD"]:
-            for channel in mutes:
-                if "left" in mutes[channel] and member.id in mutes[channel]["left"]:
-                    mutechannel = discord.utils.get(
+        if "LEFTGUILD" in tosses and str(member.id) in tosses["LEFTGUILD"]:
+            for channel in tosses:
+                if "left" in tosses[channel] and member.id in tosses[channel]["left"]:
+                    toss_channel = discord.utils.get(
                         member.guild.channels, name=channel
                     )
                     break
-            if mutechannel:
-                muterole = self.bot.pull_role(
-                    member.guild, get_config(member.guild.id, "mute", "muterole")
+            if toss_channel:
+                toss_role = self.bot.pull_role(
+                    member.guild, get_config(member.guild.id, "toss", "tossrole")
                 )
-                await member.add_roles(muterole, reason="User muted.")
-                mutes[mutechannel.name]["muted"][str(member.id)] = mutes[
+                await member.add_roles(toss_role, reason="User tossed.")
+                tosses[toss_channel.name]["tossed"][str(member.id)] = tosses[
                     "LEFTGUILD"
                 ][str(member.id)]
-                mutes[mutechannel.name]["left"].remove(member.id)
+                tosses[toss_channel.name]["left"].remove(member.id)
             else:
-                mutechannel = await self.new_session(member.guild)
-                failed_roles, previous_roles = await self.perform_mute(
-                    member, member.guild.me, mutechannel
+                toss_channel = await self.new_session(member.guild)
+                failed_roles, previous_roles = await self.perform_toss(
+                    member, member.guild.me, toss_channel
                 )
-                mutes = get_mutefile(member.guild.id, "mutes")
-                mutes[mutechannel.name]["muted"][str(member.id)] = mutes[
+                tosses = get_tossfile(member.guild.id, "tosses")
+                tosses[toss_channel.name]["tossed"][str(member.id)] = tosses[
                     "LEFTGUILD"
                 ][str(member.id)]
         else:
             return
 
-        del mutes["LEFTGUILD"][str(member.id)]
-        if not mutes["LEFTGUILD"]:
-            del mutes["LEFTGUILD"]
-        set_mutefile(member.guild.id, "mutes", json.dumps(mutes))
+        del tosses["LEFTGUILD"][str(member.id)]
+        if not tosses["LEFTGUILD"]:
+            del tosses["LEFTGUILD"]
+        set_tossfile(member.guild.id, "tosses", json.dumps(tosses))
 
-        await mutechannel.set_permissions(member, read_messages=True)
-        mutemsg = await mutechannel.send(
-            content=f"{self.username_system(member)} You are muted! You were previously muted and were kicked for not responding. Welcome back.\n"
-                            '> *For reference, being muted means a Staff member wishes to speak with you one on one. This does not necessarily mean you are in trouble. This session will be archived for Staff only once completed.*\n'
-                            '<@244328249801310219> You\'ve got another one!'
+        await toss_channel.set_permissions(member, read_messages=True)
+        tossmsg = await toss_channel.send(
+            content=f"🔁 {self.username_system(member)} rejoined while tossed."
         )
         if notify_channel:
-            mutemsg = await notify_channel.send(
-                content=f"🔁 {self.username_system(member)} ({member.id}) was previously kicked for being silent in muted and has rejoined. They have been automatically muted, see {mutechannel.mention}"
+            tossmsg = await notify_channel.send(
+                content=f"🔁 {self.username_system(member)} ({member.id}) rejoined while tossed. Continuing in {toss_channel.mention}..."
             )
-        mute_userlog(
+        toss_userlog(
             member.guild.id,
             member.id,
             member.guild.me,
-            mutemsg.jump_url,
-            mutechannel.id,
+            tossmsg.jump_url,
+            toss_channel.id,
         )
-        return                            
-    
+        return
+
     @Cog.listener()
     async def on_member_remove(self, member):
         await self.bot.wait_until_ready()
@@ -711,34 +822,33 @@ class ModMute(Cog):
         if not session:
             return
 
-        mutes = get_mutefile(member.guild.id, "mutes")
-        if "LEFTGUILD" not in mutes:
-            mutes["LEFTGUILD"] = {}
-        mutes["LEFTGUILD"][str(member.id)] = mutes[session]["muted"][str(member.id)]
-        mutes[session]["left"].append(member.id)
-        del mutes[session]["muted"][str(member.id)]
-        set_mutefile(member.guild.id, "mutes", json.dumps(mutes))
+        tosses = get_tossfile(member.guild.id, "tosses")
+        if "LEFTGUILD" not in tosses:
+            tosses["LEFTGUILD"] = {}
+        tosses["LEFTGUILD"][str(member.id)] = tosses[session]["tossed"][str(member.id)]
+        tosses[session]["left"].append(member.id)
+        del tosses[session]["tossed"][str(member.id)]
+        set_tossfile(member.guild.id, "tosses", json.dumps(tosses))
 
         notify_channel = self.bot.pull_channel(
-            member.guild, get_config(member.guild.id, "mute", "notificationchannel")
+            member.guild, get_config(member.guild.id, "toss", "notificationchannel")
         )
         if not notify_channel:
             notify_channel = self.bot.pull_channel(
                 member.guild, get_config(member.guild.id, "staff", "staffchannel")
             )
-        mutechannel = self.bot.pull_channel(member.guild, session)
+        toss_channel = self.bot.pull_channel(member.guild, session)
         try:
             await member.guild.fetch_ban(member)
-            out = f"🔨 {self.username_system(member)} got banned while muted."
+            out = f"🔨 {self.username_system(member)} got banned while tossed."
         except discord.NotFound:
-            out = f"🚪 {self.username_system(member)} left while muted."
+            out = f"🚪 {self.username_system(member)} left while tossed."
         except discord.Forbidden:
             out = f"❓ {self.username_system(member)} was removed from the server.\nI do not have Audit Log permissions to tell why."
         if notify_channel:
             await notify_channel.send(out)
-        if mutechannel:
-            await mutechannel.send(out)
-
+        if toss_channel:
+            await toss_channel.send(out)
 
     @Cog.listener()
     async def on_member_update(self, before, after):
@@ -752,22 +862,23 @@ class ModMute(Cog):
             if not session:
                 return
 
-            mutes = get_mutefile(after.guild.id, "mutes")
-            mutes[session]["unmuted"].append(after.id)
-            del mutes[session]["muted"][str(after.id)]
-            set_mutefile(after.guild.id, "mutes", json.dumps(mutes))
+            tosses = get_tossfile(after.guild.id, "tosses")
+            tosses[session]["untossed"].append(after.id)
+            del tosses[session]["tossed"][str(after.id)]
+            set_tossfile(after.guild.id, "tosses", json.dumps(tosses))
 
     @Cog.listener()
     async def on_guild_channel_delete(self, channel):
         await self.bot.wait_until_ready()
         if self.enabled(channel.guild) and channel.name in get_config(
-            channel.guild.id, "mute", "mutechannels"
+            channel.guild.id, "toss", "tosschannels"
         ):
-            mutes = get_mutefile(channel.guild.id, "mutes")
-            if channel.name not in mutes:
+            tosses = get_tossfile(channel.guild.id, "tosses")
+            if channel.name not in tosses:
                 return
-            del mutes[channel.name]
-            set_mutefile(channel.guild.id, "mutes", json.dumps(mutes))
+            del tosses[channel.name]
+            set_tossfile(channel.guild.id, "tosses", json.dumps(tosses))
+
 
 async def setup(bot):
-    await bot.add_cog(ModMute(bot))
+    await bot.add_cog(ModToss(bot))
