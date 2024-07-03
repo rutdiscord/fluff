@@ -46,6 +46,9 @@ toss:
   # The topic for each muted channel.
   tosstopic:
 
+  # Message for tosses
+  tossmsg: 
+
 
 reaction:
   # If the bot may automatically adjust names to be readable.
@@ -66,4 +69,4 @@ drive:
   # Set the ID of the Google Drive folder that the file should be uploaded to.
 
 metadata:
-  version: 10
+  version: 12

@@ -91,6 +91,10 @@ properties:
         type: 
           - string
           - "null"
+      tossmsg:
+        type:
+          - string
+          - "null"
   reaction:
     type: object
     properties:
@@ -125,4 +129,4 @@ properties:
     type: object
     properties:
       version:
-        const: 11
+        const: 12

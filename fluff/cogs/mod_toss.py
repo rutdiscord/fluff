@@ -361,7 +361,7 @@ class ModToss(Cog):
             toss_pings = ", ".join([us.mention for us in users])
             await toss_channel.send(
                 f"{toss_pings}\nYou were tossed by {self.bot.pacify_name(ctx.author.display_name)}.\n"
-                '> *For your reference, a "toss" is where a Staff member wishes to speak with you, one on one. This session will be archived for Staff only once completed.*'
+                f'{get_config(ctx.guild.id, 'toss', 'tossmsg')}'
             )
 
             def check(m):
