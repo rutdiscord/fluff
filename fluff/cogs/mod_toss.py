@@ -533,10 +533,15 @@ class ModToss(Cog):
         )
         tosses = get_tossfile(ctx.guild.id, "tosses")
 
-        if tosses[ctx.channel.name]["tossed"]:
-            return await ctx.reply(
-                content="You must unmute everyone first!", mention_author=True
-            )
+        try:
+            if tosses[ctx.channel.name]["tossed"]:
+                return await ctx.reply(
+                    content="You must unmute everyone first!", mention_author=True
+                )
+        except KeyError:
+            # This might be a bad idea.
+            return await ctx.channel.delete(reason="Fluff Mute (No one was muted, KeyError except)")
+
 
         embed = stock_embed(self.bot)
         embed.title = "Muted Session Closed (Fluff)"
