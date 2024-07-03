@@ -618,7 +618,7 @@ class ModToss(Cog):
                     inline=True,
                 )
             
-            await upload(ctx, filename, f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}/", dotzip)
+            await upload(ctx, filename, f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}/", dotzip)
 
         del tosses[ctx.channel.name]
         set_tossfile(ctx.guild.id, "tosses", json.dumps(tosses))
