@@ -657,10 +657,6 @@ class ModMute(Cog):
                     )
                     break
             if mutechannel:
-                if mutechannel.name not in mutes:
-                    mutes[mutechannel.name] = {"muted": {}, "left": []}
-                elif not isinstance(mutes[mutechannel.name], dict):
-                    mutes[mutechannel.name] = {"muted": {}, "left": []}  # Ensure it's a dict
                 muterole = self.bot.pull_role(
                     member.guild, get_config(member.guild.id, "mute", "muterole")
                 )
@@ -668,17 +664,13 @@ class ModMute(Cog):
                 mutes[mutechannel.name]["muted"][str(member.id)] = mutes[
                     "LEFTGUILD"
                 ][str(member.id)]
-                mutes[mutechannel.name]["left"].remove(str(member.id))
+                mutes[mutechannel.name]["left"].remove(member.id)
             else:
                 mutechannel = await self.new_session(member.guild)
                 failed_roles, previous_roles = await self.perform_mute(
                     member, member.guild.me, mutechannel
                 )
                 mutes = get_mutefile(member.guild.id, "mutes")
-                if mutechannel.name not in mutes:
-                    mutes[mutechannel.name] = {"muted": {}, "left": []}
-                elif not isinstance(mutes[mutechannel.name], dict):
-                    mutes[mutechannel.name] = {"muted": {}, "left": []}  # Ensure it's a dict
                 mutes[mutechannel.name]["muted"][str(member.id)] = mutes[
                     "LEFTGUILD"
                 ][str(member.id)]
