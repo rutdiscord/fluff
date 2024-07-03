@@ -28,7 +28,7 @@ class ModToss(Cog):
     def __init__(self, bot):
         self.bot = bot
         self.busy = False
-        self.spamcounter = {}
+
         self.nocfgmsg = "Tossing isn't enabled for this server."
 
     def enabled(self, g):
