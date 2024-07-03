@@ -11,7 +11,7 @@ userlog_event_types = {
     "warns": "Warn",
     "bans": "Ban",
     "kicks": "Kick",
-    "mutes": "Mute",
+    "tosses": "Toss",
     "notes": "Note",
 }
 

@@ -581,28 +581,22 @@ class ModToss(Cog):
             dotraw += f"\n{ctx.message.created_at.astimezone().strftime('%Y/%m/%d %H:%M')} {self.bot.user} [BOT]\n{reply}"
 
             if not os.path.exists(
-                f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}"
+                f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}"
             ):
                 os.makedirs(
-                    f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}"
+                    f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}"
                 )
             with open(
-                f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}/{filename}.txt",
+                f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}/{filename}.txt",
                 "w", encoding='UTF-8'
             ) as filetxt:
                 filetxt.write(dotraw)
             if dotzip:
                 with open(
-                    f"data/servers/{ctx.guild.id}/mute/archives/sessions/{ctx.channel.id}/{filename} (files).zip",
+                    f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}/{filename} (files).zip",
                     "wb",
                 ) as filezip:
                     filezip.write(dotzip.getbuffer())
-
-            # embed = stock_embed(self.bot)
-            # embed.title = "Mute Session Closed (Fluff)"
-            # embed.description = f"`#{ctx.channel.name}`'s session was closed by {ctx.author.mention} ({ctx.author.id})."
-            # embed.color = ctx.author.color
-            # embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
 
             embed.add_field(
                 name="🗒️ Text",
