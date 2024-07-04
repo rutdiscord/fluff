@@ -1,4 +1,5 @@
 import discord
+import random
 from discord.ext import commands
 from discord.ext.commands import Cog
 from helpers.embeds import stock_embed, author_embed, sympage
@@ -14,6 +15,12 @@ class BunnyFacts(Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.image_urls = {
+            "binky" [
+                "https://media-be.chewy.com/wp-content/uploads/2022/05/24112223/rabbit-binkying.gif",
+                "https://global.discourse-cdn.com/business5/uploads/gemsofwar/original/3X/8/4/84364684586e83b84361ea90fce93dae8d0888d7.gif"
+            ]
+        }
 
     @commands.group(invoke_without_command=True)
     async def bunfact(self, ctx):
@@ -35,7 +42,8 @@ class BunnyFacts(Cog):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
         help_embed.add_field(name="Binky", value="People unfamiliar to pet rabbits may not know that bunnies have a very dramatic way of expressing excitement and joy. They dance! Leaping in the air, contorting and twisting their bodies, and kicking their feet out, binkying rabbits are quite the spectacle. Sometimes rabbits lead up to a binky by taking a running start. Other times, a binky is a sudden burst to the side. What\'s really fun is when the binkies occur in succession, creating a grand acrobatic display. \n[Link](https://myhouserabbit.com/rabbit-behavior/binkies-nose-bonks-and-flops-bunny-behavior-explained/)", inline=False)
-        help_embed.set_image(url="https://media-be.chewy.com/wp-content/uploads/2022/05/24112223/rabbit-binkying.gif")
+        random_image = random.choice(self.image_urls.get("binky",[]))
+        help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
 
     @bunfact.command(name="flopping", aliases = ["flop"])
