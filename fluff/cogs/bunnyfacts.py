@@ -17,6 +17,7 @@ class BunnyFacts(Cog):
 
     @commands.command()
     async def bunfact(self, ctx,):
+            await ctx.reply(embed=help_embed,mention_author=True)
             help_embed = stock_embed(self.bot)
             help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
             help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
@@ -28,15 +29,16 @@ class BunnyFacts(Cog):
             help_embed.add_field(name="Grunting", value="Bunnies grunt too!?", inline=True)
             help_embed.add_field(name="Boxing & Lunging", value="Bunnies box and lunge at each other!?", inline=True)
             help_embed.add_field(name="Getting a Bunny", value="Rescuing a bunny...", inline=True)
-            return await ctx.reply(embed=help_embed,mention_author=True)
-            
+            return 
+    
     @commands.command()
     @bunfact.command()
     async def binky(self, ctx,):
+            await ctx.reply(embed=help_embed,mention_author=True)
             help_embed = stock_embed(self.bot)
             help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
             help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
-            return await ctx.reply(embed=help_embed,mention_author=True)
+            return 
             
 async def setup(bot):
     await bot.add_cog(BunnyFacts(bot))
