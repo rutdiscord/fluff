@@ -44,7 +44,7 @@ class BunnyFacts(Cog):
     async def binky(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Binky", value="When a rabbit does a weird twist and jump in the air, it\'s called a binky. Rabbits do this when they have so much happy energy that they just can\'t contain it. A binkying bunny is a very happy bunny!\n[Link](https://bunnylady.com/bunny-binkies/)", inline=False)
+        help_embed.add_field(name="Binky", value="When a rabbit does a weird twist and jump in the air, it\'s called a binky. Rabbits do this when they have so much happy energy that they just can\'t contain it. A binkying bunny is a very happy bunny!\n**Why do rabbits binky?**\n We don\'t really know why rabbits binky. All we know is that it\'s a normal instinct in rabbits. It\'s like an inexplicable expression of joy, much like laughing is for humans.\n[Link](https://bunnylady.com/bunny-binkies/)", inline=False)
         random_image = random.choice(self.image_urls.get("binky",[]))
         help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
