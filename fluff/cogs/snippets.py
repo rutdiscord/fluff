@@ -6,6 +6,9 @@ from helpers.checks import isadmin
 from helpers.embeds import stock_embed
 from helpers.datafiles import get_guildfile, set_guildfile
 
+'''
+TODO: Rework this god awful system
+'''
 
 class Snippets(Cog):
     """

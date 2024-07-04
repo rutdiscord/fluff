@@ -2,9 +2,9 @@
 
 # By default, Fluff will fill in any word wrapped in {} with a shorthand from here.
 shorthands:
-  noping: <:noreplyping:1256413872638656585>
-  plsping: <:pleasereplyping:1256413910664220702>
-  waitping: <:waitbeforereplyping:1256413894189256734>
+  noping: "<:noping:1258418038504689694>"
+  plsping: "<:pleaseping:1258418052651942053>"
+  waitping: "<:waitbeforeping:1258418064781738076>"
 # A list of things that Fluff will "listen" to.
 # For example, "Listening to the validity of trans people".
 games:

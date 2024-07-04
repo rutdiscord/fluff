@@ -120,7 +120,7 @@ class Reply(Cog):
 
             pleaseping = "🔘" if profile["replypref"] == "pleasereplyping" else "⚫"
             embed.add_field(
-                name="<:pleasereplyping:1256722700563513467> Please Reply Ping",
+                name="<:pleaseping:1258418052651942053> Please Reply Ping",
                 value=pleaseping
                 + " Indicates that you would like to be pinged in replies.",
                 inline=False,
@@ -130,7 +130,7 @@ class Reply(Cog):
                 "🔘" if profile["replypref"] == "waitbeforereplyping" else "⚫"
             )
             embed.add_field(
-                name="<:waitbeforereplyping:1256722701410893935> Wait Before Reply Ping",
+                name="<:waitbeforeping:1258418064781738076> Wait Before Reply Ping",
                 value=waitbeforeping
                 + " Indicates that you would only like to be pinged after some time has passed.",
                 inline=False,
@@ -138,7 +138,7 @@ class Reply(Cog):
 
             noping = "🔘" if profile["replypref"] == "noreplyping" else "⚫"
             embed.add_field(
-                name="<:noreplyping:1256722699162488874> No Reply Ping",
+                name="<:noping:1258418038504689694> No Reply Ping",
                 value=noping
                 + " Indicates that you do not wish to be reply pinged whatsoever.",
                 inline=False,
@@ -148,9 +148,9 @@ class Reply(Cog):
 
         reacts = [
             "🤷",
-            "<:pleasereplyping:1256722700563513467>",
-            "<:waitbeforereplyping:1256722701410893935>",
-            "<:noreplyping:1256722699162488874>",
+            "<:pleaseping:1258418052651942053>",
+            "<:waitbeforeping:1258418064781738076>",
+            "<:noping:1258418038504689694",
         ]
         configmsg = await ctx.reply(embed=embed, mention_author=False)
         for react in reacts:
@@ -253,14 +253,14 @@ class Reply(Cog):
             preference == "pleasereplyping"
             and refmessage.author not in message.mentions
         ):
-            await message.add_reaction("<:pleasereplyping:1256722700563513467>")
+            await message.add_reaction("<:pleaseping:1258418052651942053>")
             pokemsg = await message.reply(content=refmessage.author.mention,mention_author=False)
             await self.bot.await_message(message.channel, refmessage.author, 86400)
             return await pokemsg.delete()
 
         # If reply pinged at all...
         elif preference == "noreplyping" and refmessage.author in message.mentions:
-            await message.add_reaction("<:noreplyping:1256722699162488874>")
+            await message.add_reaction("<:noping:1258418038504689694>")
             return
 
         # If reply pinged in a window of time...
@@ -277,7 +277,7 @@ class Reply(Cog):
                 int(message.created_at.timestamp()) - 30
                 <= self.timers[message.guild.id][refmessage.author.id]
             ):
-                await message.add_reaction("<:waitbeforereplyping:1256722701410893935>")
+                await message.add_reaction("<:waitbeforeping:1258418064781738076>")
             return
 
     @tasks.loop(hours=24)
