@@ -16,7 +16,7 @@ class BunnyFacts(Cog):
     def __init__(self, bot):
         self.bot = bot
         self.image_urls = {
-            "binky" [
+            "binky": [
                 "https://media-be.chewy.com/wp-content/uploads/2022/05/24112223/rabbit-binkying.gif",
                 "https://global.discourse-cdn.com/business5/uploads/gemsofwar/original/3X/8/4/84364684586e83b84361ea90fce93dae8d0888d7.gif"
             ]
