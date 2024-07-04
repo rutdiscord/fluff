@@ -6,6 +6,7 @@ from helpers.embeds import stock_embed, author_embed, sympage
 from helpers.sv_config import get_config
 
 # this entire page is made wholesale by marr so it looks like absolute shit
+# its kind of just coding practice but educating is fun too
 
 class BunnyFacts(Cog):
     """
@@ -39,16 +40,12 @@ class BunnyFacts(Cog):
             "chinning": [
                 "https://64.media.tumblr.com/f2dc3fbe0834c9903e48a2c6818ed3d7/tumblr_o8158dq9Wh1uronh1o1_400.gif"
             ],
-            "grunting": [
-
-            ],
             "boxing": [
-
+                "https://files.catbox.moe/2zk4ql.gif"
             ],
-            "getting": [
-
-            ]
         }
+
+#this displays the list of bunfacts
 
     @commands.group(invoke_without_command=True)
     async def bunfact(self, ctx):
@@ -62,7 +59,7 @@ class BunnyFacts(Cog):
             help_embed.add_field(name="Honking", value="Bunnies honk!?", inline=True)
             help_embed.add_field(name="Grunting", value="Bunnies grunt too!?", inline=True)
             help_embed.add_field(name="Boxing & Lunging", value="Bunnies box and lunge at each other!?", inline=True)
-            help_embed.add_field(name="Getting a Bunny", value="Rescuing a bunny...", inline=True)
+            help_embed.add_field(name="Purring", value="They can purr!?", inline=True)
             await ctx.reply(embed=help_embed,mention_author=False)
 
     @bunfact.command(name="binky", aliases = ["binkying"])
@@ -126,18 +123,16 @@ class BunnyFacts(Cog):
     async def boxinglunging(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Boxing & Lunging", value="Not yet implemented...", inline=True)
+        help_embed.add_field(name="Boxing & Lunging", value="Boxing and lunging are aggressive behaviors. A rabbit will stand on their hind legs and punch with their front legs as if to “box” you or lunge at you. A rabbit may exhibit this behavior if they are frightened or uncomfortable with you entering their territory and touching their belongings.\nThose aren't rabbits in the gif but same behavior - boxing.\n[Link](https://www.thinkingoutsidethecage.org/understanding-rabbit-body-language/)", inline=True)
         random_image = random.choice(self.image_urls.get("boxing",[]))
         help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
 
-    @bunfact.command(name="getting", aliases = ["get"])
+    @bunfact.command(name="purring", aliases = ["purr"])
     async def getting(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Getting a Rabbit", value="Not yet implemented...", inline=True)
-        random_image = random.choice(self.image_urls.get("getting",[]))
-        help_embed.set_image(url=random_image)
+        help_embed.add_field(name="Purring", value="This is when the rabbit gently grinds their teeth together, making a soft vibration in their head. Sometimes it even makes an audible sound. This is called a purr because, although the mechanism is different, it means the same thing as a cat\'s purr. Your rabbit is calm and content.\n[Link](https://bunnylady.com/bunny-binkies/)\n[Link to Video](https://www.youtube.com/watch?v=PvRBpY55JmE)", inline=True)
         await ctx.reply(embed=help_embed,mention_author=False)
 
 async def setup(bot):
