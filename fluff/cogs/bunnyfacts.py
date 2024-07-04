@@ -34,7 +34,8 @@ class BunnyFacts(Cog):
     async def binky(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Binky", value="[People unfamiliar to pet rabbits may not know that bunnies have a very dramatic way of expressing excitement and joy. They dance! Leaping in the air, contorting and twisting their bodies, and kicking their feet out, binkying rabbits are quite the spectacle. Sometimes rabbits lead up to a binky by taking a running start. Other times, a binky is a sudden burst to the side. What\'s really fun is when the binkies occur in succession, creating a grand acrobatic display.](https://myhouserabbit.com/rabbit-behavior/binkies-nose-bonks-and-flops-bunny-behavior-explained/)", inline=True)
+        help_embed.add_field(name="[Binky](https://myhouserabbit.com/rabbit-behavior/binkies-nose-bonks-and-flops-bunny-behavior-explained/)", value="People unfamiliar to pet rabbits may not know that bunnies have a very dramatic way of expressing excitement and joy. They dance! Leaping in the air, contorting and twisting their bodies, and kicking their feet out, binkying rabbits are quite the spectacle. Sometimes rabbits lead up to a binky by taking a running start. Other times, a binky is a sudden burst to the side. What\'s really fun is when the binkies occur in succession, creating a grand acrobatic display.", inline=True)
+        help_embed.set_image(url="https://files.catbox.moe/7sz38r.gif")
         await ctx.reply(embed=help_embed,mention_author=False)
 
     @bunfact.command(name="flopping", aliases = ["flop"])
