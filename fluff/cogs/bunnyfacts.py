@@ -31,6 +31,7 @@ class BunnyFacts(Cog):
             help_embed.add_field(name="Honking", value="Bunnies honk!?", inline=True)
             help_embed.add_field(name="Grunting", value="Bunnies grunt too!?", inline=True)
             help_embed.add_field(name="Boxing & Lunging", value="Bunnies box and lunge at each other!?", inline=True)
+            help_embed.add_field(name="Getting a Bunny", value="Rescuing a bunny...", inline=True)
             return await ctx.reply(embed=help_embed,mention_author=True)
         else:
             botcommand = self.bot.get_fact(fact)
