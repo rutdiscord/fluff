@@ -90,7 +90,7 @@ class BunnyFacts(Cog):
     async def periscoping(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
+        help_embed.add_field(name="Periscoping", value="Not yet implemented...", inline=True)
         random_image = random.choice(self.image_urls.get("periscoping",[]))
         help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
@@ -99,7 +99,7 @@ class BunnyFacts(Cog):
     async def thumping(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
+        help_embed.add_field(name="Thumping", value="Not yet implemented...", inline=True)
         random_image = random.choice(self.image_urls.get("thumping",[]))
         help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
@@ -108,7 +108,7 @@ class BunnyFacts(Cog):
     async def chinning(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
+        help_embed.add_field(name="Chinning", value="Not yet implemented...", inline=True)
         random_image = random.choice(self.image_urls.get("chinning",[]))
         help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
@@ -117,7 +117,7 @@ class BunnyFacts(Cog):
     async def honking(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
+        help_embed.add_field(name="Honking", value="Not yet implemented...", inline=True)
         random_image = random.choice(self.image_urls.get("honking",[]))
         help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
@@ -126,7 +126,7 @@ class BunnyFacts(Cog):
     async def grunting(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
+        help_embed.add_field(name="Grunting", value="Not yet implemented...", inline=True)
         random_image = random.choice(self.image_urls.get("grunting",[]))
         help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
@@ -135,7 +135,7 @@ class BunnyFacts(Cog):
     async def boxinglunging(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
+        help_embed.add_field(name="Boxing & Lunging", value="Not yet implemented...", inline=True)
         random_image = random.choice(self.image_urls.get("boxing",[]))
         help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
@@ -144,7 +144,7 @@ class BunnyFacts(Cog):
     async def getting(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
+        help_embed.add_field(name="Getting a Rabbit", value="Not yet implemented...", inline=True)
         random_image = random.choice(self.image_urls.get("getting",[]))
         help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
