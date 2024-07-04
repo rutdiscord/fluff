@@ -26,9 +26,9 @@ class BunnyFacts(Cog):
             "flopping": [
                 "https://live.staticflickr.com/2541/4222032144_9d2be8fdaa_b.jpg",
                 "https://i.ytimg.com/vi/BNusKhdWYPw/maxresdefault.jpg",
-                "https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Fg44anan07yg31.jpg",
-                "https://www.reddit.com/media?url=https%3A%2F%2Fpreview.redd.it%2Fboo-does-dramatic-flops-v0-i35usd80wu3d1.jpg%3Fwidth%3D640%26crop%3Dsmart%26auto%3Dwebp%26s%3D6ef8e0a045e8abf318948bcdee61ba89015f4458",
-                "https://www.reddit.com/media?url=https%3A%2F%2Fpreview.redd.it%2Flc4906inm8131.jpg%3Fwidth%3D1080%26crop%3Dsmart%26auto%3Dwebp%26s%3Dea0a4e1decce4cf1ff4cb057f64f063f4ec9d0a9"
+                "https://files.catbox.moe/eezsl8.webp",
+                "https://files.catbox.moe/vko0fw.webp",
+                "https://files.catbox.moe/j13oqw.jpg"
             ],
             "periscoping": [
 
