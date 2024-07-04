@@ -36,11 +36,8 @@ class BunnyFacts(Cog):
                 "https://files.catbox.moe/qc50g5.jpg",
                 "https://www.budgetbunny.ca/wp-content/uploads/2013/09/IMG_6163-510x729.gif",
             ],  
-            "thumping": [
-
-            ],
             "chinning": [
-
+                "https://64.media.tumblr.com/f2dc3fbe0834c9903e48a2c6818ed3d7/tumblr_o8158dq9Wh1uronh1o1_400.gif"
             ],
             "grunting": [
 
@@ -99,14 +96,14 @@ class BunnyFacts(Cog):
     async def thumping(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Thumping", value="When a rabbit thumps their hind legs against the ground. This means that a rabbit senses danger or is very upset with something. https://www.youtube.com/watch?v=g9kiuQ1pql8 \n[Link](https://bunnylady.com/rabbit-care-guide/)\n[Link to Video](https://www.youtube.com/watch?v=g9kiuQ1pql8)", inline=True)
+        help_embed.add_field(name="Thumping", value="When a rabbit thumps their hind legs against the ground. This means that a rabbit senses danger or is very upset with something.\n[Link](https://bunnylady.com/rabbit-care-guide/)\n[Link to Video](https://www.youtube.com/watch?v=g9kiuQ1pql8)", inline=True)
         await ctx.reply(embed=help_embed,mention_author=False)
 
     @bunfact.command(name="chinning", aliases = ["chin"])
     async def chinning(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Chinning", value="Not yet implemented...", inline=True)
+        help_embed.add_field(name="Chinning", value="The rabbit will rub their chin against an object to claim it as their own. Rabbits have scent glands under their chins, so this spreads their scent around and lets any other rabbits know that this is your rabbit\'s territory.", inline=True)
         random_image = random.choice(self.image_urls.get("chinning",[]))
         help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
