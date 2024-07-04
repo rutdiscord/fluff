@@ -16,7 +16,7 @@ class BunnyFacts(Cog):
         self.bot = bot
 
     @commands.command()
-    async def bunfact(self, ctx, *, fact=None, bunfact):
+    async def bunfact(self, ctx, *, fact=None):
         """This is Fluff's bunny facts command."""
         if not fact:
             help_embed = stock_embed(self.bot)
@@ -32,10 +32,10 @@ class BunnyFacts(Cog):
             help_embed.add_field(name="Getting a Bunny", value="Rescuing a bunny...", inline=True)
             return await ctx.reply(embed=help_embed,mention_author=True)
         else:
-            botcommand = bunfact
+            botcommand = self.bot.get_fact(fact)
             if not botcommand:
                 return await ctx.reply(
-                    "I couldn't figure out how to get rid of this :()",
+                    "This isn't a configured bunny fact.",
                     mention_author=False,
                 )
             
