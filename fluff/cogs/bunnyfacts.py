@@ -26,15 +26,15 @@ class BunnyFacts(Cog):
             help_embed.add_field(name="Test1", value="test1", inline=True)
             help_embed.add_field(name="Test2", value="test2", inline=True)
             help_embed.add_field(name="Test3", value="test3", inline=True)
-            help_embed.add_field(name="Test4", value="test4", inline=False)
+            help_embed.add_field(name="Test4", value="test4", inline=True)
             help_embed.add_field(name="Test5", value="test5", inline=True)
             help_embed.add_field(name="Test6", value="test6", inline=True)
             help_embed.add_field(name="Test7", value="test7", inline=True)
-            help_embed.add_field(name="Test8", value="test8", inline=False)
+            help_embed.add_field(name="Test8", value="test8", inline=True)
             help_embed.add_field(name="Test9", value="test9", inline=True)
             help_embed.add_field(name="Test10", value="test10", inline=True)
             help_embed.add_field(name="Test11", value="test11", inline=True)
-            return await ctx.reply(embed=help_embed,mention_author=False)
+            return await ctx.reply(embed=help_embed,mention_author=True)
         else:
             botcommand = self.bot.get_fact(fact)
             if not botcommand:
