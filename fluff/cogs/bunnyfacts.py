@@ -22,7 +22,7 @@ class BunnyFacts(Cog):
                 "https://elizabethannemartins.com/wp-content/uploads/2016/05/tumblr_mn7spsxk191ss93ulo1_400.gif?w=350&h=276",
                 "https://files.catbox.moe/m8us2w.gif",
                 "https://imgur.com/1fIf7o3",
-                "https://imgur.com/binky-rabbit-bunny-1fIf7o3"
+                "https://files.catbox.moe/p2fg1y.gif"
             ]
         }
 
