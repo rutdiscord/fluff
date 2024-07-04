@@ -32,14 +32,14 @@ class BunnyFacts(Cog):
             ],
             "periscoping": [
                 "https://files.catbox.moe/dzgwnr.jpg",
-            ],
+                "https://farm2.static.flickr.com/1069/1473341276_980253934b.jpg",
+                "https://files.catbox.moe/qc50g5.jpg",
+                "https://www.budgetbunny.ca/wp-content/uploads/2013/09/IMG_6163-510x729.gif",
+            ],  
             "thumping": [
 
             ],
             "chinning": [
-
-            ],
-            "honking": [
 
             ],
             "grunting": [
@@ -90,7 +90,7 @@ class BunnyFacts(Cog):
     async def periscoping(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Periscoping", value="This is when your rabbit stands on their hind legs, it means they are curious and are trying to get a better vantage point. They often beg for treats like this.", inline=True)
+        help_embed.add_field(name="Periscoping", value="This is when a rabbit stands on their hind legs, it means they are curious and are trying to get a better vantage point. They often beg for treats like this.\n[Link](https://bunnylady.com/rabbit-care-guide/)", inline=True)
         random_image = random.choice(self.image_urls.get("periscoping",[]))
         help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
@@ -99,9 +99,8 @@ class BunnyFacts(Cog):
     async def thumping(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Thumping", value="Not yet implemented...", inline=True)
-        random_image = random.choice(self.image_urls.get("thumping",[]))
-        help_embed.set_image(url=random_image)
+        help_embed.add_field(name="Thumping", value="When a rabbit thumps their hind legs against the ground. This means that a rabbit senses danger or is very upset with something.\n[Link](https://bunnylady.com/rabbit-care-guide/)\n[Link to Video](https://www.youtube.com/watch?v=g9kiuQ1pql8)", inline=True)
+        help_embed.set_image(url="random_image")
         await ctx.reply(embed=help_embed,mention_author=False)
 
     @bunfact.command(name="chinning", aliases = ["chin"])
@@ -117,9 +116,8 @@ class BunnyFacts(Cog):
     async def honking(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Honking", value="Not yet implemented...", inline=True)
-        random_image = random.choice(self.image_urls.get("honking",[]))
-        help_embed.set_image(url=random_image)
+        help_embed.add_field(name="Honking", value="Honking is often a sign of pleasure. Some bunnies honk when they are eating, getting treats, getting attention, or snuggling.\nIt can also be a hormonal behavior in unfixed rabbits.\n[Link](https://www.rabbithaven.org/vocalizations)\n[Link to Video](https://www.youtube.com/watch?v=9d8JViSZ9vY)", inline=True)
+        help_embed.set_video(url="https://files.catbox.moe/wd56v8.mp4")
         await ctx.reply(embed=help_embed,mention_author=False)
 
     @bunfact.command(name="grunting", aliases = ["grunt"])
