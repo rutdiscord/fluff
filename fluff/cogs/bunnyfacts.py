@@ -113,16 +113,13 @@ class BunnyFacts(Cog):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
         help_embed.add_field(name="Honking", value="Honking is often a sign of pleasure. Some bunnies honk when they are eating, getting treats, getting attention, or snuggling.\nIt can also be a hormonal behavior in unfixed rabbits.\n[Link](https://www.rabbithaven.org/vocalizations)\n[Link to Video](https://www.youtube.com/watch?v=9d8JViSZ9vY)", inline=True)
-        help_embed.set_video(url="https://files.catbox.moe/wd56v8.mp4")
         await ctx.reply(embed=help_embed,mention_author=False)
 
     @bunfact.command(name="grunting", aliases = ["grunt"])
     async def grunting(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Grunting", value="Not yet implemented...", inline=True)
-        random_image = random.choice(self.image_urls.get("grunting",[]))
-        help_embed.set_image(url=random_image)
+        help_embed.add_field(name="Grunting", value="Rabbits grunting usually means they're angry and possibly feel threatened. Sometimes, the grunting is followed by a nip or bite. Some rabbits do not like it when you rearrange their cages as you clean. So they might grunt, charge, or even nip you when you try.\n[Link](https://bestfriends.org/pet-care-resources/pet-rabbit-body-language-and-bunny-behavior)\n[Link to Video](https://www.youtube.com/watch?v=OycSzdxCKQE)", inline=True)
         await ctx.reply(embed=help_embed,mention_author=False)
 
     @bunfact.command(name="boxinglunging", aliases = ["boxing", "lunging"])
