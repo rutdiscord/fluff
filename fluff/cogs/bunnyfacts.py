@@ -100,6 +100,7 @@ class BunnyFacts(Cog):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
         help_embed.add_field(name="Thumping", value="When a rabbit thumps their hind legs against the ground. This means that a rabbit senses danger or is very upset with something.\n[Link](https://bunnylady.com/rabbit-care-guide/)\n[Link to Video](https://www.youtube.com/watch?v=g9kiuQ1pql8)", inline=True)
+        youtube_url = "https://www.youtube.com/watch?v=g9kiuQ1pql8"
         await ctx.reply(embed=help_embed,mention_author=False)
 
     @bunfact.command(name="chinning", aliases = ["chin"])
