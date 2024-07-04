@@ -22,6 +22,34 @@ class BunnyFacts(Cog):
                 "https://elizabethannemartins.com/wp-content/uploads/2016/05/tumblr_mn7spsxk191ss93ulo1_400.gif?w=350&h=276",
                 "https://files.catbox.moe/m8us2w.gif",
                 "https://files.catbox.moe/p2fg1y.gif"
+            ],
+            "flopping": [
+                "https://live.staticflickr.com/2541/4222032144_9d2be8fdaa_b.jpg",
+                "https://i.ytimg.com/vi/BNusKhdWYPw/maxresdefault.jpg",
+                "https://www.reddit.com/media?url=https%3A%2F%2Fi.redd.it%2Fg44anan07yg31.jpg",
+                "https://www.reddit.com/media?url=https%3A%2F%2Fpreview.redd.it%2Fboo-does-dramatic-flops-v0-i35usd80wu3d1.jpg%3Fwidth%3D640%26crop%3Dsmart%26auto%3Dwebp%26s%3D6ef8e0a045e8abf318948bcdee61ba89015f4458",
+                "https://www.reddit.com/media?url=https%3A%2F%2Fpreview.redd.it%2Flc4906inm8131.jpg%3Fwidth%3D1080%26crop%3Dsmart%26auto%3Dwebp%26s%3Dea0a4e1decce4cf1ff4cb057f64f063f4ec9d0a9"
+            ],
+            "periscoping": [
+
+            ],
+            "thumping": [
+
+            ],
+            "chinning": [
+
+            ],
+            "honking": [
+
+            ],
+            "grunting": [
+
+            ],
+            "boxing": [
+
+            ],
+            "getting": [
+
             ]
         }
 
@@ -53,7 +81,9 @@ class BunnyFacts(Cog):
     async def flopping(self, ctx):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
-        help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
+        help_embed.add_field(name="Binky", value="In most cases, a rabbit laying on their side is just sleeping. They aren\'t sick or dying in any way. Instead, this is a position rabbits will sleep in when they feel completely safe and secure in their environment.\nSince rabbits are at the bottom of the food chain, they need to be prepared to run away at the first sign of danger. When they sleep like this, rabbits cannot come to awareness and get up as quickly as other sleeping positions. Moreover, rabbits tend to sleep more deeply when they lay on their sides, not waking up as easily as when they sleep in a loaf position. This means that they need to have a high amount of trust in you before they\'ll be willing to flop over to sleep.", inline=True)
+        random_image = random.choice(self.image_urls.get("flopping",[]))
+        help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
 
     @bunfact.command(name="periscoping")
@@ -61,6 +91,8 @@ class BunnyFacts(Cog):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
         help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
+        random_image = random.choice(self.image_urls.get("periscoping",[]))
+        help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
 
     @bunfact.command(name="thumping", aliases = ["thump"])
@@ -68,6 +100,8 @@ class BunnyFacts(Cog):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
         help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
+        random_image = random.choice(self.image_urls.get("thumping",[]))
+        help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
 
     @bunfact.command(name="chinning", aliases = ["chin"])
@@ -75,6 +109,8 @@ class BunnyFacts(Cog):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
         help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
+        random_image = random.choice(self.image_urls.get("chinning",[]))
+        help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
 
     @bunfact.command(name="honking", aliases = ["honk"])
@@ -82,6 +118,8 @@ class BunnyFacts(Cog):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
         help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
+        random_image = random.choice(self.image_urls.get("honking",[]))
+        help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
 
     @bunfact.command(name="grunting", aliases = ["grunt"])
@@ -89,6 +127,26 @@ class BunnyFacts(Cog):
         help_embed = stock_embed(self.bot)
         help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
         help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
+        random_image = random.choice(self.image_urls.get("grunting",[]))
+        help_embed.set_image(url=random_image)
+        await ctx.reply(embed=help_embed,mention_author=False)
+
+    @bunfact.command(name="boxinglunging", aliases = ["boxing", "lunging"])
+    async def boxinglunging(self, ctx):
+        help_embed = stock_embed(self.bot)
+        help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
+        help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
+        random_image = random.choice(self.image_urls.get("boxing",[]))
+        help_embed.set_image(url=random_image)
+        await ctx.reply(embed=help_embed,mention_author=False)
+
+    @bunfact.command(name="getting", aliases = ["get"])
+    async def getting(self, ctx):
+        help_embed = stock_embed(self.bot)
+        help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
+        help_embed.add_field(name="Binky", value="What is a binky!?", inline=True)
+        random_image = random.choice(self.image_urls.get("getting",[]))
+        help_embed.set_image(url=random_image)
         await ctx.reply(embed=help_embed,mention_author=False)
 
 async def setup(bot):
