@@ -132,7 +132,7 @@ class Basic(Cog):
             formdata.add_field("url", r)
             async with self.bot.session.post(api_url, data=formdata) as response:
                 output = await response.text()
-                await ctx.reply(content=f'output: {output}, code: {response.status_code}', mention_author=False)
+                await ctx.reply(content=f'output: {output}, code: {response.status}', mention_author=False)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command()
