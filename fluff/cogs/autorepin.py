@@ -27,9 +27,9 @@ class Autorepin(commands.Cog):
           #  print(f"")
           return
         
-    @pins.bot_has_permissions(manage_messages=True)
-    @pins.check(ismod)
-    @pins.guild_only()
+    @commands.bot_has_permissions(manage_messages=True)
+    @commands.check(ismod)
+    @commands.guild_only()
     @pins.command()
     async def create(self, ctx, msglink):
         message_link_regex = r"\/([0-9].*)\/([0-9].*)\/([0-9].*[^/])\/{0,}"
