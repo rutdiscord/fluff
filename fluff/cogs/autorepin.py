@@ -39,13 +39,13 @@ class Autorepin(commands.Cog):
                         'message': regex_match.group(3)}  # Message
                                                             # Removed the guild part because we can just assume from CTX...?
         guild_pins = get_guildfile(ctx.guild.id, "pins")
-        channel_pins = guild_pins.get(link_matches['channel'], [])
+        channel_pins = list(guild_pins.get(link_matches['channel']))
         print('before', guild_pins, channel_pins)
 
         channel_pins.append(link_matches['message'])
         print('after', guild_pins, channel_pins)
         set_guildfile(ctx.guild.id, "pins", json.dumps(guild_pins))
-        return await ctx.reply("Pin Made Lol", mention_author=False)
+        return await ctx.reply(f"xbox {get_guildfile(ctx.guild.id,'pins')}", mention_author=False)
 
     def update_pins(guild, channel):
         guild_pins = get_guildfile(guild.id, "pins")
@@ -54,6 +54,17 @@ class Autorepin(commands.Cog):
                 channel.fetch_message(pin)                
         else: 
             raise LookupError('Channel not found in pins, not bothering')
+        
+    @commands.bot_has_permissions(manage_messages=True)
+    @commands.check(ismod)
+    @commands.guild_only()
+    @pins.command()
+    async def setup(self, ctx, channel: discord.TextChannel = None):
+        if not channel:
+            channel = ctx.channel
+        guild_pins = get_guildfile(ctx.guild.id, "pins")
+        guild_pins[ctx.channel.id] = []
+        set_guildfile(ctx.guild.id, "pins", guild_pins)
         
 async def setup(bot):
    await bot.add_cog(Autorepin(bot))
