@@ -20,7 +20,8 @@ class StickiedPins(commands.Cog):
                 
                 if message.pinned: 
                     message.unpin()
-                message.pin()
+                else:
+                    message.pin()
 
         else: 
             raise LookupError('Channel not found in pins, not bothering')
