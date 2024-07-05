@@ -279,35 +279,6 @@ class Reply(Cog):
             ):
                 await message.add_reaction("<:waitbeforeping:1258418064781738076>")
             return
-        
-        @Cog.listener()
-        async def on_member_update(self, before, after):
-            await self.bot.wait_until_ready()
-
-            if before.roles == after.roles:
-                return
-            
-            role_mapping = {
-                "Please Ping": "pleaseping",
-                "Ping after Delay": "pingafterdelay",
-                "No Ping": "norping"
-            }
-
-            new_setting = None
-            for role_name, setting in role_mapping.items():
-                role = self.bot.pull_role(after.guild, role_name)
-                if role in after.roles:
-                    new_setting = setting
-                    break
-
-            if new_setting:
-                profile = fill_profile(after.id)
-                profile["replypref"] = new_setting
-                set_userfile(after.id, "profile", json.dumps(profile))
-            else:
-                profile = fill_profile(after.id)
-                profile["replypref"] = None
-                set_userfile(after.id, "profile", json.dumps(profile))
 
     @tasks.loop(hours=24)
     async def counttimer(self):
