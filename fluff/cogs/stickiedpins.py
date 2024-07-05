@@ -8,7 +8,7 @@ from helpers.datafiles import get_guildfile, set_guildfile
 from helpers.checks import ismod
 from helpers.embeds import stock_embed, sympage
 
-class Autorepin(commands.Cog):
+class StickiedPins(commands.Cog):
     def __init__(self, bot):
         self.bot = bot        
 
@@ -43,12 +43,19 @@ class Autorepin(commands.Cog):
         if link_matches["channel"] not in guild_pins:
             guild_pins[link_matches['channel']] = []
             channel_pins = guild_pins[link_matches['channel']]
+        
+        if link_matches['message'] in guild_pins[link_matches['channel']]:
+            raise ValueError('Message to be pinned already exists in stickied messages.')
             
-        print('before', guild_pins, channel_pins)
         channel_pins.append(link_matches['message'])
-        print('after', guild_pins, channel_pins)
         set_guildfile(ctx.guild.id, "pins", json.dumps(guild_pins))
-        return await ctx.reply(f"xbox {get_guildfile(ctx.guild.id,'pins')}", mention_author=False)
+
+        try:
+            if link_matches['message'] in guild_pins[link_matches['channel']]:
+              return await ctx.reply(f"Stickied pin created in <#{link_matches['channel']}>.", mention_author=False)
+        except Exception as reason:
+            return await ctx.reply(f"Stickied pin failed to be created. {reason}")
+
 
     def update_pins(guild, channel):
         guild_pins = get_guildfile(guild.id, "pins")
@@ -59,4 +66,4 @@ class Autorepin(commands.Cog):
             raise LookupError('Channel not found in pins, not bothering')
         
 async def setup(bot):
-   await bot.add_cog(Autorepin(bot))
+   await bot.add_cog(StickiedPins(bot))
