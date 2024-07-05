@@ -15,7 +15,7 @@ class StickiedPins(commands.Cog):
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
     @commands.guild_only()
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=True, aliases=["pin", "sticky"])
     async def pins(self, ctx):
         # Setup regular expression
 
