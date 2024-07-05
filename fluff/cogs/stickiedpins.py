@@ -15,7 +15,7 @@ class StickiedPins(commands.Cog):
     def update_pins(self, guild: discord.Guild, channel: discord.abc.GuildChannel):
         guild_pins = get_guildfile(guild.id, "pins")
         if str(channel.id) in guild_pins:
-            for pin in guild_pins[channel.id]:
+            for pin in guild_pins[str(channel.id)]:
                 message = channel.fetch_message(pin)
                 
                 if message.pinned: 
