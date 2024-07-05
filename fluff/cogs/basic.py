@@ -137,7 +137,8 @@ class Basic(Cog):
                 if response == 412:
                     return await ctx.reply(content=f'Your file is too large. If you\'re uploading a GIF, try optimizing with something like [Ezgif](https://ezgif.com).', mention_author=False)
                 else:
-                    return await ctx.reply(content=response.text(), mention_author=False)
+                    whats_supposed_to_be_the_image_link = await response.text()
+                    return await ctx.reply(content=whats_supposed_to_be_the_image_link, mention_author=False)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command()
