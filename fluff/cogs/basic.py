@@ -126,17 +126,22 @@ class Basic(Cog):
                 content="You need to supply a file or a file link to rehost.",
                 mention_author=False,
             )
+        # String multiple attachments/links together
         links = links.split() if links else []
         for r in [f.url for f in ctx.message.attachments] + links:
+            # Formulate form data for Catbox
             formdata = aiohttp.FormData()
             formdata.add_field("reqtype", "urlupload")
             if self.bot.config.catbox_key:
                 formdata.add_field("userhash", self.bot.config.catbox_key)
             formdata.add_field("url", r)
+            # Post form data
             async with self.bot.session.post(api_url, data=formdata) as response:
                 if response.status == 412:
+                # Catbox 412 response conflicts with server rules. Overriding this makes it both friendlier and an opportunity to direct users somewhere they can fix it
                     return await ctx.reply(content=f'Your file is too large. If you\'re uploading a GIF, try optimizing with something like [Ezgif](https://ezgif.com).', mention_author=False)
                 else:
+                # If there's no issue, then assume it's safe to send the response back
                     whats_supposed_to_be_the_image_link = await response.text()
                     return await ctx.reply(content=whats_supposed_to_be_the_image_link, mention_author=False)
 
