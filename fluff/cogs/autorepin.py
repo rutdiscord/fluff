@@ -58,16 +58,5 @@ class Autorepin(commands.Cog):
         else: 
             raise LookupError('Channel not found in pins, not bothering')
         
-    @commands.bot_has_permissions(manage_messages=True)
-    @commands.check(ismod)
-    @commands.guild_only()
-    @pins.command()
-    async def setup(self, ctx, channel: discord.TextChannel = None):
-        if not channel:
-            channel = ctx.channel
-        guild_pins = get_guildfile(ctx.guild.id, "pins")
-        guild_pins[ctx.channel.id] = []
-        set_guildfile(ctx.guild.id, "pins", guild_pins)
-        
 async def setup(bot):
    await bot.add_cog(Autorepin(bot))
