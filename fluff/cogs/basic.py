@@ -117,6 +117,9 @@ class Basic(Cog):
 
         - `links`
         The links to reupload to catbox."""
+        '''
+        TODO: Move away from Catbox due to user-facing slurs 
+        '''
         api_url = "https://catbox.moe/user/api.php"
         if not ctx.message.attachments and not links:
             return await ctx.reply(
