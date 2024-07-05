@@ -3,13 +3,12 @@ import os
 import re
 import discord
 from discord.ext import commands, tasks
-from commands import Cog
 from helpers.placeholders import random_msg
 from helpers.datafiles import get_guildfile, set_guildfile
 from helpers.checks import ismod
 from helpers.embeds import stock_embed, sympage
 
-class Autorepin(Cog):
+class Autorepin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot        
 
