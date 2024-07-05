@@ -37,15 +37,12 @@ class Autorepin(commands.Cog):
         guild_pins = get_guildfile(ctx.guild.id, "pins")
 
         link_matches = {}
-        try:
-            link_matches = {'channel': regex_match.group(2),  # Channel
-                            'message': regex_match.group(3)}  # Message
-                                                              # Removed the guild part because we can just assume from CTX...?
-            guild_pins[link_matches['channel']].append(link_matches['message'])
-            set_guildfile(ctx.guild.id, "pins", json.dumps(guild_pins))
-        except (AttributeError, KeyError):
-            return await ctx.reply(random_msg("err_generic") + (" (Regex failed to find a valid message link)"))
-        return
+        link_matches = {'channel': regex_match.group(2),  # Channel
+                        'message': regex_match.group(3)}  # Message
+                                                            # Removed the guild part because we can just assume from CTX...?
+        guild_pins[link_matches['channel']].append(link_matches['message'])
+        set_guildfile(ctx.guild.id, "pins", json.dumps(guild_pins))
+        return await ctx.reply("Pin Made Lol", mention_author=False)
 
     def update_pins(guild, channel):
         guild_pins = get_guildfile(guild.id, "pins")
