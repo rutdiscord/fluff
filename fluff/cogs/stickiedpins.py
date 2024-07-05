@@ -19,9 +19,9 @@ class StickiedPins(commands.Cog):
                 message = await channel.fetch_message(pin)
                 
                 if message.pinned: 
-                    message.unpin()
+                    await message.unpin()
                 else:
-                    message.pin()
+                    await message.pin()
 
         else: 
             raise LookupError('Channel not found in pins, not bothering')
