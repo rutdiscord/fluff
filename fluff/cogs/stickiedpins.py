@@ -74,9 +74,9 @@ class StickiedPins(commands.Cog):
     @commands.check(ismanager)
     @commands.guild_only()
     @pins.command()
-    async def force_update(self, ctx: discord.abc.GuildChannel):
+    async def force_update(self, ctx: discord.abc.GuildChannel, target_channel: discord.abc.GuildChannel= None):
         guild = ctx.guild
-        channel = ctx.channel
+        channel = target_channel or ctx.channel
         return await self.update_pins(guild,channel)
         
 async def setup(bot):
