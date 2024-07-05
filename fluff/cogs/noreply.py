@@ -285,6 +285,21 @@ class Reply(Cog):
         await self.bot.wait_until_ready()
         self.nopingreminders = {}
 
+    @Cog.listener()
+    async def on_member_update(self, before, after):
+        new_roles = set(after.roles) - set(before.roles)
+
+        role_preferences = {
+            "Please Ping": "pleaseping",
+            "Ping after Delay": "pingafterdelay",
+            "No Ping": "noping",
+        }
+        for role in new_roles:
+            if role.name in role_preferences:
+                profile = fill_profile(after.id)
+                profile["replypref"] = role_preferences[role.name]
+                set_userfile(after.id, "profile", json.dumps(profile))
+                break
 
 async def setup(bot):
     await bot.add_cog(Reply(bot))
