@@ -177,11 +177,11 @@ class Reply(Cog):
             if str(reaction) == reacts[0]:
                 profile["replypref"] = None
             elif str(reaction) == reacts[1]:
-                profile["replypref"] = "pleasereplyping"
+                profile["replypref"] = "pleaseping"
             elif str(reaction) == reacts[2]:
-                profile["replypref"] = "waitbeforereplyping"
+                profile["replypref"] = "pingafterdelay"
             elif str(reaction) == reacts[3]:
-                profile["replypref"] = "noreplyping"
+                profile["replypref"] = "noping"
             set_userfile(ctx.author.id, "profile", json.dumps(profile))
             embed.clear_fields()
             fieldadd()
