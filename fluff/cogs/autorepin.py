@@ -39,7 +39,7 @@ class Autorepin(commands.Cog):
                         'message': regex_match.group(3)}  # Message
                                                             # Removed the guild part because we can just assume from CTX...?
         guild_pins = get_guildfile(ctx.guild.id, "pins")
-        channel_pins = guild_pins.get(link_matches['channel'])
+        channel_pins = guild_pins.get(link_matches['channel'],[])
         print('before', guild_pins, channel_pins)
 
         channel_pins.append(link_matches['message'])
