@@ -185,6 +185,7 @@ class Basic(Cog):
             help_embed.add_field(name="User Avy", value="`pls avy [user]` will tell me to post your avatar. Without any user specified, I will post your current avatar.", inline=False)
             help_embed.add_field(name="Server Avy", value="`pls avy server` will tell me to post the avatar of the server.", inline=False)
             help_embed.add_field(name="About Me", value="`pls about` shows my info!")
+            help_embed.add_field(name="Bunfact", value="`pls bunfact` and `pls bunfact [fact name]` shows a fun bun fact, and sometimes an associated gif or image!")
             return await ctx.reply(embed=help_embed,mention_author=False)
         else:
             botcommand = self.bot.get_command(command)
