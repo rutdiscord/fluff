@@ -23,7 +23,7 @@ class Autorepin(commands.Cog):
                         'channel': regex_match.group(2),  # Channel
                         'message': regex_match.group(3)} # Message
             return await ctx.reply(f"Guild: {link_matches[0]}\nChannel:{link_matches[1]}\nMessage:{link_matches[2]}")
-        except AttributeError:
+        except (AttributeError, KeyError):
             return await ctx.reply(random_msg("err_generic") + ("(Regex failed to find a valid message link)"))
 
 
