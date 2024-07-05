@@ -12,7 +12,7 @@ class StickiedPins(commands.Cog):
     def __init__(self, bot):
         self.bot = bot        
 
-    def update_pins(guild: discord.Guild, channel: discord.abc.GuildChannel):
+    def update_pins(self, guild: discord.Guild, channel: discord.abc.GuildChannel):
         guild_pins = get_guildfile(guild.id, "pins")
         if channel.id in guild_pins:
             for pin in guild_pins[channel.id]:
