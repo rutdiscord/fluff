@@ -32,12 +32,12 @@ class Reply(Cog):
         if not message.guild:
             return None
         setting_roles = [
-            (self.bot.pull_role(message.guild, "Please Ping"), "pleaseping"),
+            (self.bot.pull_role(message.guild, "Please Ping"), "pleasereplyping"),
             (
                 self.bot.pull_role(message.guild, "Ping after Delay"),
-                "pingafterdelay",
+                "waitbeforereplyping",
             ),
-            (self.bot.pull_role(message.guild, "No Ping"), "noping"),
+            (self.bot.pull_role(message.guild, "No Ping"), "noreplyping"),
         ]
         for role, identifier in setting_roles:
             if role == None:
@@ -177,11 +177,11 @@ class Reply(Cog):
             if str(reaction) == reacts[0]:
                 profile["replypref"] = None
             elif str(reaction) == reacts[1]:
-                profile["replypref"] = "pleaseping"
+                profile["replypref"] = "pleasereplyping"
             elif str(reaction) == reacts[2]:
-                profile["replypref"] = "pingafterdelay"
+                profile["replypref"] = "waitbeforereplyping"
             elif str(reaction) == reacts[3]:
-                profile["replypref"] = "noping"
+                profile["replypref"] = "noreplyping"
             set_userfile(ctx.author.id, "profile", json.dumps(profile))
             embed.clear_fields()
             fieldadd()
@@ -290,9 +290,9 @@ class Reply(Cog):
         new_roles = set(after.roles) - set(before.roles)
 
         role_preferences = {
-            "Please Ping": "pleaseping",
-            "Ping after Delay": "pingafterdelay",
-            "No Ping": "noping",
+            "Please Ping": "pleasereplyping",
+            "Ping after Delay": "waitbeforereplyping",
+            "No Ping": "noreplyping",
         }
         for role in new_roles:
             if role.name in role_preferences:
