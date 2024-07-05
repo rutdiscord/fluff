@@ -1,10 +1,10 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands, tasks
 import json
 import os
 import re
 
-class PinHandler(commands.Cog):
+class Autorepin(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.json_file = "pinned_messages.json"
@@ -24,13 +24,15 @@ class PinHandler(commands.Cog):
             json.dump(self.pinned_messages, file, indent=4)
 
     @commands.command()
-    async def pinadd(self, ctx, message_link: str, position: int):
+    async def pinadd(self, ctx, message_link: str, position: int, channel_id: int = None):
         try:
             message_id = int(re.search(r'/(\d+)$', message_link).group(1))
         except AttributeError:
             return await ctx.send("Invalid message link format. Provide a valid message link.")
 
-        channel_id = ctx.channel.id
+        if not channel_id:
+            channel_id = ctx.channel.id
+
         if channel_id not in self.pinned_messages["channels"]:
             self.pinned_messages["channels"][channel_id] = {"pinned_messages": []}
 
@@ -44,27 +46,29 @@ class PinHandler(commands.Cog):
 
         pinned_messages.insert(position - 1, {"message_id": message_id, "position": position})
         self.save_pinned_messages()
-        await ctx.send(f"Message {message_id} added to pinned list at position {position}.")
+        await ctx.send(f"Message {message_id} added to pinned list at position {position} in channel {channel_id}.")
 
     @commands.command()
-    async def pinlist(self, ctx):
-        channel_id = ctx.channel.id
+    async def pinlist(self, ctx, channel_id: int = None):
+        if not channel_id:
+            channel_id = ctx.channel.id
+
         if channel_id not in self.pinned_messages["channels"]:
-            return await ctx.send(f"No pinned messages for #{ctx.channel.name}.")
+            return await ctx.send(f"No pinned messages for channel {channel_id}.")
 
         pinned_messages = self.pinned_messages["channels"][channel_id]["pinned_messages"]
         if not pinned_messages:
-            return await ctx.send(f"No pinned messages for #{ctx.channel.name}.")
+            return await ctx.send(f"No pinned messages for channel {channel_id}.")
 
         message_list = "\n".join([f"Position {msg['position']}: <https://discord.com/channels/{ctx.guild.id}/{channel_id}/{msg['message_id']}>" for msg in pinned_messages])
-        await ctx.send(f"**Pinned Messages in #{ctx.channel.name}:**\n{message_list}")
+        await ctx.send(f"**Pinned Messages in channel {channel_id}:**\n{message_list}")
 
-    @Cog.listener()
+    @commands.Cog.listener()
     async def on_message(self, message):
         if message.pinned:
             await self.repin_messages(message.channel.id)
 
-    @Cog.listener()
+    @commands.Cog.listener()
     async def on_raw_message_edit(self, payload):
         channel_id = int(payload.data['channel_id'])
         if channel_id not in self.pinned_messages["channels"]:
@@ -102,4 +106,4 @@ class PinHandler(commands.Cog):
         self.save_pinned_messages()
 
 def setup(bot):
-    bot.add_cog(PinHandler(bot))
+    bot.add_cog(Autorepin(bot))
