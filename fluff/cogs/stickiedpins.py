@@ -77,7 +77,7 @@ class StickiedPins(commands.Cog):
     async def force_update(self, ctx: discord.abc.GuildChannel):
         guild = ctx.guild
         channel = ctx.channel
-        self.update_pins(guild,channel)
+        return await self.update_pins(guild,channel)
         
 async def setup(bot):
    await bot.add_cog(StickiedPins(bot))
