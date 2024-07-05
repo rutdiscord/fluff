@@ -20,5 +20,5 @@ class Autorepin(commands.Cog):
             return await ctx.reply("No matches were found.. time to cry!!")
 
 
-def setup(bot):
-    bot.add_cog(Autorepin(bot))
+async def setup(bot):
+   await bot.add_cog(Autorepin(bot))
