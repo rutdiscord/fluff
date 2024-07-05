@@ -5,12 +5,25 @@ import discord
 from discord.ext import commands, tasks
 from helpers.placeholders import random_msg
 from helpers.datafiles import get_guildfile, set_guildfile
-from helpers.checks import ismod
+from helpers.checks import ismod, ismanager
 from helpers.embeds import stock_embed, sympage
 
 class StickiedPins(commands.Cog):
     def __init__(self, bot):
         self.bot = bot        
+
+    def update_pins(guild: discord.Guild, channel: discord.abc.GuildChannel):
+        guild_pins = get_guildfile(guild.id, "pins")
+        if channel.id in guild_pins:
+            for pin in guild_pins[channel.id]:
+                message = channel.fetch_message(pin)
+                
+                if message.pinned: 
+                    message.unpin()
+                message.pin()
+
+        else: 
+            raise LookupError('Channel not found in pins, not bothering')
 
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
@@ -31,7 +44,7 @@ class StickiedPins(commands.Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @pins.command()
-    async def create(self, ctx, msglink):
+    async def create(self, ctx: discord.abc.GuildChannel, msglink):
         message_link_regex = r"\/([0-9].*)\/([0-9].*)\/([0-9].*[^/])\/{0,}"
         regex_match = re.search(message_link_regex, msglink)
         link_matches = {}
@@ -55,15 +68,15 @@ class StickiedPins(commands.Cog):
               return await ctx.reply(f"Stickied pin created in <#{link_matches['channel']}>.", mention_author=False)
         except Exception as reason:
             return await ctx.reply(f"Stickied pin failed to be created. {reason}")
-
-
-    def update_pins(guild, channel):
-        guild_pins = get_guildfile(guild.id, "pins")
-        if channel.id in guild_pins:
-            for pin in guild_pins[channel.id]:
-                channel.fetch_message(pin)                
-        else: 
-            raise LookupError('Channel not found in pins, not bothering')
+    
+    @commands.bot_has_permissions(manage_messages=True)
+    @commands.check(ismanager)
+    @commands.guild_only()
+    @pins.command()
+    async def force_update(self, ctx: discord.abc.GuildChannel):
+        guild = ctx.guild
+        channel = ctx.channel
+        self.update_pins(guild,channel)
         
 async def setup(bot):
    await bot.add_cog(StickiedPins(bot))
