@@ -3,6 +3,7 @@ from discord.ext import commands, tasks
 import json
 import os
 import re
+from helpers.placeholders import random_msg
 
 class Autorepin(commands.Cog):
     def __init__(self, bot):
@@ -13,11 +14,16 @@ class Autorepin(commands.Cog):
     @commands.command()
     async def repin(self, ctx, msglink):
         message_link_regex = r"\/([0-9].*)\/([0-9].*)\/([0-9].*[^/])\/{0,}"
-        link_matches = re.findall(message_link_regex, msglink)
-        if len(link_matches) > 0:
+        regex_match = re.search(message_link_regex, msglink)
+        link_matches = {}
+
+        try:
+            link_matches = {'guild': regex_match.group(1), 
+                        'channel': regex_match.group(2), 
+                        'message': regex_match.group(3)}
             return await ctx.reply(f"Guild: {link_matches[0]}\nChannel:{link_matches[1]}\nMessage:{link_matches[2]}")
-        else:
-            return await ctx.reply("No matches were found.. time to cry!!")
+        except AttributeError:
+            return await ctx.reply(random_msg("err_generic") + ("(Regex failed to find a valid message link)"))
 
 
 async def setup(bot):
