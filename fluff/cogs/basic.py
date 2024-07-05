@@ -134,7 +134,7 @@ class Basic(Cog):
                 formdata.add_field("userhash", self.bot.config.catbox_key)
             formdata.add_field("url", r)
             async with self.bot.session.post(api_url, data=formdata) as response:
-                if response == 412:
+                if response.status == 412:
                     return await ctx.reply(content=f'Your file is too large. If you\'re uploading a GIF, try optimizing with something like [Ezgif](https://ezgif.com).', mention_author=False)
                 else:
                     whats_supposed_to_be_the_image_link = await response.text()
