@@ -40,6 +40,9 @@ class Autorepin(commands.Cog):
         link_matches = {'channel': regex_match.group(2),  # Channel
                         'message': regex_match.group(3)}  # Message
                                                             # Removed the guild part because we can just assume from CTX...?
+        if not guild_pins[link_matches['channel']]:
+            guild_pins[link_matches['channel']] = []
+            
         guild_pins[link_matches['channel']].append(link_matches['message'])
         set_guildfile(ctx.guild.id, "pins", json.dumps(guild_pins))
         return await ctx.reply("Pin Made Lol", mention_author=False)
