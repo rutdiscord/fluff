@@ -2,6 +2,7 @@ import json
 import os
 import re
 import discord
+import asyncio
 from discord.ext import commands, tasks
 from helpers.placeholders import random_msg
 from helpers.datafiles import get_guildfile, set_guildfile
@@ -18,10 +19,9 @@ class StickiedPins(commands.Cog):
             for pin in guild_pins[str(channel.id)]:
                 message = await channel.fetch_message(pin)
                 
-                if message.pinned: 
+                if message.pinned:
                     await message.unpin()
-                else:
-                    await message.pin()
+                await message.pin()
 
         else: 
             raise LookupError('Channel not found in pins, not bothering')
