@@ -45,7 +45,7 @@ class StickiedPins(commands.Cog):
             channel_pins = guild_pins[link_matches['channel']]
         
         if link_matches['message'] in guild_pins[link_matches['channel']]:
-            raise ValueError('Message to be pinned already exists in stickied messages.')
+            return await ctx.reply(f"Stickied pin already exists in channel: {msglink}")
             
         channel_pins.append(link_matches['message'])
         set_guildfile(ctx.guild.id, "pins", json.dumps(guild_pins))
