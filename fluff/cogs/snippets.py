@@ -35,7 +35,7 @@ class Snippets(Cog):
             embed.title = "Configured Snippets"
             embed.color = discord.Color.red()
             embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
-            sensible_snippets_list = []
+            sensible_snippets_dict = {}
             if not snippets:
                 embed.add_field(
                     name="None",
@@ -45,13 +45,13 @@ class Snippets(Cog):
             else:
                 for name, snippet in list(snippets.items()):
                     if snippet in snippets:
-                        sensible_snippets_list[str(name)] = []
+                        sensible_snippets_dict[str(name)] = []
                         continue
                     aliases = ""
                     for subname, subsnippet in list(snippets.items()):
                         if subsnippet == name:
                             aliases += f"\n➡️ " + subname
-                            sensible_snippets_list[str(name)].append(str(subname))
+                            sensible_snippets_dict[str(name)].append(str(subname))
                     embed.add_field(
                         name=name,
                         value=(
