@@ -31,15 +31,8 @@ class StickiedPins(commands.Cog):
     @commands.guild_only()
     @commands.group(invoke_without_command=True, aliases=["pin", "sticky"])
     async def pins(self, ctx):
-        # Setup regular expression
-
         guild_pins = get_guildfile(ctx.guild.id, "pins") 
-        await ctx.reply(f"DEBUG LOL ({len(guild_pins)} pins in guild)", mention_author=False)
-       
-        for channel, message in guild_pins.items():
-          #  fetched_channel = ctx.guild.fetch_channel(channel)
-          #  print(f"")
-          return
+
         
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
@@ -78,6 +71,10 @@ class StickiedPins(commands.Cog):
         guild = ctx.guild
         channel = target_channel or ctx.channel
         return await self.update_pins(guild,channel)
-        
+    
+    # @commands.Cog.listener()
+    # async def on_guild_channel_pins_update(self, pin_channel, new_pin):
+    #     self.update_pins(pin_channel.guild, pin_channel)
+
 async def setup(bot):
    await bot.add_cog(StickiedPins(bot))
