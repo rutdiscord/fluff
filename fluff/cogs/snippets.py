@@ -35,7 +35,7 @@ class Snippets(Cog):
             embed.title = "Configured Snippets"
             embed.color = discord.Color.red()
             embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
-            sensible_snippets_dict = {}
+            sensible_snippets_list = []
             if not snippets:
                 embed.add_field(
                     name="None",
