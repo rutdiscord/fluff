@@ -45,7 +45,7 @@ class Snippets(Cog):
             else:
                 for name, snippet in list(snippets.items()):
                     if snippet in snippets:
-                        sensible_snippets_dict[str(name)] = {}
+                        sensible_snippets_dict[str(name)] = []
                         continue
                     aliases = ""
                     for subname, subsnippet in list(snippets.items()):
