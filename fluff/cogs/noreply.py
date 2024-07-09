@@ -273,32 +273,31 @@ class Reply(Cog):
                 return
 
         async def wrap_violation(message):
-            return await self.add_violation(message)
-            # try:
-            #     await self.add_violation(message)
-            #     return
-            # except discord.errors.Forbidden:
-            #     if not (
-            #         message.channel.permissions_for(message.guild.me).add_reactions
-            #         and message.channel.permissions_for(
-            #             message.guild.me
-            #         ).manage_messages
-            #         and message.channel.permissions_for(
-            #             message.guild.me
-            #         ).moderate_members
-            #     ):
-            #         return
+            try:
+                await self.add_violation(message)
+                return
+            except discord.errors.Forbidden:
+                if not (
+                    message.channel.permissions_for(message.guild.me).add_reactions
+                    and message.channel.permissions_for(
+                        message.guild.me
+                    ).manage_messages
+                    and message.channel.permissions_for(
+                        message.guild.me
+                    ).moderate_members
+                ):
+                    return
 
-            #     await message.author.timeout(datetime.timedelta(minutes=10))
-            #     return await message.reply(
-            #         content=f"**Congratulations, {message.author.mention}, you absolute dumbass.**\nAs your reward for blocking me to disrupt my function, here is a time out, just for you.",
-            #         mention_author=True,
-            #     )
-            # except discord.errors.NotFound:
-            #     return await message.reply(
-            #         content=f"{message.author.mention} immediately deleted their own message.\n{message.author.display_name} now has `{self.violations[message.guild.id][message.author.id]}` violation(s).",
-            #         mention_author=True,
-            #     )
+                await message.author.timeout(datetime.timedelta(minutes=10))
+                return await message.reply(
+                    content=f"**Congratulations, {message.author.mention}, you absolute dumbass.**\nAs your reward for blocking me to disrupt my function, here is a time out, just for you.",
+                    mention_author=True,
+                )
+            except discord.errors.NotFound:
+                return await message.reply(
+                    content=f"{message.author.mention} immediately deleted their own message.\n{message.author.display_name} now has `{self.violations[message.guild.id][message.author.id]}` violation(s).",
+                    mention_author=True,
+                )
 
         # If not reply pinged...
         if (
