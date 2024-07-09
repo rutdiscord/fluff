@@ -48,28 +48,28 @@ class Reply(Cog):
         return None
 
     async def add_violation(self, message):
-            staff_roles = [
-                self.bot.pull_role(
-                    message.guild, get_config(message.guild.id, "staff", "modrole")
-                ),
-                self.bot.pull_role(
-                    message.guild, get_config(message.guild.id, "staff", "adminrole")
-                ),
-            ]
-            if not get_config(message.guild.id, "staff", "noreplythreshold"):
-                return
-            maximum = (
-                5
-                if get_config(message.guild.id, "staff", "noreplythreshold") > 5
-                else get_config(message.guild.id, "staff", "noreplythreshold")
-            )
-            if (
-                not maximum
-                or not any(staff_roles)
-                or any([staff_role in message.author.roles for staff_role in staff_roles])
-                or self.bot.is_owner(message.author)
-            ):
-                return
+            # staff_roles = [
+            #     self.bot.pull_role(
+            #         message.guild, get_config(message.guild.id, "staff", "modrole")
+            #     ),
+            #     self.bot.pull_role(
+            #         message.guild, get_config(message.guild.id, "staff", "adminrole")
+            #     ),
+            # ]
+            # if not get_config(message.guild.id, "staff", "noreplythreshold"):
+            #     return
+            # maximum = (
+            #     5
+            #     if get_config(message.guild.id, "staff", "noreplythreshold") > 5
+            #     else get_config(message.guild.id, "staff", "noreplythreshold")
+            # )
+            # if (
+            #     not maximum
+            #     or not any(staff_roles)
+            #     or any([staff_role in message.author.roles for staff_role in staff_roles])
+            #     or self.bot.is_owner(message.author)
+            # ):
+            #     return
 
             if message.guild.id not in self.violations:
                 self.violations[message.guild.id] = {}
