@@ -67,7 +67,7 @@ class Reply(Cog):
                 not maximum
                 or not any(staff_roles)
                 or any([staff_role in message.author.roles for staff_role in staff_roles])
-                or self.bot.is_owner(message.author)
+                or await self.bot.is_owner(message.author)
             ):
                 return
 
