@@ -20,6 +20,7 @@ class Reply(Cog):
     def __init__(self, bot):
         self.bot = bot
         self.pingreminders = {}
+        self.violations = {}
         self.timers = {}
         self.counttimer.start()
         self.last_eval_result = None
@@ -47,6 +48,10 @@ class Reply(Cog):
         return None
 
     async def add_violation(self, message):
+        guild_id = message.guild.id
+        user_id = message.author.id
+
+        #checks if youre staff so this doesnt trigger
         staff_roles = [
             self.bot.pull_role(
                 message.guild, get_config(message.guild.id, "staff", "modrole")
@@ -54,38 +59,25 @@ class Reply(Cog):
             self.bot.pull_role(
                 message.guild, get_config(message.guild.id, "staff", "adminrole")
             ),
+            self.bot.pull_role(
+                message.guild, get_config(message.guuild.id, "staff", "botrole")
+            )
         ]
-        if not get_config(message.guild.id, "staff", "noreplythreshold"):
+        if any ([staff_role in message.author.roles for staff_role in staff_roles]):
             return
-        maximum = (
-            10
-            if get_config(message.guild.id, "staff", "noreplythreshold") > 10
-            else get_config(message.guild.id, "staff", "noreplythreshold")
-        )
-        if (
-            not maximum
-            or not any(staff_roles)
-            or any([staff_role in message.author.roles for staff_role in staff_roles])
-            or self.bot.is_owner(message.author)
-        ):
-            return
+        
+        if guild_id not in self.violations:
+            self.violations[guild_id] = {}
+        if user_id not in self.violations[guild_id]:
+            self.violations[guild_id][user_id] = 0
+        
+        self.violations[guild_id][user_id] += 1
 
-        if message.guild.id not in self.nopingreminders:
-            self.nopingreminders[message.guild.id] = {}
-        if message.author.id not in self.nopingreminders[message.guild.id]:
-            self.nopingreminders[message.guild.id][message.author.id] = False
-            usertracks = get_guildfile(message.guild.id, "usertrack")
-            if (
-                self
-            ):
-                return await message.reply(
-                    content="**Do not reply ping users who do not wish to be pinged.**\n"
-                    + "Be mindful of others' preferences. This message will not be shown again, but may result in consequences, so please be mindful.",
-                    file=discord.File("assets/noreply.png"),
-                    mention_author=True,
-                )
-
-        self.nopingreminders[message.guild.id][message.author.id] = True
+        if self.violations[guild_id][user_id] % 5 == 0:
+            await message.reply(
+                "**Do not reply ping users who do not wish to be pinged.**\nBe mindful of others' preferences. Failure to follow this rule may result in consequences.",
+                mention_author=False
+            )
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command()
