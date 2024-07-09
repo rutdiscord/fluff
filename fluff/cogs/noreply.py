@@ -201,7 +201,7 @@ class Reply(Cog):
             "🤷",
             "<:pleaseping:1258418052651942053>",
             "<:waitbeforeping:1258418064781738076>",
-            "<:noping:1258418038504689694",
+            "<:noping:1258418038504689694>",
         ]
         configmsg = await ctx.reply(embed=embed, mention_author=False)
         for react in reacts:
