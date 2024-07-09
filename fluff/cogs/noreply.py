@@ -53,15 +53,9 @@ class Reply(Cog):
 
         #checks if youre staff so this doesnt trigger
         staff_roles = [
-            self.bot.pull_role(
-                message.guild, get_config(message.guild.id, "staff", "modrole")
-            ),
-            self.bot.pull_role(
-                message.guild, get_config(message.guild.id, "staff", "adminrole")
-            ),
-            self.bot.pull_role(
-                message.guild, get_config(message.guuild.id, "staff", "botrole")
-            )
+            self.bot.pull_role(message.guild, get_config(message.guild.id, "staff", "modrole")),
+            self.bot.pull_role(message.guild, get_config(message.guild.id, "staff", "adminrole")),
+            self.bot.pull_role(message.guild, get_config(message.guuild.id, "staff", "botrole"))
         ]
         if any ([staff_role in message.author.roles for staff_role in staff_roles]):
             return
