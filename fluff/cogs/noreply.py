@@ -298,6 +298,11 @@ class Reply(Cog):
                     content=f"{message.author.mention} immediately deleted their own message.\n{message.author.display_name} now has `{self.violations[message.guild.id][message.author.id]}` violation(s).",
                     mention_author=True,
                 )
+            except Exception as err:
+                return await message.reply(
+                    content=f"oh jeez oh fuck ```\n{err}```",
+                    mention_author=False
+                )
 
         # If not reply pinged...
         if (
