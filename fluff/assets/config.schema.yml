@@ -1,0 +1,140 @@
+---
+type: object
+properties:
+  logging:
+    type: object
+    properties:
+      modlog:
+        type:
+          - integer
+          - string
+          - "null"
+        minimum: 100000000000000000
+      serverlog:
+        type:
+          - integer
+          - string
+          - "null"
+        minimum: 100000000000000000
+      userlog:
+        type:
+          - integer
+          - string
+          - "null"
+        minimum: 100000000000000000
+  staff:
+    type: object
+    properties:
+      adminrole:
+        type:
+          - integer
+          - string
+          - "null"
+        minimum: 100000000000000000
+      modrole:
+        type:
+          - integer
+          - string
+          - "null"
+        minimum: 100000000000000000
+      botrole:
+        type:
+          - integer
+          - string
+          - "null"
+        minimum: 100000000000000000
+      staffchannel:
+        type:
+          - integer
+          - string
+          - "null"
+        minimum: 100000000000000000
+      rulesurl:
+        type:
+          - string
+          - "null"
+      appealurl:
+        type:
+          - string
+          - "null"
+      noreplythreshold:
+        type:
+          - integer
+          - "null"
+  toss:
+    type: object
+    properties:
+      tossrole:
+        type:
+          - integer
+          - string
+          - "null"
+        minimum: 100000000000000000
+      tosscategory:
+        type:
+          - integer
+          - string
+          - "null"
+        minimum: 100000000000000000
+      notificationchannel:
+        type:
+          - integer
+          - string
+          - "null"
+        minimum: 100000000000000000
+      tosschannels:
+        type: 
+          - array
+          - "null"
+        items:
+          type:
+            - integer
+            - string
+          minimum: 100000000000000000
+      tosstopic:
+        type: 
+          - string
+          - "null"
+      tossmsg:
+        type:
+          - string
+          - "null"
+      tossmsg_rejoin:
+        type:
+          - string
+          - "null"
+  reaction:
+    type: object
+    properties:
+      autoreadableenable:
+        type:
+          - boolean
+          - "null"
+  overrides:
+    type:
+      - array
+      - "null"
+    items:
+      type: object
+      properties:
+        command:
+          type: string
+        roles:
+          type: array
+          items:
+            type:
+              - integer
+              - string
+            minimum: 100000000000000000
+        restrict:
+          type: boolean
+  drive:
+    type: object
+    properties:
+      folder:
+        type: string
+  metadata:
+    type: object
+    properties:
+      version:
+        const: 14

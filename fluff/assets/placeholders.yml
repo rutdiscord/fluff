@@ -1,0 +1,150 @@
+# If you want to customize this file, COPY this file and put it into the data/ folder.
+
+# By default, Fluff will fill in any word wrapped in {} with a shorthand from here.
+shorthands:
+  noping: "<:noping:1258418038504689694>"
+  plsping: "<:pleaseping:1258418052651942053>"
+  waitping: "<:waitbeforeping:1258418064781738076>"
+# A list of things that Fluff will "listen" to.
+# For example, "Listening to the validity of trans people".
+games:
+  - Pancake's hare-brained schemes.
+  - pellets drop in the bowl.
+  - my loves munching hay.
+  - a symphony of thumps.
+  - Blackberry twitch her nose.
+  - a cardboard box being shredded.
+  - parsley being chewed.
+  - the sounds of mischief.
+  - everybunny flop.
+  - Marr typing in the closet.
+  - the sweet sound of bunny kisses.
+  - Blackberry and Pancake snuggle.
+  - the rustle of leafy greens.
+  - the bunny zoomies.
+  - Marr filling the litterbox.
+  - the quiet of bunny nap time.
+  - bunny pitter-patter.
+  - the munching of dandelions.
+  - the rustling of bunny fur.
+  - bunny dreams.
+  - the gnawing on a hay cube.
+  - the fridge door open.
+
+# === ERRORS ===
+
+# A generic error message.
+err_generic:
+  - "That didn't work - oh, I may have chewed through that wire... I let my owner know."
+  - "*Thump! Thump!* I'm letting my owner know something went wrong!"
+
+# An error message for commands that can be used in servers only.
+err_serversonly:
+  - "*nose twitch*... This is a server-only command, I can't do anything here."
+
+# An error message for commands that can be used in DMs only.
+err_dmsonly:
+  - "*nose twitch*... This command can only be used in DMs, I can't do this here."
+
+# An error message for if Fluff cannot understand the quotes in a command.
+err_quotes:
+  - "I can barely read messages structured *correctly*... I couldn't understand your quotes!"
+  - "Huh? Your quotes are confusing me - please fix them."
+
+# An error message for unauthorized users missing a specific role.
+err_role:
+  - "You do Not tell me what to do *indignant flop* (You don't have the permissions for this)"
+  - "And who are you? *flicks feet* (You don't have the permissions for this)"
+
+# An error message for when the bot is missing permissions.
+err_perms:
+  - "My hop's been restricted due to missing permissions... I need these."
+  - "I really tried, but something's in the way! It told me I needed these permissions..."
+  - "Help! I can't see, my fur's in my eyes, I need a brushing... oh and I need these permissions."
+
+# An error message for when a command is on cooldown.
+err_cooldown:
+  - "I'm tired, I can't hop that fast... Give me "
+  - "I'm napping... Try again in "
+  - "I just flopped over... try again in "
+
+# An error message for when a command is missing an attachment.
+err_noattachment:
+  - "I perked my ears up waiting for the attachment, but it never came."
+  - "You dropped your attachment!"
+  - "This command without an attachment is like a litterbox without hay."
+
+# A generic error message for failed checks. Used for manager commands mostly.
+err_checkfail:
+  - "Nuhuh, not listening. You're unauthorized."
+  - "Who are you? You can't ask me to do that."
+  - "I don't know you. I'm not doing that."
+
+# An error message for if the bot needs to DM you, but cannot.
+err_dmfail:
+  - "I'm getting mixed messages! I need to DM you for that, but you have DMs off!"
+  - "I don't bite (much), turn your DMs on or I can't do that."
+
+# An error message for if a user given does not exist.
+err_usernotfound:
+  - "I don't know anyone like that - are you sure you have the right information?"
+  - "Who's that? There's no data matching them that I can find."
+  - "This user doesn't seem to exist."
+
+# An error message for if a user given is not on the server.
+err_membernotfound:
+  - "This member isn't here - I'm going back to sleep."
+  - "I even looked inside the cardboard castle, but this member isn't on this server."
+  - "There's nobody here like that."
+
+# === WARNINGS ===
+
+# Used if you try to use a dangerous command on yourself.
+# {authorname} = Name of message author.
+warn_targetself:
+  - "Err, {authorname}, did you miss?"
+  - "{authorname}, I don't know what you're doing, but I'm not helping."
+  - "{authorname}, *thump*"
+
+# Used if you try to use a dangerous command on the bot.
+# {authorname} = Name of message author.
+warn_targetbot:
+  - "Okay {authorname}, I'm settled in, I'm staying."
+  - "{authorname}, I don't think you know how hard I bite."
+  - "Oh come on, you know you love me, {authorname}."
+  
+# Used if a command times out.
+warn_timedout:
+  - "You took too long, I got bored and went to eat some hay. Your command timed out."
+  - "I'm a busy rabbit you know, you can't keep me here forever. (Your command timed out)"
+  - "I'm gonna go have a snack, let me know when you're actually ready. (Your command timed out)"
+
+# === INFORMATION ===
+
+# Used when pls quit is used.
+quit_deaths:
+  - "Okay! (flops over)"
+  - "Okay! (honk shoo honk shoo honk shoo)"
+  - "Wh-What? I was already asleep..."
+  - "Yippee! Greens!"
+  - "Litterbox time!"
+  - "Ooh, can I get some parsley then?"
+  - "Time to wedge myself between Pancake & Blackberry."
+
+# Used in pls errors when there are no errors.
+errors_noerrors:
+  - "Scanning... I see nothing. Brush me."
+  - "Everything's dandy! What's dandy?"
+
+# Used with pls hello.
+hello_hello:
+  - "*nose twitch*"
+  - "*looks up sleepily... slowly lowers head back down*"
+  - "*splayed out af*"
+
+# === COMPONENTS ===
+
+# Used for messages with embeds.
+embed_msg:
+  - "If you can't see this, check your message link settings."
+  - "Here's your embed. Check your settings if you can't see it."
