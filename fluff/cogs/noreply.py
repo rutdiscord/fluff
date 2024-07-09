@@ -48,30 +48,95 @@ class Reply(Cog):
         return None
 
     async def add_violation(self, message):
-        guild_id = message.guild.id
-        user_id = message.author.id
-
-        #checks if youre staff so this doesnt trigger
-        staff_roles = [
-            self.bot.pull_role(message.guild, get_config(message.guild.id, "staff", "modrole")),
-            self.bot.pull_role(message.guild, get_config(message.guild.id, "staff", "adminrole")),
-            self.bot.pull_role(message.guild, get_config(message.guuild.id, "staff", "botrole"))
-        ]
-        if any ([staff_role in message.author.roles for staff_role in staff_roles]):
-            return
-        
-        if guild_id not in self.violations:
-            self.violations[guild_id] = {}
-        if user_id not in self.violations[guild_id]:
-            self.violations[guild_id][user_id] = 0
-        
-        self.violations[guild_id][user_id] += 1
-
-        if self.violations[guild_id][user_id] % 5 == 0:
-            await message.reply(
-                "**Do not reply ping users who do not wish to be pinged.**\nBe mindful of others' preferences. Failure to follow this rule may result in consequences.",
-                mention_author=False
+            staff_roles = [
+                self.bot.pull_role(
+                    message.guild, get_config(message.guild.id, "staff", "modrole")
+                ),
+                self.bot.pull_role(
+                    message.guild, get_config(message.guild.id, "staff", "adminrole")
+                ),
+            ]
+            if not get_config(message.guild.id, "staff", "noreplythreshold"):
+                return
+            maximum = (
+                10
+                if get_config(message.guild.id, "staff", "noreplythreshold") > 10
+                else get_config(message.guild.id, "staff", "noreplythreshold")
             )
+            if (
+                not maximum
+                or not any(staff_roles)
+                or any([staff_role in message.author.roles for staff_role in staff_roles])
+                or self.bot.is_owner(message.author)
+            ):
+                return
+
+            if message.guild.id not in self.violations:
+                self.violations[message.guild.id] = {}
+            if message.author.id not in self.violations[message.guild.id]:
+                self.violations[message.guild.id][message.author.id] = 0
+                usertracks = get_guildfile(message.guild.id, "usertrack")
+                if (
+                    str(message.author.id) not in usertracks
+                    or usertracks[str(message.author.id)]["truedays"] < 14
+                ):
+                    return await message.reply(
+                        content="**Do not reply ping users who do not wish to be pinged.**\n"
+                        + "As you are new, this first time will not be a violation.",
+                        file=discord.File("assets/noreply.png"),
+                        mention_author=True,
+                    )
+
+            self.violations[message.guild.id][message.author.id] += 1
+            if self.violations[message.guild.id][message.author.id] == maximum:
+                await message.reply(
+                    content=f"{next(staff_role for staff_role in staff_roles if staff_role is not None).mention}, {message.author.mention} reached `{maximum}` reply ping violations.",
+                    mention_author=False,
+                )
+                self.violations[message.guild.id][message.author.id] = 0
+                return
+
+            counts = [
+                "0️⃣",
+                "1️⃣",
+                "2️⃣",
+                "3️⃣",
+                "4️⃣",
+                "5️⃣",
+                "6️⃣",
+                "7️⃣",
+                "8️⃣",
+                "9️⃣",
+                "🔟",
+            ]
+
+            await message.add_reaction(
+                counts[self.violations[message.guild.id][message.author.id]]
+            )
+            await message.add_reaction("🛑")
+
+            reacted = self.bot.await_reaction(
+                message, message.reference.resolved.author, ["🛑"], 120
+            )
+            if not reacted:
+                return await message.clear_reaction("🛑")
+
+            self.violations[message.guild.id][message.author.id] -= 1
+            await message.clear_reaction("🛑")
+            await message.clear_reaction(
+                counts[self.violations[message.guild.id][message.author.id] + 1]
+            )
+            await message.add_reaction(
+                counts[self.violations[message.guild.id][message.author.id]]
+            )
+            await message.add_reaction("👍")
+            await asyncio.sleep(5)
+            await message.clear_reaction("👍")
+            await message.clear_reaction(
+                counts[self.violations[message.guild.id][message.author.id]]
+            )
+            return
+
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command()
@@ -239,15 +304,15 @@ class Reply(Cog):
             preference == "pleasereplyping"
             and refmessage.author not in message.mentions
         ):
-            await message.add_reaction("<:pleaseping:1258418052651942053>")
-            pokemsg = await message.reply(content=refmessage.author.mention,mention_author=False)
+            await message.add_reaction("<:pleasereplyping:1256722700563513467> ")
+            pokemsg = await message.reply(content=refmessage.author.mention)
             await self.bot.await_message(message.channel, refmessage.author, 86400)
             return await pokemsg.delete()
 
         # If reply pinged at all...
         elif preference == "noreplyping" and refmessage.author in message.mentions:
-            await message.add_reaction("<:noping:1258418038504689694>")
-            await self.add_violation(message)
+            await message.add_reaction("<:noreplyping:1256722699162488874>")
+            await wrap_violation(message)
             return
 
         # If reply pinged in a window of time...
@@ -264,8 +329,8 @@ class Reply(Cog):
                 int(message.created_at.timestamp()) - 30
                 <= self.timers[message.guild.id][refmessage.author.id]
             ):
-                await message.add_reaction("<:waitbeforeping:1258418064781738076>")
-                await self.add_violation(message)
+                await message.add_reaction("<:waitbeforereplyping:1256722701410893935>")
+                await wrap_violation(message)
             return
 
     @tasks.loop(hours=24)
