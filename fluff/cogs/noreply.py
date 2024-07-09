@@ -96,7 +96,9 @@ class Reply(Cog):
                 )
                 self.violations[message.guild.id][message.author.id] = 0
                 return
-
+            
+            print(self.violations)
+            
             counts = [
                 "0️⃣",
                 "1️⃣",
@@ -136,8 +138,8 @@ class Reply(Cog):
             await message.clear_reaction(
                 counts[self.violations[message.guild.id][message.author.id]]
             )
-            print(self.violations)
             return
+
 
 
     @commands.bot_has_permissions(embed_links=True)
