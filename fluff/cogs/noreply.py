@@ -253,6 +253,7 @@ class Reply(Cog):
         # If reply pinged at all...
         elif preference == "noreplyping" and refmessage.author in message.mentions:
             await message.add_reaction("<:noping:1258418038504689694>")
+            await self.add_violation(message)
             return
 
         # If reply pinged in a window of time...
@@ -270,6 +271,7 @@ class Reply(Cog):
                 <= self.timers[message.guild.id][refmessage.author.id]
             ):
                 await message.add_reaction("<:waitbeforeping:1258418064781738076>")
+                await self.add_violation(message)
             return
 
     @tasks.loop(hours=24)
