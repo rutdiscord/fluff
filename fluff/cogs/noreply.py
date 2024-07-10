@@ -99,7 +99,7 @@ class Reply(Cog):
                 elif self.violations[message.guild.id][message.author.id] >= 7:
                     toss_cmd = self.bot.get_command('toss')
                     self.violations[message.guild.id][message.author.id] = 0
-                    return await toss_cmd(message, users=[message.author])
+                    return await toss_cmd(self.bot.get_context(message), users=[message.author])
             except ZeroDivisionError:
                 # drop zde
                 return
