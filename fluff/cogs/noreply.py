@@ -88,7 +88,10 @@ class Reply(Cog):
 
             self.violations[message.guild.id][message.author.id] += 1
             try:
-                if self.violations[message.guild.id][message.author.id] % modulo == 0:
+                if self.violations[message.guild.id][message.author.id] >= 20:
+                    toss_cmd = self.bot.get_command('toss')
+                    return await toss_cmd(ctx=message, users=commands.Greedy[message.author.id])
+                elif self.violations[message.guild.id][message.author.id] % modulo == 0:
                     # test reply
                     message.reply(
                         content="**Please do not reply ping users who do not wish to be pinged.**\n"
@@ -97,9 +100,6 @@ class Reply(Cog):
                         mention_author=False,
                     )
                     self.violations[message.guild.id][message.author.id] = 0
-                elif self.violations[message.guild.id][message.author.id] >= 20:
-                    toss_cmd = self.bot.get_command('toss')
-                    return await toss_cmd(ctx=message, users=commands.Greedy[message.author.id])
             except ZeroDivisionError:
                 # drop zde
                 return
