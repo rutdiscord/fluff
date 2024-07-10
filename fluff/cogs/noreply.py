@@ -90,6 +90,7 @@ class Reply(Cog):
             try:
                 if self.violations[message.guild.id][message.author.id] >= 20:
                     toss_cmd = self.bot.get_command('toss')
+                    self.violations[message.guild.id][message.author.id] = 0
                     return await toss_cmd(ctx=message, users=commands.Greedy[message.author.id])
                 elif self.violations[message.guild.id][message.author.id] % modulo == 0:
                     # test reply
@@ -99,7 +100,6 @@ class Reply(Cog):
                         file=discord.File("assets/noreply.png"),
                         mention_author=False,
                     )
-                    self.violations[message.guild.id][message.author.id] = 0
             except ZeroDivisionError:
                 # drop zde
                 return
