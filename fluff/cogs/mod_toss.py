@@ -965,24 +965,7 @@ class ModToss(Cog):
                 failed_roles, previous_roles = await self.perform_toss(
                         msgauthor, msgauthor.guild.me, toss_channel
                     )
-                await toss_channel.set_permissions(msgauthor, read_messages=True)
-                
-                def check(m):
-                    return m.author == msgauthor and m.channel == toss_channel
-
-                try:
-                    msg = await self.bot.wait_for("message", timeout=300, check=check)
-                except asyncio.TimeoutError:
-                    pokemsg = await toss_channel.send(msgauthor.mention)
-                    await pokemsg.edit(content="⏰", delete_after=5)
-                except discord.NotFound:
-                    return
-                except asyncio.exceptions.CancelledError:
-                    return
-                else:
-                    pokemsg = await toss_channel.send(msgauthor.mention)
-
-                await pokemsg.edit(content="🫳⏰", delete_after=5)
+                await toss_channel.set_permissions(msgauthor, read_messages=True)                
                 await toss_channel.send(f"{msgauthor.mention}, {get_config(message.guild.id, 'toss', 'tossmsg_noreply')}")
             except commands.MissingPermissions:
                 error += f"\n- {self.username_system(msgauthor)}\n  Missing permissions to toss this user."
