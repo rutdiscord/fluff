@@ -965,6 +965,7 @@ class ModToss(Cog):
                 failed_roles, previous_roles = await self.perform_toss(
                         msgauthor, msgauthor.guild.me, toss_channel
                     )
+                await message.reply(f"{self.username_system(msgauthor)} was tossed for repeatedly violating ping preferences.")
                 await toss_channel.set_permissions(msgauthor, read_messages=True)
             except commands.MissingPermissions:
                 error += f"\n- {self.username_system(msgauthor)}\n  Missing permissions to toss this user."
