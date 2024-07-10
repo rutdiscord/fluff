@@ -85,7 +85,7 @@ class Mod(Cog):
         await ctx.send(f"**{target.mention}** was KICKED.{failmsg}")
 
     @commands.bot_has_permissions(ban_members=True)
-    @commands.check(ismod)
+    @commands.check(isadmin)
     @commands.guild_only()
     @commands.command(aliases=["yeet"])
     async def ban(self, ctx, target: discord.User, *, reason: str = ""):
