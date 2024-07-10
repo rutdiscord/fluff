@@ -58,14 +58,13 @@ class Reply(Cog):
             ]
             if not get_config(message.guild.id, "staff", "noreplythreshold"):
                 return
-            maximum = (
+            modulo = (
                 5
                 if get_config(message.guild.id, "staff", "noreplythreshold") > 5
                 else get_config(message.guild.id, "staff", "noreplythreshold")
             )
             if (
-                not maximum
-                or not any(staff_roles)
+                not any(staff_roles)
                 or any([staff_role in message.author.roles for staff_role in staff_roles])
                 or await self.bot.is_owner(message.author)
             ):
@@ -84,59 +83,22 @@ class Reply(Cog):
                         content="**Do not reply ping users who do not wish to be pinged.**\n"
                         + "As you are new, this first time will not be a violation.",
                         file=discord.File("assets/noreply.png"),
-                        mention_author=True,
+                        mention_author=False,
                     )
 
             self.violations[message.guild.id][message.author.id] += 1
-            if self.violations[message.guild.id][message.author.id] == maximum:
-                await message.reply(
-                    content=f"{next(staff_role for staff_role in staff_roles if staff_role is not None).mention}, {message.author.mention} reached `{maximum}` reply ping violations.",
-                    mention_author=False,
-                )
-                self.violations[message.guild.id][message.author.id] = 0
+            try:
+                if self.violations[message.guild.id][message.author.id] % modulo == 0:
+                    # test reply
+                    await message.reply(
+                        content=f"AAAAHHHHHHH",
+                        mention_author=False,
+                    )
+                    self.violations[message.guild.id][message.author.id] = 0
+                    return
+            except ZeroDivisionError:
+                # drop zde
                 return
-
-            counts = [
-                "0️⃣",
-                "1️⃣",
-                "2️⃣",
-                "3️⃣",
-                "4️⃣",
-                "5️⃣",
-                "6️⃣",
-                "7️⃣",
-                "8️⃣",
-                "9️⃣",
-                "🔟",
-            ]
-
-            await message.add_reaction(
-                counts[self.violations[message.guild.id][message.author.id]]
-            )
-            await message.add_reaction("🛑")
-
-            reacted = self.bot.await_reaction(
-                message, message.reference.resolved.author, ["🛑"], 120
-            )
-            if not reacted:
-                return await message.clear_reaction("🛑")
-
-            self.violations[message.guild.id][message.author.id] -= 1
-            await message.clear_reaction("🛑")
-            await message.clear_reaction(
-                counts[self.violations[message.guild.id][message.author.id] + 1]
-            )
-            await message.add_reaction(
-                counts[self.violations[message.guild.id][message.author.id]]
-            )
-            await message.add_reaction("👍")
-            await asyncio.sleep(5)
-            await message.clear_reaction("👍")
-            await message.clear_reaction(
-                counts[self.violations[message.guild.id][message.author.id]]
-            )
-            return
-
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command()
