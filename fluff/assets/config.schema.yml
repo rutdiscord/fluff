@@ -57,10 +57,6 @@ properties:
         type:
           - string
           - "null"
-      noreplythreshold:
-        type:
-          - integer
-          - "null"
   toss:
     type: object
     properties:

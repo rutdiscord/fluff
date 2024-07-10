@@ -18,20 +18,15 @@ logging:
 staff:
   # The role ID for your admin role.
   adminrole: 
- 
   # The role ID for your moderator role.
   modrole: 
- 
   # The role ID for bots. This will allow bots to speak during lockdowns, and in mute channels.
   botrole: 
-  
   # The channel ID for the Staff channel.
   staffchannel: 
- 
   # A link to your rules. You can use channels with "<#CHANNELID>",
   # but the bot will not convert a name for you.
   rulesurl: 
- 
   # A link to appeal bans or actions. This will be forwarded to
   # the user upon being banned by the bot.
   appealurl: 
