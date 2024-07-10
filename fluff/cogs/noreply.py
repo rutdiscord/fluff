@@ -96,14 +96,13 @@ class Reply(Cog):
                         file=discord.File("assets/noreply.png"),
                         mention_author=False,
                     )
+                elif self.violations[message.guild.id][message.author.id] >= 20:
+                    toss_cmd = self.bot.get_command('toss')
+                    self.violations[message.guild.id][message.author.id] = 0
+                    return await toss_cmd(ctx=message, users=commands.Greedy[message.author.id])
             except ZeroDivisionError:
                 # drop zde
                 return
-    
-            if self.violations[message.guild.id][message.author.id] >= 20:
-              toss_cmd = self.bot.get_command('toss')
-              self.violations[message.guild.id][message.author.id] = 0
-              return await toss_cmd(ctx=message, users=commands.Greedy[message.author.id])
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command()
