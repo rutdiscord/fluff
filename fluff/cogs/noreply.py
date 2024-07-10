@@ -80,8 +80,8 @@ class Reply(Cog):
                     or usertracks[str(message.author.id)]["truedays"] < 14
                 ):
                     return await message.reply(
-                        content="**Do not reply ping users who do not wish to be pinged.**\n"
-                        + "As you are new, this first time will not be a violation.",
+                        content="**Please do not reply ping users who do not wish to be pinged.**\n"
+                        + "As you are new, or this is your first violation, you are not being actioned upon at the moment.",
                         file=discord.File("assets/noreply.png"),
                         mention_author=False,
                     )
@@ -90,12 +90,16 @@ class Reply(Cog):
             try:
                 if self.violations[message.guild.id][message.author.id] % modulo == 0:
                     # test reply
-                    await message.reply(
-                        content=f"AAAAHHHHHHH",
+                    message.reply(
+                        content="**Please do not reply ping users who do not wish to be pinged.**\n"
+                        + f"You have currently received {self.violations[message.guild.id[message.author.id]]} violations. ",
+                        file=discord.File("assets/noreply.png"),
                         mention_author=False,
                     )
                     self.violations[message.guild.id][message.author.id] = 0
-                    return
+                elif self.violations[message.guild.id][message.author.id] >= 20:
+                    toss_cmd = self.bot.get_command('toss')
+                    return await toss_cmd(ctx=message, users=commands.Greedy[message.author.id])
             except ZeroDivisionError:
                 # drop zde
                 return
@@ -295,7 +299,7 @@ class Reply(Cog):
                 await wrap_violation(message)
             return
 
-    @tasks.loop(hours=24)
+    @tasks.loop(hours=1)
     async def counttimer(self):
         await self.bot.wait_until_ready()
         self.violations = {}
