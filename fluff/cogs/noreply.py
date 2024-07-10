@@ -96,7 +96,7 @@ class Reply(Cog):
                     # test reply
                     message.reply(
                         content="**Please do not reply ping users who do not wish to be pinged.**\n"
-                        + f"You have currently received {self.violations[message.guild.id[message.author.id]]} violations. ",
+                        + f"You have currently received {str(self.violations[message.guild.id[message.author.id]])} violations. ",
                         file=discord.File("assets/noreply.png"),
                         mention_author=False,
                     )
