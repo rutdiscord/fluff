@@ -97,9 +97,7 @@ class Reply(Cog):
                         mention_author=False,
                     )
                 elif self.violations[message.guild.id][message.author.id] >= 7:
-                    toss_cmd = self.bot.get_command('toss')
-                    self.violations[message.guild.id][message.author.id] = 0
-                    return await toss_cmd(self.bot.get_context(message), users=[message.author])
+                    self.bot.dispatch("violation_threshold_reached", message, message.author)
             except ZeroDivisionError:
                 # drop zde
                 return

@@ -907,6 +907,43 @@ class ModToss(Cog):
             del tosses[channel.name]
             set_tossfile(channel.guild.id, "tosses", json.dumps(tosses))
 
+    @Cog.listener()
+    async def on_violation_threshold_reached(self, message, msgauthor):
+        await self.bot.wait_until_ready()
+        if (
+            not message.guild
+            or msgauthor.bot
+            or not self.enabled(message.guild)
+            or self.is_rolebanned(message.author)
+            or self.get_session(message.author)
+            or self.bot.pull_role(
+                message.guild, get_config(message.guild.id, "staff", "modrole")
+            )
+            in message.author.roles
+            or self.bot.pull_role(
+                message.guild, get_config(message.guild.id, "staff", "adminrole")
+            )
+            in message.author.roles
+        ):
+            return
+
+        notify_channel = self.bot.pull_channel(
+            message.guild, get_config(message.guild.id, "toss", "notificationchannel")
+        )
+        if not notify_channel:
+            notify_channel = self.bot.pull_channel(
+                message.guild, get_config(message.guild.id, "staff", "staffchannel")
+            )
+        staff_roles = [
+            self.bot.pull_role(
+                message.guild, get_config(message.guild.id, "staff", "modrole")
+            ),
+            self.bot.pull_role(
+                message.guild, get_config(message.guild.id, "staff", "adminrole")
+            ),
+        ]
+
+        return await message.reply(content="testing this.. blah..", mention_author=False)
 
 async def setup(bot):
     await bot.add_cog(ModToss(bot))
