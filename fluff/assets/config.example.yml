@@ -36,17 +36,21 @@ staff:
   # the user upon being banned by the bot.
   appealurl: 
 
-  # Integer value of how many violations before 
+  # Integer value of how many violations before a user is tossed.
+  noreplythreshold:
   
 
 toss:
   # The role ID to add to users when muting a user.
   tossrole: 
+
   # The category ID for mute sessions to be created in.
   tosscategory: 
+
   # The channel that the bot will send its mute notifications to.
   # If left blank, the bot will use the Staff channel instead.
   notificationchannel: 
+
   # The channel names that the bot will use when creating sessions.
   # You may only have up to 25.
   tosschannels:
@@ -80,4 +84,4 @@ drive:
   # Set the ID of the Google Drive folder that the file should be uploaded to.
 
 metadata:
-  version: 14
+  version: 15
