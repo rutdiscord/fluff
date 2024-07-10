@@ -93,7 +93,7 @@ class Reply(Cog):
                     self.violations[message.guild.id][message.author.id] = 0
                     return await toss_cmd(ctx=message, users=commands.Greedy[message.author.id])
                 elif self.violations[message.guild.id][message.author.id] % modulo == 0:
-                    violation_count = str(self.violations[message.guild.id[message.author.id]])
+                    violation_count = str(self.violations[message.guild.id][message.author.id])
                     message.reply(
                         content="**Please do not reply ping users who do not wish to be pinged.**\n"
                         + f"You have currently received {violation_count} violations. ",
