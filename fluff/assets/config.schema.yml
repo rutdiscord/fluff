@@ -110,6 +110,15 @@ properties:
         type:
           - boolean
           - "null"
+      noreply_threshold:
+        type:
+          - integer
+          - "null"
+      noreply_remind_every:
+        type:
+          - integer
+          - "null"
+
   overrides:
     type:
       - array
@@ -137,4 +146,4 @@ properties:
     type: object
     properties:
       version:
-        const: 15
+        const: 16

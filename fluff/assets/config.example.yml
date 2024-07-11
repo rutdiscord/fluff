@@ -18,21 +18,23 @@ logging:
 staff:
   # The role ID for your admin role.
   adminrole: 
+
   # The role ID for your moderator role.
   modrole: 
+
   # The role ID for bots. This will allow bots to speak during lockdowns, and in mute channels.
   botrole: 
+
   # The channel ID for the Staff channel.
   staffchannel: 
+
   # A link to your rules. You can use channels with "<#CHANNELID>",
   # but the bot will not convert a name for you.
   rulesurl: 
+  
   # A link to appeal bans or actions. This will be forwarded to
   # the user upon being banned by the bot.
   appealurl: 
-
-  # Integer value of how many violations before a user is tossed.
-  noreplythreshold:
   
 
 toss:
@@ -74,9 +76,17 @@ overrides:
   #     - 259199371361517569
   #   restrict: false          # Whether to allow (false) or restrict this command to (true) these roles.
 
+  # Boolean value of if you want Fluff to automatically action unreadable nicknames or not
+  autoreadableenable:
+
+  # Integer value of how many violations before a user is tossed.
+  noreply_threshold:
+
+  # Integer value of how frequently a user is reminded of their violations.
+  noreply_remind_every:
 drive:
   folder:
   # Set the ID of the Google Drive folder that the file should be uploaded to.
 
 metadata:
-  version: 15
+  version: 16

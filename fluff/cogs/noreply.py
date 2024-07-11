@@ -56,12 +56,20 @@ class Reply(Cog):
                     message.guild, get_config(message.guild.id, "staff", "adminrole")
                 ),
             ]
-            if not get_config(message.guild.id, "staff", "noreplythreshold"):
+            if not get_config(message.guild.id, "reaction", "noreply_remind_every"):
                 return
-            modulo = (
-                5
-                if get_config(message.guild.id, "staff", "noreplythreshold") > 5
-                else get_config(message.guild.id, "staff", "noreplythreshold")
+            noreply_remind = (
+                3
+                if get_config(message.guild.id, "reaction", "noreply_remind_every") > 3
+                else get_config(message.guild.id, "reaction", "noreply_remind_every")
+            )
+
+            if not get_config(message.guild.id, "reaction", "noreply_threshold"):
+                return
+            noreply_thres = (
+                10
+                if get_config(message.guild.id, "reaction", "noreply_threshold") > 10
+                else get_config(message.guild.id, "reaction", "noreply_threshold")
             )
             if (
                 not any(staff_roles)
@@ -81,23 +89,32 @@ class Reply(Cog):
                 ):
                     return await message.reply(
                         content="**Please do not reply ping users who do not wish to be pinged.**\n"
-                        + "As you are new, or this is your first violation, you are not being actioned upon at the moment.",
+                        + "This incident will be excused, but further incidents will be counted as **violations**.",
                         file=discord.File("assets/noreply.png"),
                         mention_author=False,
                     )
 
             self.violations[message.guild.id][message.author.id] += 1
             try:
-                if self.violations[message.guild.id][message.author.id] % modulo == 0:
+                if self.violations[message.guild.id][message.author.id] % noreply_remind == 0:
                     violation_count = str(self.violations[message.guild.id][message.author.id])
                     return await message.reply(
-                        content="**Please do not reply ping users who do not wish to be pinged.**\n"
-                        + f"You have currently received {violation_count} violations. ",
+                        content="**Do not reply ping users who do not wish to be pinged.**\n"
+                        + f"You have currently received {violation_count} violations.\n"
+                        + f"{noreply_thres} violations will result in a penalty.",
                         file=discord.File("assets/noreply.png"),
                         mention_author=False,
                     )
-                elif self.violations[message.guild.id][message.author.id] >= 7:
-                    self.bot.dispatch("violation_threshold_reached", message, message.author)
+                elif self.violations[message.guild.id][message.author.id] == (noreply_thres-1):
+                    return await message.reply(
+                        content=f"# {message.author.mention}, your next violation will result in penalty.\n"
+                        + f"You have currently received {violation_count} violations.\n"
+                        + f"As a reminder, **please respect ping preferences, and do not reply ping users who do not wish to be pinged.",
+                        file=discord.File("assets/noreply.png"),
+                        mention_author=False,
+                    )
+                elif self.violations[message.guild.id][message.author.id] >= noreply_thres:
+                    return self.bot.dispatch("violation_threshold_reached", message, message.author)
             except ZeroDivisionError:
                 # drop zde
                 return
