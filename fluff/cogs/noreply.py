@@ -96,6 +96,7 @@ class Reply(Cog):
 
             self.violations[message.guild.id][message.author.id] += 1
             try:
+                violation_count = str(self.violations[message.guild.id][message.author.id])
                 if self.violations[message.guild.id][message.author.id] == (noreply_thres-1):
                     return await message.reply(
                         content=f"# {message.author.mention}, your next violation will result in penalty.\n"
@@ -105,7 +106,6 @@ class Reply(Cog):
                         mention_author=False,
                     )
                 elif self.violations[message.guild.id][message.author.id] % noreply_remind == 0:
-                    violation_count = str(self.violations[message.guild.id][message.author.id])
                     return await message.reply(
                         content="**Do not reply ping users who do not wish to be pinged.**\n"
                         + f"You have currently received {violation_count} violations.\n"
