@@ -967,7 +967,10 @@ class ModToss(Cog):
                     )
                 await toss_channel.set_permissions(msgauthor, read_messages=True)
                 await message.reply(f"{self.username_system(message.author)} has been automatically muted for reaching the threshold for reply ping preference violation.")           
-                await toss_channel.send(f"{msgauthor.mention}, {get_config(message.guild.id, 'toss', 'tossmsg_noreply')}")
+                await toss_channel.send(
+                    f"{msgauthor.mention}, {get_config(message.guild.id, 'toss', 'tossmsg_noreply')}",
+                    file=discord.File("assets/noreply.png")
+                    )
             except commands.MissingPermissions:
                 error += f"\n- {self.username_system(msgauthor)}\n  Missing permissions to toss this user."
         
