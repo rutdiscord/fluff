@@ -101,7 +101,7 @@ class Reply(Cog):
                     return await message.reply(
                         content=f"# {message.author.mention}, your next violation will result in penalty.\n"
                         + f"You have currently received {violation_count} violations.\n"
-                        + f"As a reminder, **please respect ping preferences, and do not reply ping users who do not wish to be pinged.",
+                        + f"As a reminder, **please respect ping preferences, and do not reply ping users who do not wish to be pinged**.",
                         file=discord.File("assets/noreply.png"),
                         mention_author=False,
                     )
