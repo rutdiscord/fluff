@@ -93,21 +93,21 @@ class Reply(Cog):
 
                     def wait_check(new_msg):
                         return new_msg.author == message.author and isinstance(new_msg.channel, discord.DMChannel)
-                    
+                
                     try:
                         wait = await self.bot.wait_for("message", timeout=60, check=wait_check)
                         if wait:
-                           await temp_reminder_msg.delete()
+                            await temp_reminder_msg.delete()
                     except asyncio.TimeoutError:
-                       await temp_reminder_msg.delete()
+                        await temp_reminder_msg.delete()
 
-                    acknowledgements[str(message.author.id)] = True
-                    return set_guildfile(message.guild.id,"acknowledgements", json.dumps(acknowledgements))
-                       
+                acknowledgements[str(message.author.id)] = True
+                return set_guildfile(message.guild.id,"acknowledgements", json.dumps(acknowledgements))
+                    
 
             self.violations[message.guild.id][message.author.id] += 1
+            violation_count = self.violations[message.guild.id][message.author.id]
             try:
-                violation_count = self.violations[message.guild.id][message.author.id]
                 if self.violations[message.guild.id][message.author.id] == (noreply_thres-1):
                         await message.reply(
                         content=f"# {message.author.mention}, your next violation will result in penalty.\n"
@@ -116,21 +116,12 @@ class Reply(Cog):
                         file=discord.File("assets/noreply.png"),
                     )
                 elif self.violations[message.guild.id][message.author.id] % noreply_remind == 0:
-                    try:
                         return await message.author.send(
                         content="**Do not reply ping users who do not wish to be pinged.**\n"
                         + f"You have currently received {str(violation_count)} violations.\n"
                         + f"{noreply_thres} violations will result in a penalty.",
-                        file=discord.File("assets/noreply.png"),
-                    )
-                    except discord.errors.Forbidden:
-                        return await message.reply(
-                        content="**Do not reply ping users who do not wish to be pinged. You have me blocked, so I am posting it here! _thump thump_ **\n"
-                        + f"You have currently received {str(violation_count)} violations.\n"
-                        + f"{noreply_thres} violations will result in a penalty.",
-                        file=discord.File("assets/noreply.png"),
-                        mention_author=False,
-                    )
+                        file=discord.File("assets/noreply.png")
+                        )
                 elif self.violations[message.guild.id][message.author.id] >= noreply_thres:
                     return self.bot.dispatch("violation_threshold_reached", message, message.author)
             except ZeroDivisionError:
