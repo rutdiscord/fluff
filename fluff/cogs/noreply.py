@@ -277,12 +277,11 @@ class Reply(Cog):
                     ).moderate_members
                 ):
                     return
-
-                await message.author.timeout(datetime.timedelta(minutes=10))
                 return await message.reply(
-                    content=f"**Congratulations, {message.author.mention}, you absolute dumbass.**\nAs your reward for blocking me to disrupt my function, here is a time out, just for you.",
-                    mention_author=True,
-                )
+                        content=f"""# {message.author.mention}
+                        You have me blocked, or you have DMs for non-friends disabled! Not cool..""",
+                        file=discord.File("assets/noreply.png"),
+                    )
             except discord.errors.NotFound:
                 return await message.reply(
                     content=f"{message.author.mention} immediately deleted their own message.\n{message.author.display_name} now has `{self.violations[message.guild.id][message.author.id]}` violation(s).",
