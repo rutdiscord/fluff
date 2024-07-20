@@ -108,13 +108,16 @@ class Reply(Cog):
             try:
                 violation_count = str(self.violations[message.guild.id][message.author.id])
                 if self.violations[message.guild.id][message.author.id] == (noreply_thres-1):
-                    return await message.reply(
+                    try:
+                        await message.author.send_message(
                         content=f"# {message.author.mention}, your next violation will result in penalty.\n"
                         + f"You have currently received {violation_count} violations.\n"
                         + f"As a reminder, **please respect ping preferences, and do not reply ping users who do not wish to be pinged**.",
                         file=discord.File("assets/noreply.png"),
-                        mention_author=False,
                     )
+                    except discord.errors.Forbidden:
+                        await message.reply(f"\*thump thump\* You blocked me, or have your direct messages for this message turned off! How rude.. you violated someone's ping preferences {violation_count} times. You will be muted the next time you violate someone's ping preferences.",
+                                            file=discord.File("assets/noreply.png"))
                 elif self.violations[message.guild.id][message.author.id] % noreply_remind == 0:
                     return await message.reply(
                         content="**Do not reply ping users who do not wish to be pinged.**\n"
