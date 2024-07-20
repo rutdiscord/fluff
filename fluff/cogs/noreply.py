@@ -84,7 +84,7 @@ class Reply(Cog):
                 if (
                     str(message.author.id) not in acknowledgements
                 ):
-                    temp_reminder_msg = await message.author.send_message(
+                    temp_reminder_msg = await message.author.send(
                         content="**Please do not reply ping users who do not wish to be pinged.**\n"
                         + "This incident will be excused, but further incidents will be counted as **violations**.",
                         file=discord.File("assets/noreply.png"),
@@ -117,7 +117,7 @@ class Reply(Cog):
                     )
                 elif self.violations[message.guild.id][message.author.id] % noreply_remind == 0:
                     try:
-                        return await message.author.send_message(
+                        return await message.author.send(
                         content="**Do not reply ping users who do not wish to be pinged.**\n"
                         + f"You have currently received {str(violation_count)} violations.\n"
                         + f"{noreply_thres} violations will result in a penalty.",
