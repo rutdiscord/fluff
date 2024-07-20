@@ -98,7 +98,7 @@ class Reply(Cog):
                         return new_msg.author == message.author
                     
                     try:
-                        wait = await self.bot.wait_for("message", timeout=30, check=wait_check)
+                        wait = await self.bot.wait_for("message", timeout=60, check=wait_check)
                         if wait:
                            await temp_reminder_msg.delete()
                     except asyncio.TimeoutError:
