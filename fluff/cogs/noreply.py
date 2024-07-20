@@ -100,7 +100,10 @@ class Reply(Cog):
                     try:
                         wait = await self.bot.wait_for("message", timeout=30, check=wait_check)
                     except asyncio.TimeoutError:
-                        wait.delete()
+                        temp_reminder_msg.delete()
+
+                    if wait:
+                        temp_reminder_msg.delete()
 
             self.violations[message.guild.id][message.author.id] += 1
             try:
