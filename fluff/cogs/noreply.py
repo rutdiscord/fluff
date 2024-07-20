@@ -95,7 +95,7 @@ class Reply(Cog):
                     )
 
                     def wait_check(new_msg):
-                        return new_msg.author.id == message.author.id
+                        return new_msg.author == message.author
                     
                     try:
                         wait = await self.bot.wait_for("message", timeout=30, check=wait_check)
