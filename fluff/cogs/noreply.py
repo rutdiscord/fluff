@@ -87,12 +87,20 @@ class Reply(Cog):
                     str(message.author.id) not in usertracks
                     or usertracks[str(message.author.id)]["truedays"] < 14
                 ):
-                    return await message.reply(
+                    temp_reminder_msg = await message.reply(
                         content="**Please do not reply ping users who do not wish to be pinged.**\n"
                         + "This incident will be excused, but further incidents will be counted as **violations**.",
                         file=discord.File("assets/noreply.png"),
                         mention_author=False,
                     )
+
+                    def wait_check(new_msg):
+                        return new_msg.author.id == message.author.id
+                    
+                    try:
+                        wait = await self.bot.wait_for("message", timeout=30, check=wait_check)
+                    except asyncio.TimeoutError:
+                        wait.delete()
 
             self.violations[message.guild.id][message.author.id] += 1
             try:
