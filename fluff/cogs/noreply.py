@@ -277,9 +277,13 @@ class Reply(Cog):
                     ).moderate_members
                 ):
                     return
+                self.violations[message.guild.id][message.author.id] += 1
+                cur_violation_count = self.violations[message.guild.id][message.author.id]
                 return await message.reply(
-                        content=f"""# {message.author.mention}
-**You have me blocked, or you have DMs for non-friends disabled!** _Not cool.._ (You have been given a violation for violating someone's reply ping preference.)""",
+                        content=f"""**{message.author.mention}, You have me blocked, or you have DMs disabled!** Not cool.
+**Do not reply ping users who do not wish to be pinged.**
+You have currently received {cur_violation_count} violations.
+10 violations will result in a penalty.""",
                         file=discord.File("assets/noreply.png"),
                     )
             except discord.errors.NotFound:
