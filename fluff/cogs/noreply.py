@@ -279,7 +279,7 @@ class Reply(Cog):
                     return
                 return await message.reply(
                         content=f"""# {message.author.mention}
-                        You have me blocked, or you have DMs for non-friends disabled! Not cool..""",
+**You have me blocked, or you have DMs for non-friends disabled!** _Not cool.._ (You have been given a violation for violating someone's reply ping preference.)""",
                         file=discord.File("assets/noreply.png"),
                     )
             except discord.errors.NotFound:
