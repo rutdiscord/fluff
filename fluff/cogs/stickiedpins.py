@@ -40,7 +40,9 @@ class StickiedPins(commands.Cog):
     @pins.command()
     async def create(self, ctx: discord.abc.GuildChannel, msg: discord.Message):
         guild_pins = get_guildfile(ctx.guild.id, "pins")
-        channel_pins = guild_pins.get(str(msg.channel.id), [])
+        if str(msg.channel.id) not in guild_pins:
+            guild_pins[str(msg.channel.id)] = []
+        channel_pins = guild_pins[str(msg.channel.id)]
         
         if msg.id in channel_pins:
             return await ctx.reply(f"Stickied pin already exists in channel: {msg.jump_url}", mention_author=False)
