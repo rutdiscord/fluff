@@ -33,12 +33,14 @@ class StickiedPins(commands.Cog):
     async def pins(self, ctx):
         guild_pins = get_guildfile(ctx.guild.id, "pins") 
 
-        
+
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
     @commands.guild_only()
     @pins.command()
     async def create(self, ctx: discord.abc.GuildChannel, msg: discord.Message):
+        # fetch all already pinned messages as a way of precaching lol?
+        await msg.channel.pins()
         guild_pins = get_guildfile(ctx.guild.id, "pins")
         channel_pins = None
         if str(msg.channel.id) not in guild_pins:
