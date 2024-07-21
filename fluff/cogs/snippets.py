@@ -80,8 +80,9 @@ class Snippets(Cog):
                     with open(f"temp/snippets-{ctx.guild.id}.txt", "w") as file:
                         file.write(file_content)
 
-                    await ctx.send(file=discord.File(f"temp/snippets-{ctx.guild.id}.txt"))
-                    os.remove(f"temp/snippets-{ctx.guild.id}.txt")
+                    file_sent = await ctx.send(file=discord.File(f"temp/snippets-{ctx.guild.id}.txt"))
+                    if file_sent:
+                        os.remove(f"temp/snippets-{ctx.guild.id}.txt")
                     
                     
                 
