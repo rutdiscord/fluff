@@ -38,28 +38,22 @@ class StickiedPins(commands.Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @pins.command()
-    async def create(self, ctx: discord.abc.GuildChannel, msglink):
-        message_link_regex = r"\/([0-9].*)\/([0-9].*)\/([0-9].*[^/])\/{0,}"
-        regex_match = re.search(message_link_regex, msglink)
-        link_matches = {}
-        link_matches = {'channel': regex_match.group(2),  # Channel
-                        'message': regex_match.group(3)}  # Message
-                                                            # Removed the guild part because we can just assume from CTX...?
+    async def create(self, ctx: discord.abc.GuildChannel, msg: discord.Message):
         guild_pins = get_guildfile(ctx.guild.id, "pins")
         channel_pins = None
-        if link_matches["channel"] not in guild_pins:
-            guild_pins[link_matches['channel']] = []
-            channel_pins = guild_pins[link_matches['channel']]
+        if msg.channel not in guild_pins:
+            guild_pins[msg.channel.id] = []
+            channel_pins = guild_pins[msg.channel.id]
         
-        if link_matches['message'] in guild_pins[link_matches['channel']]:
-            return await ctx.reply(f"Stickied pin already exists in channel: {msglink}")
+        if msg in guild_pins[msg.channel.id]:
+            return await ctx.reply(f"Stickied pin already exists in channel: {msg.jump_url}", mention_author=False)
             
-        channel_pins.append(link_matches['message'])
+        channel_pins.append(msg.id)
         set_guildfile(ctx.guild.id, "pins", json.dumps(guild_pins))
 
         try:
-            if link_matches['message'] in guild_pins[link_matches['channel']]:
-              return await ctx.reply(f"Stickied pin created in <#{link_matches['channel']}>.", mention_author=False)
+            if msg in guild_pins[msg.channel.id]:
+              return await ctx.reply(f"Stickied pin created in <#{msg.channel.id}>.", mention_author=False)
         except Exception as reason:
             return await ctx.reply(f"Stickied pin failed to be created. {reason}")
     
@@ -72,9 +66,10 @@ class StickiedPins(commands.Cog):
         channel = target_channel or ctx.channel
         return await self.update_pins(guild,channel)
     
-    # @commands.Cog.listener()
-    # async def on_guild_channel_pins_update(self, pin_channel, new_pin):
-    #     self.update_pins(pin_channel.guild, pin_channel)
-
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.channel.type == discord.ChannelType.text and message.pinned:
+            return await self.update_pins(message.guild, message.channel)
+            
 async def setup(bot):
    await bot.add_cog(StickiedPins(bot))
