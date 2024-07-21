@@ -49,7 +49,7 @@ class Snippets(Cog):
                     for subname, subsnippet in list(snippets.items()):
                         if subsnippet == name:
                             aliases += f"\n➡️ " + subname
-                    embed.add_field(
+                        embed.add_field(
                         name=name,
                         value=(
                             "> "
@@ -61,8 +61,26 @@ class Snippets(Cog):
                         ),
                         inline=False,
                     )
+                            
+            try:
+                await ctx.reply(embed=embed, mention_author=False)
+            except discord.errors.HTTPException as exception: # almost always too many embed fields
+                if exception.code == 50035:
+                    file_content = ""
+                    for name, snippet in list(snippets.items()):
+                        if snippet in snippets:
+                            continue
+                        aliases = ""
+                        for subname, subsnippet in list(snippets.items()):
+                            if subsnippet == name:
+                                aliases += f"\n➡️ " + subname
+                        file_content += f"{name}:\n{snippet}\nAliases:{aliases}\n\n"
 
-            return await ctx.reply(embed=embed, mention_author=False)
+                    with open("snippets.txt", "w") as file:
+                        file.write(file_content)
+
+                    await ctx.reply(file=discord.File("snippets.txt"), mention_author=False)
+                
         else:
             if name.lower() not in snippets:
                 return
