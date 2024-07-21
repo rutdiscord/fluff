@@ -1,5 +1,6 @@
 import discord
 import json
+import os
 from discord.ext import commands
 from discord.ext.commands import Cog
 from helpers.checks import isadmin
@@ -76,10 +77,13 @@ class Snippets(Cog):
                                 aliases += f"\n➡️ " + subname
                         file_content += f"{name}:\n{snippet}\nAliases:{aliases}\n\n"
 
-                    with open("snippets.txt", "w") as file:
+                    with open(f"temp/snippets-{ctx.guild.id}.txt", "w") as file:
                         file.write(file_content)
 
-                    await ctx.reply(file=discord.File("snippets.txt"), mention_author=False)
+                    await ctx.send(file=discord.File(f"temp/snippets-{ctx.guild.id}.txt"))
+                    os.remove(f"temp/snippets-{ctx.guild.id}.txt")
+                    
+                    
                 
         else:
             if name.lower() not in snippets:
