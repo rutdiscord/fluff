@@ -16,6 +16,10 @@ from helpers.datafiles import fill_profile, get_botfile
 from helpers.errors import handle_code_error, handle_command_error
 
 
+# Setup temp dir
+if not os.path.exists("temp"):
+    os.makedirs("temp")
+
 # Logging setup to file and stdout.
 if not os.path.exists("logs"):
     os.makedirs("logs")
