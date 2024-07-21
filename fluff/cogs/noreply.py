@@ -217,19 +217,29 @@ class Reply(Cog):
         else:
             if str(reaction) == reacts[0]:
                 profile["replypref"] = None
+                role_name = None
             elif str(reaction) == reacts[1]:
                 profile["replypref"] = "pleasereplyping"
+                role_name = "Please Ping"
             elif str(reaction) == reacts[2]:
                 profile["replypref"] = "waitbeforereplyping"
+                role_name = "Ping after Delay"
             elif str(reaction) == reacts[3]:
                 profile["replypref"] = "noreplyping"
+                role_name = "No Ping"
+            
             set_userfile(ctx.author.id, "profile", json.dumps(profile))
+            if role_name != None:
+                role = self.bot.pull_role(ctx.guild, role_name)
+                if role:
+                    await ctx.author.add_roles(role)
             embed.clear_fields()
             fieldadd()
             embed.color = discord.Color.gold()
             for react in reacts:
                 await configmsg.remove_reaction(react, ctx.bot.user)
             await configmsg.edit(embed=embed, allowed_mentions=allowed_mentions)
+
 
     @Cog.listener()
     async def on_message(self, message):
