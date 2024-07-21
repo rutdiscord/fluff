@@ -66,7 +66,7 @@ class Snippets(Cog):
                 await ctx.reply(embed=embed, mention_author=False)
             except discord.errors.HTTPException as exception: # almost always too many embed fields
                 if exception.code == 50035:
-                    file_content = ""
+                    file_content = "" # GITHUB COPILOT CODE LOL
                     for name, snippet in list(snippets.items()):
                         if snippet in snippets:
                             continue
