@@ -190,7 +190,7 @@ class Basic(Cog):
             help_embed.add_field(name="Join Graph", value="`pls joingraph` shows a graph of users who have joined.", inline=False)
             help_embed.add_field(name="Join Score", value="`pls joinscore` shows when you joined in comparison to other users.", inline=False)
             help_embed.add_field(name="Rule Snippets", value="`pls rule` will display a list of rule snippets. You can individually call them with their names, `pls rule [name]`. Useful for people who are confused about the rules!")
-            help_embed.add_field(name="Ping Preferences", value="`pls pingconfig` will allow you to change your ping preferences, AKA whether you'd like to be pinged always, never, or after a delay.", inline=False)
+            help_embed.add_field(name="Ping Preferences", value="`pls replyconfig` will allow you to change your ping preferences, AKA whether you'd like to be pinged always, never, or after a delay.", inline=False)
             help_embed.add_field(name="Rolling the Dice", value="`pls choose [options separated by spaces]` will choose something at random for you.", inline=False)
             help_embed.add_field(name="Timer", value="`pls timer [duration in minutes, max 60]` I will start a timer for you and ping you when it's done. By default I will set it for 5 minutes.", inline=False)
             help_embed.add_field(name="User Avy", value="`pls avy [user]` will tell me to post your avatar. Without any user specified, I will post your current avatar.", inline=False)
