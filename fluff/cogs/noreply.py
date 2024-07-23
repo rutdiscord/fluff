@@ -292,9 +292,9 @@ class Reply(Cog):
                 try:
                     await message.reply(
                         content=f"""**{message.author.mention}, You have me blocked, or you have DMs disabled!** Not cool.
-                        **Do not reply ping users who do not wish to be pinged.**
-                        You have currently received {cur_violation_count} violation(s).
-                        10 violations will result in a penalty.""",
+**Do not reply ping users who do not wish to be pinged.**
+You have currently received {cur_violation_count} violation(s).
+10 violations will result in a penalty.""",
                         file=discord.File("assets/noreply.png"),
                     )
                 except discord.errors.Forbidden:
