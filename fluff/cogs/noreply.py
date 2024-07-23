@@ -361,7 +361,7 @@ You have currently received {cur_violation_count} violation(s).
                     await message.add_reaction("<:waitbeforeping:1258418064781738076>")
                 except discord.errors.Forbidden as err:
                         if err.code == 90001:
-                            return await self.bot.dispatch("autotoss_blocked", message, message.author)
+                            return await self.bot.dispatch("autotoss_blocked", refmessage, refmessage.author)
                 await wrap_violation(message)
             return
 
