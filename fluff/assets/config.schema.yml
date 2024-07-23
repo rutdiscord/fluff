@@ -103,6 +103,10 @@ properties:
         type:
           - string
           - "null"
+      tossmsg_noreply_blocked:
+        type:
+          - string
+          - "null"
   reaction:
     type: object
     properties:
@@ -146,4 +150,4 @@ properties:
     type: object
     properties:
       version:
-        const: 16
+        const: 17

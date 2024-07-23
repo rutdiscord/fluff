@@ -61,6 +61,12 @@ toss:
   # Message for tosses on rejoin
   tossmsg_rejoin:
 
+  # Message for tosses when a user is tossed for exceeding the threshold
+  tossmsg_noreply:
+
+  # Message for tosses when the bot is unable to send a message to the user on Noreply violation
+  tossmsg_noreply_blocked:
+
 
 reaction:
   # If the bot may automatically adjust names to be readable.
