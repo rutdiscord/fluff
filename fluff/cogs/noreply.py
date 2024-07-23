@@ -273,6 +273,21 @@ class Reply(Cog):
                 return
 
         async def wrap_violation(message):
+            if not get_config(message.guild.id, "reaction", "noreply_remind_every"):
+                return
+            noreply_remind = (
+                3
+                if get_config(message.guild.id, "reaction", "noreply_remind_every") > 3
+                else get_config(message.guild.id, "reaction", "noreply_remind_every")
+            )
+
+            if not get_config(message.guild.id, "reaction", "noreply_threshold"):
+                return
+            noreply_thres = (
+                10
+                if get_config(message.guild.id, "reaction", "noreply_threshold") > 10
+                else get_config(message.guild.id, "reaction", "noreply_threshold")
+            )
             try:
                 await self.add_violation(message)
                 return
@@ -290,11 +305,12 @@ class Reply(Cog):
                 self.violations[message.guild.id][message.author.id] += 1
                 cur_violation_count = self.violations[message.guild.id][message.author.id]
                 try:
-                    await message.reply(
+                    if (cur_violation_count % noreply_remind):
+                        await message.reply(
                         content=f"""**{message.author.mention}, You have me blocked, or you have DMs disabled!** Not cool.
 **Do not reply ping users who do not wish to be pinged.**
 You have currently received {cur_violation_count} violation(s).
-10 violations will result in a penalty.""",
+{noreply_thres} violations will result in a penalty.""",
                         file=discord.File("assets/noreply.png"),
                     )
                 except discord.errors.Forbidden:
@@ -308,8 +324,7 @@ You have currently received {cur_violation_count} violation(s).
                         await message.add_reaction("❌")
                     except discord.errors.Forbidden as err:
                         if err.code == 90001:
-                            return await message.reply("Blocked... :(")
-                        # await self.bot.dispatch("violation_threshold_reached", message, message.author)
+                            return await self.bot.dispatch("violation_threshold_reached", message, message.author)
             except discord.errors.NotFound:
                 return await message.reply(
                     content=f"{message.author.mention} immediately deleted their own message.\n{message.author.display_name} now has `{self.violations[message.guild.id][message.author.id]}` violation(s).",
