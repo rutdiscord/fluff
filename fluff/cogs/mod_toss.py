@@ -908,6 +908,120 @@ class ModToss(Cog):
             set_tossfile(channel.guild.id, "tosses", json.dumps(tosses))
 
     @Cog.listener()
+    async def autotoss_blocked(self, message, msgauthor): # lazily copied and pasted 2!
+        await self.bot.wait_until_ready()
+
+        if not self.enabled(message.guild): # this should never ever fire but its here anyway
+            return await message.reply(self.nocfgmsg, mention_author=False)
+
+        staff_roles = [
+            self.bot.pull_role(message.guild, get_config(message.guild.id, "staff", "modrole")),
+            self.bot.pull_role(
+                message.guild, get_config(message.guild.id, "staff", "adminrole")
+            ),
+        ]
+        toss_role = self.bot.pull_role(
+            message.guild, get_config(message.guild.id, "toss", "tossrole")
+        )
+        if not any(staff_roles) or not toss_role:
+            return await message.reply(
+                content="PLACEHOLDER no staff or toss role configured",
+                mention_author=False,
+            )
+        notify_channel = self.bot.pull_channel(
+            message.guild, get_config(message.guild.id, "toss", "notificationchannel")
+        )
+        if not notify_channel:
+            notify_channel = self.bot.pull_channel(
+                message.guild, get_config(message.guild.id, "staff", "staffchannel")
+            )
+        modlog_channel = self.bot.pull_channel(
+            message.guild, get_config(message.guild.id, "logging", "modlog")
+        )
+        # end logic lazily ported from actual tossing
+        error = ""
+       
+        if self.get_session(msgauthor) and toss_role in msgauthor.roles:
+                error += (
+                    f"\n- {self.username_system(msgauthor)}\n  This user is already tossed."
+                )
+
+        if all(
+            [
+                c in [g.name for g in message.guild.channels]
+                for c in get_config(message.guild.id, "toss", "tosschannels")
+            ]
+        ):
+            await message.add_reaction("🚫")
+            return await notify_channel.send(
+                f"Error in toss command from {msgauthor.mention}...\n- No toss channels available.\n```diff"
+                + error
+                + "\n```\n"
+            )
+        else:
+            toss_channel = await self.new_session(message.guild)
+            try:
+                failed_roles, previous_roles = await self.perform_toss(
+                        msgauthor, msgauthor.guild.me, toss_channel
+                    )
+                await toss_channel.set_permissions(msgauthor, read_messages=True)
+                await message.reply(f"{self.username_system(message.author)} has been automatically muted for blocking Fluff.")           
+                await toss_channel.send(
+                    f"{msgauthor.mention}, {get_config(message.guild.id, 'toss', 'tossmsg_noreply')}",
+                    file=discord.File("assets/noreply.png")
+                    )
+            except commands.MissingPermissions:
+                error += f"\n- {self.username_system(msgauthor)}\n  Missing permissions to toss this user."
+        
+        toss_userlog(
+                message.guild.id,
+                msgauthor.id,
+                message.guild.me,
+                message.jump_url,
+                toss_channel.id,
+            )
+        
+        if notify_channel:
+                embed = stock_embed(self.bot)
+                author_embed(embed, msgauthor, True)
+                embed.color = msgauthor.color
+                embed.title = "🚷 Toss"
+                embed.description = f"{msgauthor.mention} was tossed by {message.guild.me.mention} [`#{message.channel.name}`] [[Jump]({message.jump_url})]\n> This toss takes place in {toss_channel.mention}..."
+                createdat_embed(embed, msgauthor)
+                joinedat_embed(embed, msgauthor)
+                prevlist = []
+                if len(previous_roles) > 0:
+                    for role in previous_roles:
+                        prevlist.append("<@&" + str(role.id) + ">")
+                    prevlist = ",".join(reversed(prevlist))
+                else:
+                    prevlist = "None"
+                embed.add_field(
+                    name="🎨 Previous Roles",
+                    value=prevlist,
+                    inline=False,
+                )
+                if failed_roles:
+                    faillist = []
+                    for role in failed_roles:
+                        faillist.append("<@&" + str(role.id) + ">")
+                    faillist = ",".join(reversed(faillist))
+                    embed.add_field(
+                        name="🚫 Failed Roles",
+                        value=faillist,
+                        inline=False,
+                    )
+                await notify_channel.send(embed=embed)
+        
+        if modlog_channel and modlog_channel != notify_channel:
+                embed = stock_embed(self.bot)
+                embed.color = discord.Color.from_str("#FF0000")
+                embed.title = "🚷 Toss"
+                embed.description = f"{msgauthor.mention} was tossed by {message.guild.me.mention} [`#{message.channel.name}`] [[Jump]({message.jump_url})]"
+                mod_embed(embed, msgauthor, message.guild.me)
+                await modlog_channel.send(embed=embed)
+            
+    @Cog.listener()
     async def on_violation_threshold_reached(self, message, msgauthor):
         await self.bot.wait_until_ready()
 
