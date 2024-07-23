@@ -307,43 +307,39 @@ class Reply(Cog):
                 try:
                     if (cur_violation_count % noreply_remind):
                         await message.reply(
-                        content=f"""**{message.author.mention}, You have me blocked, or you have DMs disabled!** Not cool.
+                        content=f"""**{message.author.mention}, You have me blocked, or you have DMs disabled!**
 **Do not reply ping users who do not wish to be pinged.**
 You have currently received {cur_violation_count} violation(s).
 {noreply_thres} violations will result in a penalty.""",
                         file=discord.File("assets/noreply.png"),
+                        )
+                except discord.errors.NotFound:
+                    return await message.reply(
+                        content=f"{message.author.mention} immediately deleted their own message.\n{message.author.display_name} now has `{self.violations[message.guild.id][message.author.id]}` violation(s).",
+                        mention_author=True,
                     )
-                except discord.errors.Forbidden:
-                    if not (
-                        message.channel.permissions_for(message.guild.me).add_reactions
-                        and message.channel.permissions_for(message.guild.me).manage_messages
-                        and message.channel.permissions_for(message.guild.me).moderate_members
-                    ):
-                        return
-                    try:
-                        await message.add_reaction("❌")
-                    except discord.errors.Forbidden as err:
-                        if err.code == 90001:
-                            return await self.bot.dispatch("violation_threshold_reached", message, message.author)
-            except discord.errors.NotFound:
-                return await message.reply(
-                    content=f"{message.author.mention} immediately deleted their own message.\n{message.author.display_name} now has `{self.violations[message.guild.id][message.author.id]}` violation(s).",
-                    mention_author=True,
-                )
 
         # If not reply pinged...
         if (
             preference == "pleasereplyping"
             and refmessage.author not in message.mentions
         ):
-            await message.add_reaction("<:pleaseping:1258418052651942053>")
+            try:
+                await message.add_reaction("<:pleaseping:1258418052651942053>")
+            except discord.errors.Forbidden as err:
+                    if err.code == 90001:
+                        return 
             pokemsg = await message.reply(content=refmessage.author.mention,mention_author=False)
             await self.bot.await_message(message.channel, refmessage.author, 86400)
             return await pokemsg.delete()
 
         # If reply pinged at all...
         elif preference == "noreplyping" and refmessage.author in message.mentions:
-            await message.add_reaction("<:noping:1258418038504689694>")
+            try:
+                await message.add_reaction("<:noping:1258418038504689694>")
+            except discord.errors.Forbidden as err:
+                    if err.code == 90001:
+                        return await self.bot.dispatch("violation_threshold_reached", message, message.author)
             await wrap_violation(message)
             return
 
@@ -361,7 +357,11 @@ You have currently received {cur_violation_count} violation(s).
                 int(message.created_at.timestamp()) - 30
                 <= self.timers[message.guild.id][refmessage.author.id]
             ):
-                await message.add_reaction("<:waitbeforeping:1258418064781738076>")
+                try:
+                    await message.add_reaction("<:waitbeforeping:1258418064781738076>")
+                except discord.errors.Forbidden as err:
+                        if err.code == 90001:
+                            return await self.bot.dispatch("violation_threshold_reached", message, message.author)
                 await wrap_violation(message)
             return
 
