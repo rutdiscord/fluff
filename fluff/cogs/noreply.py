@@ -289,13 +289,27 @@ class Reply(Cog):
                     return
                 self.violations[message.guild.id][message.author.id] += 1
                 cur_violation_count = self.violations[message.guild.id][message.author.id]
-                return await message.reply(
+                try:
+                    await message.reply(
                         content=f"""**{message.author.mention}, You have me blocked, or you have DMs disabled!** Not cool.
-**Do not reply ping users who do not wish to be pinged.**
-You have currently received {cur_violation_count} violations.
-10 violations will result in a penalty.""",
+                        **Do not reply ping users who do not wish to be pinged.**
+                        You have currently received {cur_violation_count} violation(s).
+                        10 violations will result in a penalty.""",
                         file=discord.File("assets/noreply.png"),
                     )
+                except discord.errors.Forbidden:
+                    if not (
+                        message.channel.permissions_for(message.guild.me).add_reactions
+                        and message.channel.permissions_for(message.guild.me).manage_messages
+                        and message.channel.permissions_for(message.guild.me).moderate_members
+                    ):
+                        return
+                    try:
+                        await message.add_reaction("❌")
+                    except discord.errors.Forbidden as err:
+                        if err.code == 90001:
+                            return await message.reply("Blocked... :(")
+                        # await self.bot.dispatch("violation_threshold_reached", message, message.author)
             except discord.errors.NotFound:
                 return await message.reply(
                     content=f"{message.author.mention} immediately deleted their own message.\n{message.author.display_name} now has `{self.violations[message.guild.id][message.author.id]}` violation(s).",
