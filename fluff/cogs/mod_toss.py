@@ -908,7 +908,7 @@ class ModToss(Cog):
             set_tossfile(channel.guild.id, "tosses", json.dumps(tosses))
 
     @Cog.listener()
-    async def autotoss_blocked(self, message, msgauthor): # lazily copied and pasted 2!
+    async def on_autotoss_blocked(self, message, msgauthor): # lazily copied and pasted 2!
         await self.bot.wait_until_ready()
 
         if not self.enabled(message.guild): # this should never ever fire but its here anyway
