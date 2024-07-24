@@ -304,7 +304,7 @@ class Reply(Cog):
                     return
                 self.violations[message.guild.id][message.author.id] += 1
                 cur_violation_count = self.violations[message.guild.id][message.author.id]
-                if (cur_violation_count % noreply_remind):
+                if (cur_violation_count > 1 and cur_violation_count % noreply_remind == 0):
                     try:
                             await message.reply(
                             content=f"""**{message.author.mention}, You have me blocked, or you have DMs disabled!**
@@ -318,6 +318,7 @@ class Reply(Cog):
                             content=f"{message.author.mention} immediately deleted their own message.\n{message.author.display_name} now has `{self.violations[message.guild.id][message.author.id]}` violation(s).",
                             mention_author=True,
                         )
+                    
 
         # If not reply pinged...
         if (
