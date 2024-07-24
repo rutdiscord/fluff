@@ -376,8 +376,11 @@ class ModToss(Cog):
             except asyncio.exceptions.CancelledError:
                 return
             else:
-                pokemsg = await toss_channel.send(ctx.author.mention)
-                await pokemsg.edit(content="🫳⏰", delete_after=5)
+                try:
+                    pokemsg = await toss_channel.send(ctx.author.mention)
+                    await pokemsg.edit(content="🫳⏰", delete_after=5)
+                except discord.errors.NotFound:
+                    return
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.bot_has_permissions(manage_roles=True, manage_channels=True)
