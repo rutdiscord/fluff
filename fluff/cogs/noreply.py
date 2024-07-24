@@ -304,20 +304,20 @@ class Reply(Cog):
                     return
                 self.violations[message.guild.id][message.author.id] += 1
                 cur_violation_count = self.violations[message.guild.id][message.author.id]
-                try:
-                    if (cur_violation_count % noreply_remind):
-                        await message.reply(
-                        content=f"""**{message.author.mention}, You have me blocked, or you have DMs disabled!**
-**Do not reply ping users who do not wish to be pinged.**
-You have currently received {cur_violation_count} violation(s).
-{noreply_thres} violations will result in a penalty.""",
-                        file=discord.File("assets/noreply.png"),
+                if (cur_violation_count % noreply_remind):
+                    try:
+                            await message.reply(
+                            content=f"""**{message.author.mention}, You have me blocked, or you have DMs disabled!**
+    **Do not reply ping users who do not wish to be pinged.**
+    You have currently received {cur_violation_count} violation(s).
+    {noreply_thres} violations will result in a penalty.""",
+                            file=discord.File("assets/noreply.png"),
+                            )
+                    except discord.errors.NotFound:
+                        return await message.reply(
+                            content=f"{message.author.mention} immediately deleted their own message.\n{message.author.display_name} now has `{self.violations[message.guild.id][message.author.id]}` violation(s).",
+                            mention_author=True,
                         )
-                except discord.errors.NotFound:
-                    return await message.reply(
-                        content=f"{message.author.mention} immediately deleted their own message.\n{message.author.display_name} now has `{self.violations[message.guild.id][message.author.id]}` violation(s).",
-                        mention_author=True,
-                    )
 
         # If not reply pinged...
         if (
