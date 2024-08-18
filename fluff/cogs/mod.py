@@ -555,7 +555,6 @@ class Mod(Cog):
         else:
             return await ctx.reply(f"Slowmode disabled in {channel.mention}.", mention_author=False)
 
-
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command(aliases=["unslow"])
@@ -576,7 +575,6 @@ class Mod(Cog):
             new_channel_data = await channel.edit(slowmode_delay=0)
             if new_channel_data.slowmode_delay == 0:
                 return await ctx.reply(f"Slowmode disabled in {channel.mention}.", mention_author=False)
-
 
     @commands.check(isadmin)
     @commands.guild_only()
