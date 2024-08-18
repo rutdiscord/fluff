@@ -535,24 +535,51 @@ class Mod(Cog):
     @commands.command(aliases=["slow"])
     async def slowmode(self, ctx, channel: discord.abc.GuildChannel = None, seconds: int = 5):
         """This makes the bot set a channel's slowmode.
+
+        Slowmode will be set in a `channel` to `seconds` amount of seconds. 
+        Running this command by itself will enable a 5 second slowmode for the invoker's current channel.
         
         - `channel`
         The channel to manage slowmode for. Optional, will target to the current channel by default.
+
         - `seconds`
         The time (in seconds) to set slowmode for. Optional, will be five seconds by default."""
         if not channel:
             channel = ctx.channel
 
         if channel.slowmode_delay == seconds:
-            return await ctx.send(f"Slowmode is already `{seconds}` second(s) in {channel.mention}!")
+            return await ctx.reply(f"Slowmode is already `{seconds}` second(s) in {channel.mention}!", mention_author=False)
         
         new_channel_data = await channel.edit(slowmode_delay=seconds)
 
         if new_channel_data.slowmode_delay > 0:
-            await ctx.send(f"Slowmode set to `{seconds}` second(s) in {channel.mention}.")
+            return await ctx.reply(f"Slowmode set to `{seconds}` second(s) in {channel.mention}.", mention_author=False)
         else:
-            await ctx.send(f"Slowmode disabled in {channel.mention}.")
+            return await ctx.reply(f"Slowmode disabled in {channel.mention}.", mention_author=False)
+
+
+    @commands.check(ismod)
+    @commands.guild_only()
+    @commands.command(aliases=["unslow"])
+    async def unslowmode(self, ctx, channel: discord.abc.GuildChannel):
+        """This makes the bot disable a channel's slowmode.
+
+        Slowmode will be disabled in a `channel` if it is supplied, otherwise Fluff will disable slowmode for the invoker's current channel.
         
+        - `channel`
+        The channel to disable slowmode for. Optional, will target to the current channel by default."""
+        if not channel:
+            channel = ctx.channel
+        
+        if channel.slowmode_delay == 0:
+            return await ctx.reply(f"Slowmode is already disabled in {channel.mention}!", mention_author=False)
+        
+        if channel.slowmode_delay > 0:
+            new_channel_data = await channel.edit(slowmode_delay=0)
+            if new_channel_data.slowmode_delay == 0:
+                return await ctx.reply(f"Slowmode disabled in {channel.mention}.", mention_author=False)
+
+
     @commands.check(isadmin)
     @commands.guild_only()
     @commands.command(aliases=["send"])
