@@ -536,8 +536,7 @@ class Mod(Cog):
     async def slowmode(self, ctx, channel: discord.abc.GuildChannel = None, seconds: int = 5):
         """This makes the bot set a channel's slowmode.
 
-        Slowmode will be set in a `channel` to `seconds` amount of seconds. 
-        Running this command by itself will enable a 5 second slowmode for the invoker's current channel.
+        Slowmode will be set in a `channel` to `seconds` amount of seconds. Running this command by itself will enable a 5 second slowmode for the invoker's current channel.
         
         - `channel`
         The channel to manage slowmode for. Optional, will target to the current channel by default.
