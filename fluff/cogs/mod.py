@@ -577,6 +577,7 @@ class Mod(Cog):
             if new_channel_data.slowmode_delay == 0:
                 return await ctx.reply(f"Slowmode disabled in {channel.mention}.", mention_author=False)
 
+
     @commands.check(isadmin)
     @commands.guild_only()
     @commands.command(aliases=["send"])
