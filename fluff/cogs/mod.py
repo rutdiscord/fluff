@@ -540,7 +540,6 @@ class Mod(Cog):
         
         - `channel`
         The channel to manage slowmode for. Optional, will target to the current channel by default.
-
         - `seconds`
         The time (in seconds) to set slowmode for. Optional, will be five seconds by default."""
         if not channel:
