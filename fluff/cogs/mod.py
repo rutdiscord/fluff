@@ -542,7 +542,10 @@ class Mod(Cog):
         The time (in seconds) to set slowmode for. Optional, will be five seconds by default."""
         if not channel:
             channel = ctx.channel
-
+            
+        if channel.slowmode_delay == seconds:
+            return await ctx.send(f"Slowmode is already `{seconds}` in {channel.mention}!")
+        
         new_channel_data = await channel.edit(slowmode_delay=seconds)
 
         if new_channel_data.slowmode_delay > 0:
