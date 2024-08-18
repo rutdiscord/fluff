@@ -561,7 +561,7 @@ class Mod(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command(aliases=["unslow"])
-    async def unslowmode(self, ctx, channel: discord.abc.GuildChannel):
+    async def unslowmode(self, ctx, channel: discord.abc.GuildChannel = None):
         """This makes the bot disable a channel's slowmode.
 
         Slowmode will be disabled in a `channel` if it is supplied, otherwise Fluff will disable slowmode for the invoker's current channel.
