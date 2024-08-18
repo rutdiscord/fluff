@@ -368,12 +368,14 @@ class ModToss(Cog):
 
             try:
                 msg = await self.bot.wait_for("message", timeout=300, check=check)
+                
             except asyncio.TimeoutError:
-                pokemsg = await toss_channel.send(ctx.author.mention)
-                await pokemsg.edit(content="⏰", delete_after=5)
+                try:
+                    pokemsg = await toss_channel.send(ctx.author.mention)
+                    await pokemsg.edit(content="⏰", delete_after=5)
+                except asyncio.CancelledError:
+                    return
             except discord.NotFound:
-                return
-            except asyncio.exceptions.CancelledError:
                 return
             else:
                 try:
