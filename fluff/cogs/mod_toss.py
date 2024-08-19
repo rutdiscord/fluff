@@ -371,8 +371,11 @@ class ModToss(Cog):
                 return channel.id in self.poketimers and channel.id == toss_channel.id
 
             try:
-                self.poketimers[toss_channel.id] = self.bot.wait_for("message", timeout=300, check=check)
-                await self.bot.wait_for("guild_channel_create", timeout=300, check=delete_check)
+                self.poketimers[str(toss_channel.id)] = self.bot.wait_for("message", timeout=300, check=check)
+                toss_channel_delete_event = await self.bot.wait_for("guild_channel_create", timeout=300, check=delete_check)
+                if toss_channel_delete_event:
+                    self.poketimers[str(toss_channel.id)].close()
+                    del self.poketimers[str(toss_channel.id)]
             except asyncio.TimeoutError:
                     pokemsg = await toss_channel.send(ctx.author.mention)
                     await pokemsg.edit(content="⏰", delete_after=5)
