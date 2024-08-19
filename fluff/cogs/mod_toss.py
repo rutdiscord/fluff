@@ -366,22 +366,24 @@ class ModToss(Cog):
 
             def check(m):
                 return m.author in users and m.channel == toss_channel
+            
+            def delete_check(channel):
+                return channel.id in self.poketimers and channel.id == toss_channel.id
 
             try:
-                msg = await asyncio.shield(self.bot.wait_for("message", timeout=300, check=check))
+                self.poketimers[toss_channel.id] = self.bot.wait_for("message", timeout=300, check=check)
+                await self.bot.wait_for("guild_channel_create", timeout=300, check=delete_check)
             except asyncio.TimeoutError:
                     pokemsg = await toss_channel.send(ctx.author.mention)
                     await pokemsg.edit(content="⏰", delete_after=5)
-            except asyncio.CancelledError:
-                return
-            except discord.NotFound:
-                return
             else:
                 try:
                     pokemsg = await toss_channel.send(ctx.author.mention)
                     await pokemsg.edit(content="🫳⏰", delete_after=5)
                 except discord.errors.NotFound:
                     return
+            
+            
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.bot_has_permissions(manage_roles=True, manage_channels=True)
