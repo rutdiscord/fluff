@@ -372,7 +372,7 @@ class ModToss(Cog):
 
             try:
                 self.poketimers[str(toss_channel.id)] = self.bot.wait_for("message", timeout=300, check=check)
-                await self.bot.wait_for("guild_channel_create", timeout=300, check=delete_check)
+                await self.bot.wait_for("guild_channel_delete", timeout=300, check=delete_check)
                 self.poketimers[str(toss_channel.id)].cancel()
                 del self.poketimers[str(toss_channel.id)]
             except asyncio.TimeoutError:
