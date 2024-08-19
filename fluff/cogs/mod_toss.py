@@ -28,7 +28,8 @@ class ModToss(Cog):
     def __init__(self, bot):
         self.bot = bot
         self.busy = False
-        self.spamcounter = {}
+        self.poketimers = dict()
+        # self.spamcounter = {}
         self.nocfgmsg = "Tossing isn't enabled for this server."
 
     def enabled(self, g):
@@ -367,14 +368,12 @@ class ModToss(Cog):
                 return m.author in users and m.channel == toss_channel
 
             try:
-                msg = await self.bot.wait_for("message", timeout=300, check=check)
-                
+                msg = await asyncio.shield(self.bot.wait_for("message", timeout=300, check=check))
             except asyncio.TimeoutError:
-                try:
                     pokemsg = await toss_channel.send(ctx.author.mention)
                     await pokemsg.edit(content="⏰", delete_after=5)
-                except asyncio.CancelledError:
-                    return
+            except asyncio.CancelledError:
+                return
             except discord.NotFound:
                 return
             else:
