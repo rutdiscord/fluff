@@ -121,9 +121,10 @@ class Reply(Cog):
 
             modlog_channel = self.bot.pull_channel(
             message.guild, get_config(message.guild.id, "logging", "modlog")
-        )
+            )
             
             modlog_channel.send(f"♾ {self.username_system(message_author)} has received a reply ping preference violation. Their current violation count is {violation_count}.")
+
             try:
                 if self.violations[message.guild.id][message.author.id] == (noreply_thres-1):
                         await message.reply(
