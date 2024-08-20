@@ -122,8 +122,6 @@ class Reply(Cog):
             modlog_channel = self.bot.pull_channel(
             message.guild, get_config(message.guild.id, "logging", "modlog")
             )
-            
-            await modlog_channel.send(f"♾ {self.username_system(message_author)} has received a reply ping preference violation. Their current violation count is {violation_count}.")
 
             try:
                 if self.violations[message.guild.id][message.author.id] == (noreply_thres-1):
@@ -143,8 +141,7 @@ class Reply(Cog):
                 elif self.violations[message.guild.id][message.author.id] >= noreply_thres:
                     return self.bot.dispatch("violation_threshold_reached", message, message.author)
             except ZeroDivisionError:
-                # drop zde
-                return
+                return await modlog_channel.send(f"♾ {self.username_system(message_author)} has received a reply ping preference violation. Their current violation count is {violation_count}.")
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command()
