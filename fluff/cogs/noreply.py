@@ -44,15 +44,6 @@ class Reply(Cog):
                 return identifier
         return None
     
-    def username_system(self, user):
-        return (
-            "**"
-            + self.bot.pacify_name(user.global_name)
-            + f"** [{self.bot.pacify_name(str(user))}]"
-            if user.global_name
-            else f"**{self.bot.pacify_name(str(user))}**"
-        )
-    
     async def add_violation(self, message):
             staff_roles = [
                 self.bot.pull_role(
@@ -122,7 +113,7 @@ class Reply(Cog):
             modlog_channel = self.bot.pull_channel(
             message.guild, get_config(message.guild.id, "logging", "modlog")
             )
-
+            await modlog_channel.send(f"♾ {message_author.username} ({message_author.id}) has received a reply ping preference violation. Their current violation count is {violation_count}.")
             try:
                 if self.violations[message.guild.id][message.author.id] == (noreply_thres-1):
                         await message.reply(
@@ -141,7 +132,7 @@ class Reply(Cog):
                 elif self.violations[message.guild.id][message.author.id] >= noreply_thres:
                     return self.bot.dispatch("violation_threshold_reached", message, message.author)
             except ZeroDivisionError:
-                return await modlog_channel.send(f"♾ {self.username_system(message_author)} has received a reply ping preference violation. Their current violation count is {violation_count}.")
+                return
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command()
