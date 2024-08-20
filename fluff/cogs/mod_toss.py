@@ -28,7 +28,8 @@ class ModToss(Cog):
     def __init__(self, bot):
         self.bot = bot
         self.busy = False
-        self.spamcounter = {}
+        self.poketimers = dict()
+        # self.spamcounter = {}
         self.nocfgmsg = "Tossing isn't enabled for this server."
 
     def enabled(self, g):
@@ -365,24 +366,26 @@ class ModToss(Cog):
 
             def check(m):
                 return m.author in users and m.channel == toss_channel
+            
+            def delete_check(channel):
+                return channel.id in self.poketimers and channel.id == toss_channel.id
 
             try:
-                msg = await self.bot.wait_for("message", timeout=300, check=check)
-                
+                self.poketimers[str(toss_channel.id)] = self.bot.wait_for("message", timeout=300, check=check)
+                await self.bot.wait_for("guild_channel_delete", timeout=300, check=delete_check)
+                self.poketimers[str(toss_channel.id)].cancel()
+                del self.poketimers[str(toss_channel.id)]
             except asyncio.TimeoutError:
-                try:
                     pokemsg = await toss_channel.send(ctx.author.mention)
                     await pokemsg.edit(content="⏰", delete_after=5)
-                except asyncio.CancelledError:
-                    return
-            except discord.NotFound:
-                return
             else:
                 try:
                     pokemsg = await toss_channel.send(ctx.author.mention)
                     await pokemsg.edit(content="🫳⏰", delete_after=5)
                 except discord.errors.NotFound:
                     return
+            
+            
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.bot_has_permissions(manage_roles=True, manage_channels=True)

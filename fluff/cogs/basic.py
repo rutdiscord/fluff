@@ -246,7 +246,7 @@ class Basic(Cog):
 
             try:
                 await botcommand.can_run(ctx)
-            except BotMissingPermissions as e:
+            except commands.BotMissingPermissions as e:
                 when = (
                     "**No.** Missing:\n```diff\n+ "
                     + "\n+ ".join(e.missing_permissions)
