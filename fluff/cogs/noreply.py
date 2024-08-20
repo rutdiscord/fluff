@@ -10,7 +10,6 @@ from helpers.sv_config import get_config
 from helpers.datafiles import fill_profile, set_userfile
 from helpers.embeds import stock_embed, author_embed
 
-
 class Reply(Cog):
     """
     A cog that stops people from ping replying people who don't want to be.
@@ -44,7 +43,16 @@ class Reply(Cog):
             elif role in message.author.roles:
                 return identifier
         return None
-
+    
+    def username_system(self, user):
+        return (
+            "**"
+            + self.bot.pacify_name(user.global_name)
+            + f"** [{self.bot.pacify_name(str(user))}]"
+            if user.global_name
+            else f"**{self.bot.pacify_name(str(user))}**"
+        )
+    
     async def add_violation(self, message):
             staff_roles = [
                 self.bot.pull_role(
@@ -75,16 +83,19 @@ class Reply(Cog):
                 or await self.bot.is_owner(message.author)
             ):
                 return
+            
+            message_author = message.author
+            message_guild = message.guild
 
-            if message.guild.id not in self.violations:
-                self.violations[message.guild.id] = {}
-            if message.author.id not in self.violations[message.guild.id]:
-                self.violations[message.guild.id][message.author.id] = 0
+            if message_guild.id not in self.violations:
+                self.violations[message_guild.id] = {}
+            if message_author.id not in self.violations[message.guild.id]:
+                self.violations[message_guild.id][message.author.id] = 0
                 acknowledgements = get_guildfile(message.guild.id, "acknowledgements")
                 if (
                     str(message.author.id) not in acknowledgements
                 ):
-                    temp_reminder_msg = await message.author.send(
+                    temp_reminder_msg = await message_author.send(
                         content="**Please do not reply ping users who do not wish to be pinged.**\n"
                         + "This incident will be excused, but further incidents will be counted as **violations**.",
                         file=discord.File("assets/noreply.png"),
@@ -102,11 +113,17 @@ class Reply(Cog):
                         await temp_reminder_msg.delete()
 
                 acknowledgements[str(message.author.id)] = True
-                return set_guildfile(message.guild.id,"acknowledgements", json.dumps(acknowledgements))
+                return set_guildfile(message_guild.id,"acknowledgements", json.dumps(acknowledgements))
                     
 
             self.violations[message.guild.id][message.author.id] += 1
             violation_count = self.violations[message.guild.id][message.author.id]
+
+            modlog_channel = self.bot.pull_channel(
+            message.guild, get_config(message.guild.id, "logging", "modlog")
+        )
+            
+            modlog_channel.send(f"♾ {self.username_system(message_author)} has received a reply ping preference violation. Their current violation count is {violation_count}.")
             try:
                 if self.violations[message.guild.id][message.author.id] == (noreply_thres-1):
                         await message.reply(
