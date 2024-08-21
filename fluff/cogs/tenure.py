@@ -16,7 +16,7 @@ async def on_message(self, msg):
         or not msg.guild
     ):
         return
-    member = msg.member
+    member = msg.author
     guild = msg.guild
 
     modlog_channel = self.bot.pull_channel(
