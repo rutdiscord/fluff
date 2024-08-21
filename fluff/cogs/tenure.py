@@ -70,7 +70,7 @@ class Tenure(commands.Cog):
                     await logchannel_cached.send(f"Fluff Tenure: **{roled_member_count}** of {guild_member_count} members have been processed..")
             except ZeroDivisionError:
                 return
-
+            print(f"{roled_member_count}/{guild_member_count}")
             tenure_dt = await self.check_joindelta(member)
             tenure_days = tenure_dt.days
 
