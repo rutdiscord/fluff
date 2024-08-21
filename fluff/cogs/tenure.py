@@ -57,15 +57,10 @@ class Tenure(commands.Cog):
        """
        if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
-       
-       logchannel_cached = self.bot.get_channel(logchannel)
        tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
        tenure_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role"))
        await ctx.reply("Oh boy..", mention_author=False)
-       roled_member_count = 0 
-       guild_member_count = len([x for x in ctx.guild.members if not x.bot])
        for member in ctx.guild.members:
-            print(f"{roled_member_count}/{guild_member_count}")
             tenure_dt = await self.check_joindelta(member)
             tenure_days = tenure_dt.days
 
