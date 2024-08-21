@@ -70,7 +70,13 @@ toss:
 
 reaction:
   # If the bot may automatically adjust names to be readable.
-  autoreadableenable:
+  autoreadableenable: 
+
+  # Integer value of how many violations before a user is tossed.
+  noreply_threshold: 
+
+  # Integer value of how frequently a user is reminded of their violations.
+  noreply_remind_every: 
 
 tenure:
   # Number in days as a threshold for when a 'regular' role can be assigned
@@ -79,24 +85,6 @@ tenure:
   # Role ID for the 'regular' role
   role: 
 
-overrides:
-  # To override a command for use with more roles than allowed by default,
-  # or to restrict a command to certain roles, configure it here.
-  # Please see the following example.
-  #
-  # - command: kick            # The command you want to override.
-  #   roles:                   # The roles this override should apply for.
-  #     - 259199371361517569
-  #   restrict: false          # Whether to allow (false) or restrict this command to (true) these roles.
-
-  # Boolean value of if you want Fluff to automatically action unreadable nicknames or not
-  autoreadableenable:
-
-  # Integer value of how many violations before a user is tossed.
-  noreply_threshold:
-
-  # Integer value of how frequently a user is reminded of their violations.
-  noreply_remind_every:
 drive:
   folder:
   # Set the ID of the Google Drive folder that the file should be uploaded to.
