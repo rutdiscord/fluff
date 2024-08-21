@@ -14,8 +14,6 @@ async def on_message(self, msg):
         msg.author.bot
         or msg.is_system()
         or not msg.guild
-        or not msg.reference
-        or msg.type != discord.msgType.reply
     ):
         return
     member = msg.member
