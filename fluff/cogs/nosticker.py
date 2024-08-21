@@ -26,7 +26,7 @@ class NoSticker(Cog):
             msg.author.bot
             or msg.is_system()
             or not msg.guild
-            or not self.enabled()
+            or not self.enabled(msg.guild)
         ):
             return
         
