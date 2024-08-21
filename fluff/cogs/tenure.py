@@ -10,15 +10,8 @@ class Tenure(commands.Cog):
 @Cog.listener()
 async def on_message(self, msg):
     await self.bot.wait_until_ready()
-    if (
-        msg.author.bot
-        or msg.is_system()
-        or not msg.guild
-    ):
-        return
     member = msg.author
     guild = msg.guild
-    print(member,guild)
     modlog_channel = self.bot.pull_channel(
             guild, get_config(guild.id, "logging", "modlog")
             )
