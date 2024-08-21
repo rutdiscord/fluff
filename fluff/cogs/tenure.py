@@ -105,7 +105,7 @@ class Tenure(commands.Cog):
             if tenureconfig["role"] not in msg.author.roles:
                 await msg.author.add_roles(tenureconfig["role"], reason="Fluff Tenure")
                 if logchannel_cached:
-                    await logchannel_cached.send(f"**{msg.guild.name}**♾ {msg.author.mention} has been assigned the {tenureconfig['role'].namne} role.")
+                    await logchannel_cached.send(f"**{msg.guild.name}**♾ {msg.author.mention} has been assigned the {tenureconfig['role'].name} role.")
         
 
 async def setup(bot: discord.Client):
