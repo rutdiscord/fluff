@@ -60,15 +60,17 @@ class Tenure(commands.Cog):
        tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
        tenure_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role"))
        await ctx.reply("Oh boy..", mention_author=False)
+
+       to_be_roled = []
        for member in ctx.guild.members:
             tenure_dt = await self.check_joindelta(member)
             tenure_days = tenure_dt.days
             if tenure_role not in member.roles:
                if tenure_threshold < tenure_days and not member.bot:
-                    await member.add_roles(tenure_role, reason="Fluff Tenure")
-                    roled_member_count += 1
+                to_be_roled.append(member)
                else: 
                     return
+       print(len(to_be_roled))
 
 
 
