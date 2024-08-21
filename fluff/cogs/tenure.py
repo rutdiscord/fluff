@@ -10,10 +10,15 @@ class Tenure(commands.Cog):
     async def check_joindelta(self, member):
         return (datetime.now(UTC) - member.joined_at).days
     
-    @commands.group(invoke_without_command=True)
+    @commands.command()
     async def tenure(self, ctx):
         tenure = await self.check_joindelta(ctx.author)
-        return await ctx.reply(f"You last joined around {tenure} days ago.",mention_author=False)
+        tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
+        tenure_role = ctx.guild.get_role(get_config(ctx.guild.id, "tenure", "role"))
+        if not tenure_threshold or tenure_role:
+            return await ctx.reply("Tenure is not configured on this server!", mention_author=False)
+        if tenure_threshold < tenure:
+            await ctx.reply(f"You joined around {tenure} days ago! You've been here long enough to be assigned the `",mention_author=False)
 
     @Cog.listener()
     async def on_message(self, msg):

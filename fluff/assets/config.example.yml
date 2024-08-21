@@ -71,7 +71,14 @@ toss:
 reaction:
   # If the bot may automatically adjust names to be readable.
   autoreadableenable:
-  
+
+tenure:
+  # Number in days as a threshold for when a 'regular' role can be assigned
+  threshold: 
+
+  # Role ID for the 'regular' role
+  role: 
+
 overrides:
   # To override a command for use with more roles than allowed by default,
   # or to restrict a command to certain roles, configure it here.
@@ -95,4 +102,4 @@ drive:
   # Set the ID of the Google Drive folder that the file should be uploaded to.
 
 metadata:
-  version: 16
+  version: 17

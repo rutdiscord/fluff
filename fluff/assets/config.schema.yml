@@ -122,7 +122,19 @@ properties:
         type:
           - integer
           - "null"
-
+  tenure:
+    type: object
+    properties:
+      threshold:
+        type:
+          - integer
+          - "null"
+      role:
+        type:
+          - integer
+          - string
+          - "null"
+        minimum: 100000000000000000
   overrides:
     type:
       - array
