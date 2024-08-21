@@ -23,7 +23,7 @@ async def on_message(self, msg):
             guild, get_config(guild.id, "logging", "modlog")
             )
     
-    await modlog_channel.send(f"♾ **{member.global_name}** (**{member.id}**) has been in this server since {datetime.now() - member.joined_at}")
+    return await modlog_channel.send(f"♾ **{member.global_name}** (**{member.id}**) has been in this server since {datetime.now() - member.joined_at}")
         
 
 async def setup(bot):
