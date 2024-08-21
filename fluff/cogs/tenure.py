@@ -2,7 +2,9 @@ import discord
 from discord.ext.commands import Cog
 from discord.ext import commands, tasks
 from helpers.sv_config import get_config
+from helpers.checks import ismanager, isadmin
 from datetime import datetime, timedelta, UTC
+from config import logchannel
 class Tenure(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -43,6 +45,37 @@ class Tenure(commands.Cog):
             await ctx.reply(f"You joined around {tenure_days} days ago, and you've already been assigned the {tenure_role.name} role!",mention_author=False)
         else:
             await ctx.reply(f"You joined around {tenure_days} days ago! Not long enough, though.. try again in {(timedelta(days=tenure_threshold)-tenure_dt).days} days!",mention_author=False)
+    
+    @commands.check(ismanager)
+    @tenure.command()
+    async def force_sync(self,ctx):
+       """THIS WILL FORCEFULLY SYNCHRONIZE THE SERVER MEMBERS WITH THE TENURE ROLE.
+
+       THIS IS VERY TIME CONSUMING.
+
+       RUN ONCE, NEVER AGAIN.
+       """
+       if not self.enabled(ctx.guild):
+            return await ctx.reply(self.nocfgmsg, mention_author=False)
+       
+       logchannel_cached = self.bot.get_channel(logchannel)
+       tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
+       tenure_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role"))
+       await ctx.reply("Oh boy..", mention_author=False)
+       roled_member_count = 0 
+       guild_member_count = len([x for x in ctx.guild.members if not x.bot])
+       for member in ctx.guild.members:
+            await logchannel_cached.send(f"Fluff Tenure: **{roled_member_count}** of {guild_member_count} members have been processed..")
+
+            tenure_dt = await self.check_joindelta(member)
+            tenure_days = tenure_dt.days
+
+            if tenure_threshold < tenure_days and not member.bot:
+                if tenure_role not in member.roles:
+                    await member.add_roles(tenure_role, reason="Fluff Tenure")
+                    roled_member_count += 1
+
+
 
     # @Cog.listener()
     # async def on_message(self, msg):
