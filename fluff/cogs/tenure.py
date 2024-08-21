@@ -21,5 +21,5 @@ async def on_message(self, msg):
         await modlog_channel.send(f"♾ **{member.global_name}** (**{member.id}**) has been in this server since {datetime.now() - member.joined_at}")
         
 
-def setup(bot):
-    bot.add_cog(Tenure(bot))
+async def setup(bot):
+    await bot.add_cog(Tenure(bot))
