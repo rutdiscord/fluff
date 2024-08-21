@@ -12,7 +12,8 @@ class Tenure(commands.Cog):
     
     @commands.group(invoke_without_command=True)
     async def tenure(self, ctx):
-        return await ctx.reply(f"You last joined around {self.check_joindelta(ctx.author)} days ago.",mention_author=False)
+        tenure = await self.check_joindelta(ctx.author)
+        return await ctx.reply(f"You last joined around {tenure} days ago.",mention_author=False)
 
     @Cog.listener()
     async def on_message(self, msg):
