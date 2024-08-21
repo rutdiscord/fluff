@@ -65,7 +65,8 @@ class Tenure(commands.Cog):
        roled_member_count = 0 
        guild_member_count = len([x for x in ctx.guild.members if not x.bot])
        for member in ctx.guild.members:
-            await logchannel_cached.send(f"Fluff Tenure: **{roled_member_count}** of {guild_member_count} members have been processed..")
+            if roled_member_count % 10 == 0:
+                await logchannel_cached.send(f"Fluff Tenure: **{roled_member_count}** of {guild_member_count} members have been processed..")
 
             tenure_dt = await self.check_joindelta(member)
             tenure_days = tenure_dt.days
