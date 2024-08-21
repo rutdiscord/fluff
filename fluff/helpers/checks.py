@@ -16,31 +16,9 @@ async def ismanager(ctx, layered=False):
 
     return await commands.is_owner().predicate(ctx)
 
-
-def isoverride(ctx):
-    config = get_raw_config(ctx.guild.id)
-    if not config["overrides"]:
-        return (False, False)
-    role = None
-    for override in config["overrides"]:
-        if ctx.bot.get_command(override["command"]) == ctx.command:
-            for role in override["roles"]:
-                if isinstance(role, str):
-                    role = discord.utils.get(ctx.guild.roles, name=role)
-                    if role:
-                        role = role.id
-                if ctx.author.get_role(role):
-                    return (override["restrict"], True)
-    return (override["restrict"], False)
-
-
 async def isowner(ctx, layered=False):
     if not layered:
         if await ismanager(ctx, True):
-            return True
-        if isoverride(ctx)[0]:
-            return isoverride(ctx)[1]
-        elif isoverride(ctx)[1]:
             return True
 
     return ctx.guild.owner.id == ctx.author.id
@@ -48,10 +26,6 @@ async def isowner(ctx, layered=False):
 async def isadmin(ctx, layered=False):
     if not layered:
         if await ismanager(ctx, True):
-            return True
-        if isoverride(ctx)[0]:
-            return isoverride(ctx)[1]
-        elif isoverride(ctx)[1]:
             return True
     if await isowner(ctx, True):
         return True
@@ -71,10 +45,6 @@ async def isadmin(ctx, layered=False):
 
 async def ismod(ctx):
     if await ismanager(ctx, True):
-        return True
-    if isoverride(ctx)[0]:
-        return isoverride(ctx)[1]
-    elif isoverride(ctx)[1]:
         return True
     if await isadmin(ctx, True):
         return True
