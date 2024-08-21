@@ -65,6 +65,7 @@ class Tenure(commands.Cog):
             tenure_dt = await self.check_joindelta(member)
             tenure_days = tenure_dt.days
             print(f"{member.global_name} ({member.id}) joined {tenure_days} ago")
+            print(len(member.roles))
 
 
 
