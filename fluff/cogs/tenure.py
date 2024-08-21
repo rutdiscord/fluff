@@ -6,6 +6,13 @@ from datetime import datetime, UTC
 class Tenure(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+    
+    async def check_joindelta(self, member):
+        return (datetime.now(UTC) - member.joined_at).days
+    
+    @commands.group(invoke_without_command=True)
+    async def tenure(self, ctx):
+        return await ctx.reply(f"You last joined around {self.check_joindelta(ctx.author)} days ago.",mention_author=False)
 
     @Cog.listener()
     async def on_message(self, msg):
@@ -18,11 +25,8 @@ class Tenure(commands.Cog):
             return
         member = msg.author
         guild = msg.guild
-        modlog_channel = self.bot.pull_channel(
-                guild, get_config(guild.id, "logging", "modlog")
-                )
-        
-        return await modlog_channel.send(f"♾ **{member.global_name}** (**{member.id}**) has been in this server since {(datetime.now(UTC) - member.joined_at).days}")
+
+        member_joindelta = (datetime.now(UTC) - member.joined_at).days
         
 
 async def setup(bot):
