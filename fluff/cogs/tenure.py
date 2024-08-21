@@ -63,12 +63,11 @@ class Tenure(commands.Cog):
        for member in ctx.guild.members:
             tenure_dt = await self.check_joindelta(member)
             tenure_days = tenure_dt.days
-
-            if tenure_threshold < tenure_days and not member.bot:
-                if tenure_role not in member.roles:
+            if tenure_role not in member.roles:
+               if tenure_threshold < tenure_days and not member.bot:
                     await member.add_roles(tenure_role, reason="Fluff Tenure")
                     roled_member_count += 1
-                else: 
+               else: 
                     return
 
 
