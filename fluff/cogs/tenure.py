@@ -86,14 +86,15 @@ class Tenure(commands.Cog):
     @Cog.listener()
     async def on_message(self, msg):
         await self.bot.wait_until_ready()
-        if not self.enabled(msg.guild):
-            return
         
         if (
             msg.author.bot
             or msg.is_system()
             or not msg.guild
         ):
+            return
+        
+        if not self.enabled(msg.guild):
             return
         tenureconfig = self.get_tenureconfig(msg.guild)
         tenure_dt = await self.check_joindelta(msg.author)
