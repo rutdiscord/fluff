@@ -1,4 +1,5 @@
 import discord
+import asyncio
 from discord.ext.commands import Cog
 from discord.ext import commands, tasks
 from helpers.sv_config import get_config
@@ -69,6 +70,7 @@ class Tenure(commands.Cog):
                 print(f"Assigning {tenure_role.name} to {member.global_name}, as they have enough tenure")
                 if tenure_role not in member.roles:
                     await member.add_roles(tenure_role, reason="Fluff Tenure")
+                    asyncio.sleep(1)
 
 
 
