@@ -14,6 +14,12 @@ class Tenure(commands.Cog):
     async def check_joindelta(self, member: discord.Member):
         return (datetime.now(UTC) - member.joined_at)
     
+    def get_tenureconfig(self, guild: discord.Guild):
+        return {
+            "role": self.bot.pull_role(guild, get_config(guild.id, "tenure", "role")),
+            "threshold": get_config(guild.id, "tenure", "threshold"),
+        }
+    
     def enabled(self, guild: discord.Guild):
         return all(
         (
@@ -58,8 +64,10 @@ class Tenure(commands.Cog):
        """
        if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
-       tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
-       tenure_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role"))
+       tenure_config = self.get_tenureconfig(ctx.guild)
+       tenure_threshold = tenure_config["threshold"]
+       tenure_role = tenure_config["role"]
+
        await ctx.reply("Oh boy..", mention_author=False)
 
        for member in ctx.guild.members:
@@ -75,19 +83,28 @@ class Tenure(commands.Cog):
 
 
 
-    # @Cog.listener()
-    # async def on_message(self, msg):
-    #     await self.bot.wait_until_ready()
-    #     if (
-    #         msg.author.bot
-    #         or msg.is_system()
-    #         or not msg.guild
-    #     ):
-    #         return
-    #     member = msg.author
-    #     guild = msg.guild
+    @Cog.listener()
+    async def on_message(self, msg):
+        await self.bot.wait_until_ready()
+        if not self.enabled(msg.guild):
+            return
+        
+        if (
+            msg.author.bot
+            or msg.is_system()
+            or not msg.guild
+        ):
+            return
+        tenureconfig = self.get_tenureconfig(msg.guild)
+        tenure_dt = await self.check_joindelta(msg.author)
+        tenure_days = tenure_dt.days
+        logchannel_cached = self.bot.get_channel(logchannel)
 
-    #     member_joindelta = (datetime.now(UTC) - member.joined_at).days
+        if tenureconfig["threshold"] < tenure_days:
+            if tenureconfig["role"] not in msg.author.roles:
+                await msg.author.add_roles(tenureconfig["role"], reason="Fluff Tenure")
+                if logchannel_cached:
+                    await logchannel_cached.send(f"**{msg.guild.name}**♾ {msg.author.mention} has been assigned the {tenureconfig['role'].mention}.")
         
 
 async def setup(bot: discord.Client):
