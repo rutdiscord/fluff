@@ -1,12 +1,12 @@
 import discord
 import asyncio
 from discord.ext.commands import Cog
-from discord.ext import commands, tasks
+from discord.ext import commands
 from helpers.sv_config import get_config
 from helpers.checks import ismanager, isadmin
 from datetime import datetime, timedelta, UTC
 from config import logchannel
-class Tenure(commands.Cog):
+class Tenure(Cog):
     def __init__(self, bot):
         self.bot = bot
         self.nocfgmsg = "Tenure isn't configured for this server.."

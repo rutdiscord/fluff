@@ -104,7 +104,7 @@ err_membernotfound:
 warn_targetself:
   - "Err, {authorname}, did you miss?"
   - "{authorname}, I don't know what you're doing, but I'm not helping."
-  - "{authorname}, *thump*"
+  - "{authorname}, *thump* YOU'RE GOING TO HIT YOURSELF!"
 
 # Used if you try to use a dangerous command on the bot.
 # {authorname} = Name of message author.
