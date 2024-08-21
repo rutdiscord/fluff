@@ -35,4 +35,4 @@ class NoSticker(Cog):
             return await msg.delete()
 
 async def setup(bot: discord.Client):
-    bot.add_cog(NoSticker(bot))
+   await bot.add_cog(NoSticker(bot))
