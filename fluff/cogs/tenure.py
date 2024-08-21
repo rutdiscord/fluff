@@ -22,7 +22,7 @@ class Tenure(commands.Cog):
                 guild, get_config(guild.id, "logging", "modlog")
                 )
         
-        return await modlog_channel.send(f"♾ **{member.global_name}** (**{member.id}**) has been in this server since {datetime.now(timezone.UTC) - member.joined_at}")
+        return await modlog_channel.send(f"♾ **{member.global_name}** (**{member.id}**) has been in this server since {datetime.now(tz='UTC') - member.joined_at}")
         
 
 async def setup(bot):
