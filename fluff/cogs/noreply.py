@@ -113,9 +113,11 @@ class Reply(Cog):
             modlog_channel = self.bot.pull_channel(
             message.guild, get_config(message.guild.id, "logging", "modlog")
             )
-            await modlog_channel.send(f"♾ **{message_author.global_name}** (**{message_author.id}**) has received a reply ping preference violation. Their current violation count is {violation_count}.")
+
             try:
                 if self.violations[message.guild.id][message.author.id] == (noreply_thres-1):
+                        await modlog_channel.send(f"♾ **{message_author.global_name}** (**{message_author.id}**) has received a reply ping preference violation. Their current violation count is {violation_count}, which is their **last** violation before being automatically muted.")
+
                         await message.reply(
                         content=f"# {message.author.mention}, your next violation will result in penalty.\n"
                         + f"You have currently received {str(violation_count)} violations.\n"
@@ -123,6 +125,8 @@ class Reply(Cog):
                         file=discord.File("assets/noreply.png"),
                     )
                 elif self.violations[message.guild.id][message.author.id] % noreply_remind == 0:
+                        await modlog_channel.send(f"♾ **{message_author.global_name}** (**{message_author.id}**) has received a reply ping preference violation. They have accumulated {violation_count} violation(s) so far.")
+
                         return await message.author.send(
                         content="**Do not reply ping users who do not wish to be pinged.**\n"
                         + f"You have currently received {str(violation_count)} violations.\n"
