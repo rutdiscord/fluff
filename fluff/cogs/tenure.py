@@ -65,8 +65,10 @@ class Tenure(commands.Cog):
        for member in ctx.guild.members:
             tenure_dt = await self.check_joindelta(member)
             tenure_days = tenure_dt.days
+            print(f"{member.global_name} ({member.id}) joined {tenure_days} ago")
             if tenure_role not in member.roles:
                if tenure_threshold < tenure_days and not member.bot:
+                print(f"{member.global_name} ({member.id}) added to to-be-roled list")
                 to_be_roled.append(member)
                else: 
                     return
