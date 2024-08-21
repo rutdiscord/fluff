@@ -67,8 +67,8 @@ class Tenure(commands.Cog):
             tenure_days = tenure_dt.days
             print(f"{member.global_name} ({member.id}) joined {tenure_days} ago")
             if tenure_threshold < tenure_days:
-                print(f"Assigning {tenure_role.name} to {member.global_name}, as they have enough tenure")
                 if tenure_role not in member.roles:
+                    print(f"Assigning {tenure_role.name} to {member.global_name}, as they have enough tenure")
                     await member.add_roles(tenure_role, reason="Fluff Tenure")
                 else:
                     return
