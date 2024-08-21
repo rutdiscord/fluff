@@ -2,23 +2,43 @@ import discord
 from discord.ext.commands import Cog
 from discord.ext import commands, tasks
 from helpers.sv_config import get_config
-from datetime import datetime, UTC
+from datetime import datetime, timedelta, UTC
 class Tenure(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.nocfgmsg = "Tenure isn't configured for this server.."
     
     async def check_joindelta(self, member):
-        return (datetime.now(UTC) - member.joined_at).days
+        return (datetime.now(UTC) - member.joined_at)
     
+    def enabled(self, guild):
+        return all(
+        (
+            self.bot.pull_role(guild, get_config(guild.id, "tenure", "role")),
+            get_config(guild.id, "tenure", "threshold") >= 0,
+        )
+        )
+    
+    @commands.guild_only()
     @commands.command()
     async def tenure(self, ctx):
-        tenure = await self.check_joindelta(ctx.author)
+        """This shows the user their tenure in the server.
+        
+        Any guild channel that has Tenure configured.
+
+        No arguments."""
+        if not self.enabled(ctx.guild):
+            return await ctx.reply(self.nocfgmsg, mention_author=False)
+        
+        tenure_dt = await self.check_joindelta(ctx.author)
+        tenure_days = tenure_dt.days
         tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
-        tenure_role = ctx.guild.get_role(get_config(ctx.guild.id, "tenure", "role"))
-        if not tenure_threshold or tenure_role:
-            return await ctx.reply("Tenure is not configured on this server!", mention_author=False)
-        if tenure_threshold < tenure:
-            await ctx.reply(f"You joined around {tenure} days ago! You've been here long enough to be assigned the `",mention_author=False)
+        tenure_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role"))
+
+        if tenure_threshold < tenure_days:
+            await ctx.reply(f"You joined around {tenure_days} days ago! You've been here long enough to be assigned the {tenure_role.name} role!",mention_author=False)
+        else:
+            await ctx.reply(f"You joined around {tenure_days} days ago! Not long enough, though.. try again in {(timedelta(days=tenure_threshold)-tenure_dt).days} days!",mention_author=False)
 
     @Cog.listener()
     async def on_message(self, msg):

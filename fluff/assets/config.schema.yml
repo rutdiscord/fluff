@@ -157,7 +157,9 @@ properties:
     type: object
     properties:
       folder:
-        type: string
+        type: 
+          - string
+          - "null"
   metadata:
     type: object
     properties:
