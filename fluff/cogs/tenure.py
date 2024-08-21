@@ -65,8 +65,11 @@ class Tenure(commands.Cog):
        roled_member_count = 0 
        guild_member_count = len([x for x in ctx.guild.members if not x.bot])
        for member in ctx.guild.members:
-            if roled_member_count % 10 == 0:
-                await logchannel_cached.send(f"Fluff Tenure: **{roled_member_count}** of {guild_member_count} members have been processed..")
+            try:
+                if roled_member_count % 5 == 0:
+                    await logchannel_cached.send(f"Fluff Tenure: **{roled_member_count}** of {guild_member_count} members have been processed..")
+            except ZeroDivisionError:
+                return
 
             tenure_dt = await self.check_joindelta(member)
             tenure_days = tenure_dt.days
@@ -75,6 +78,8 @@ class Tenure(commands.Cog):
                 if tenure_role not in member.roles:
                     await member.add_roles(tenure_role, reason="Fluff Tenure")
                     roled_member_count += 1
+                else: 
+                    return
 
 
 
