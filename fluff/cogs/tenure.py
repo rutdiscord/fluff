@@ -24,7 +24,7 @@ class Tenure(commands.Cog):
         return all(
         (
             self.bot.pull_role(guild, get_config(guild.id, "tenure", "role")),
-            get_config(guild.id, "tenure", "threshold") >= 0,
+            get_config(guild.id, "tenure", "threshold"),
         )
         )
     
