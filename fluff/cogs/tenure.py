@@ -7,11 +7,22 @@ class Tenure(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-@Cog.listener()
-async def on_message(self, msg):
-    await self.bot.wait_until_ready()
-    print(msg)
-    # return await modlog_channel.send(f"♾ **{member.global_name}** (**{member.id}**) has been in this server since {datetime.now() - member.joined_at}")
+    @Cog.listener()
+    async def on_message(self, msg):
+        await self.bot.wait_until_ready()
+        if (
+            msg.author.bot
+            or msg.is_system()
+            or not msg.guild
+        ):
+            return
+        member = msg.author
+        guild = msg.guild
+        modlog_channel = self.bot.pull_channel(
+                guild, get_config(guild.id, "logging", "modlog")
+                )
+        
+        return await modlog_channel.send(f"♾ **{member.global_name}** (**{member.id}**) has been in this server since {datetime.now() - member.joined_at}")
         
 
 async def setup(bot):
