@@ -8,10 +8,10 @@ class Tenure(commands.Cog):
         self.bot = bot
         self.nocfgmsg = "Tenure isn't configured for this server.."
     
-    async def check_joindelta(self, member):
+    async def check_joindelta(self, member: discord.Member):
         return (datetime.now(UTC) - member.joined_at)
     
-    def enabled(self, guild):
+    def enabled(self, guild: discord.Guild):
         return all(
         (
             self.bot.pull_role(guild, get_config(guild.id, "tenure", "role")),
@@ -20,7 +20,7 @@ class Tenure(commands.Cog):
         )
     
     @commands.guild_only()
-    @commands.command()
+    @commands.group(invoke_without_command=True)
     async def tenure(self, ctx):
         """This shows the user their tenure in the server.
         
@@ -59,5 +59,5 @@ class Tenure(commands.Cog):
     #     member_joindelta = (datetime.now(UTC) - member.joined_at).days
         
 
-async def setup(bot):
+async def setup(bot: discord.Client):
     await bot.add_cog(Tenure(bot))
