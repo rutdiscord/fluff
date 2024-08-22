@@ -33,6 +33,7 @@ class NoSticker(Cog):
             return print("Tenure not even enabled here")
         
         tenure_role = self.get_tenurerole(msg.guild)
+        print(tenure_role not in msg.author.roles, msg.stickers)
         if tenure_role not in msg.author.roles and msg.stickers:
             return await msg.delete()
 
