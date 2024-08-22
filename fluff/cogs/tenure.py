@@ -29,6 +29,7 @@ class Tenure(Cog):
         )
     
     @commands.guild_only()
+    @commands.cooldown(1, 60, commands.BucketType.guild)
     @commands.group(invoke_without_command=True)
     async def tenure(self, ctx):
         """This shows the user their tenure in the server.
