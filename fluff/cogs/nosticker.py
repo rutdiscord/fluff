@@ -27,10 +27,10 @@ class NoSticker(Cog):
             or msg.is_system()
             or not msg.guild
         ):
-            return print("Ignoring message")
+            return 
         
         if not self.enabled(msg.guild):
-            return print("Tenure not even enabled here")
+            return 
         
         tenure_role = self.get_tenurerole(msg.guild)
         print(tenure_role not in msg.author.roles, msg.stickers)
