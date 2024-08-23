@@ -43,17 +43,33 @@ class Snippets(Cog):
                     inline=False,
                 )
             else:
-                snippets_list = list(snippets.items())
-                embed.add_field(
-                    name="Snippets",
-                    value="\n".join(
-                        [
-                            f"{name}: {snippet}\nAliases: {', '.join([subname for subname, subsnippet in snippets_list if subsnippet == name])}"
-                            for name, snippet in snippets_list[:5]
-                        ]
-                    ),
-                    inline=False,
-                )
+                snippets_procd = {}
+                for name, snippet in list(snippets.items()):
+                    snippets_procd[name] = {
+                        "aliases": [],
+                        "data": ""
+                    }
+                    
+                    if snippet in snippets:
+                        continue
+                    for subname, subsnippet in list(snippets.items()):
+                        if subsnippet == name:
+                            snippets_procd[name]["aliases"].append(subname)
+                        embed_fields = []
+                        for name, snippet_data in snippets_procd.items():
+                            aliases = ", ".join(snippet_data["aliases"])
+                            snippet = snippet_data["data"]
+                            snippet_text = f"{name} ({aliases})\n{snippet[:100]}..."
+                            embed_fields.append((name, snippet_text))
+
+                        for i in range(0, len(embed_fields), 5):
+                            field_data = embed_fields[i:i+5]
+                            field_value = "\n".join([f"> {name} {snippet}" for name, snippet in field_data])
+                            embed.add_field(
+                                name="Snippets",
+                                value=field_value,
+                                inline=False
+                            )
                             
             try:
                 await ctx.reply(embed=embed, mention_author=False)
