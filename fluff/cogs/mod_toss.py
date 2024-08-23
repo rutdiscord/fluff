@@ -628,9 +628,9 @@ class ModToss(Cog):
                     inline=True,
                 )
             
-        upload = await upload(ctx, filename, f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}/", dotzip)
+        upload_rsl = await upload(ctx, filename, f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}/", dotzip)
 
-        if upload: 
+        if upload_rsl: 
             await ctx.channel.delete(reason="Fluff Mute Completed")
 
         del tosses[ctx.channel.name]
