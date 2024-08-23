@@ -192,9 +192,11 @@ class Snippets(Cog):
                     }
                     continue
                 for subname, subsnippet in list(snippets.items()):
-                    if subsnippet == name and not isinstance(int(subname),int):
+                    try:
+                        if subsnippet == name and not isinstance(int(subname),int):
+                            processed_snippets[name]["aliases"].append(str(subname))
+                    except ValueError:
                         processed_snippets[name]["aliases"].append(str(subname))
-                
                 with open(f"temp/snippets-{ctx.guild.id}-dump.txt", "w") as file:
                     file.write(
                         json.dumps(processed_snippets, indent=4)
