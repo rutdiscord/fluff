@@ -43,7 +43,7 @@ class Snippets(Cog):
                         embed.add_field(
                             name = f"**{snippet}**",
                             value = ("> " + guild_snippets[snippet]["content"][:60] + "_..._"
-                                        + f'\nAliases: {', '.join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"}'
+                                        + f'\nAliases: {"", "".join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"}'
                             ),
                             inline=False,
                         )
@@ -57,7 +57,7 @@ class Snippets(Cog):
                         file_content += (
                             "**{snippet}** \n" +
                             ("> " + guild_snippets[snippet]["content"][:100] + "_..._"
-                                        + f'\nAliases: {', '.join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"}'
+                                        + f'\nAliases: {", ".join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"}'
                             )
                         )
 
