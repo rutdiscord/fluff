@@ -183,20 +183,13 @@ class Snippets(Cog):
         if not snippets:
             new_msg.edit(content="There are no configured snippets to dump.")
         else:
-            processed_snippets = {}
+            processed_snippets = "" # THIS IS GOING TO GIVE ME NIGHTMARES
             for name, snippet in list(snippets.items()):
                 if snippet in snippets:
                     processed_snippets[name] = {
                         "content": snippets[snippet],
-                        "aliases": []
                     }
                     continue
-                for subname, subsnippet in list(snippets.items()):
-                    try:
-                        if subsnippet == name and not isinstance(int(subname),int):
-                            processed_snippets[name]["aliases"].append(str(subname))
-                    except ValueError:
-                        processed_snippets[name]["aliases"].append(str(subname))
                 with open(f"temp/snippets-{ctx.guild.id}-dump.txt", "w") as file:
                     file.write(
                         json.dumps(processed_snippets, indent=4)
