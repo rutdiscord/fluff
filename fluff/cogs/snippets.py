@@ -4,7 +4,7 @@ import os
 from discord.ext import commands
 from discord.ext.commands import Cog
 from helpers.checks import isadmin
-from helpers.embeds import stock_embed, sympage
+from helpers.embeds import stock_embed
 from helpers.datafiles import get_guildfile, set_guildfile
 
 '''
@@ -31,7 +31,6 @@ class Snippets(Cog):
         - `name`
         The name of the rule snippet to post. Optional."""
         snippets = get_guildfile(ctx.guild.id, "snippets")
-        embeds = []
         if not name:
             embed = stock_embed(self.bot)
             embed.title = "Configured Snippets"
@@ -44,39 +43,39 @@ class Snippets(Cog):
                     inline=False,
                 )
             else:
-                for name, snippet in list(snippets.items()):
-                    if snippet in snippets:
-                        continue
-                    aliases = ""
-                    for subname, subsnippet in list(snippets.items()):
-                        if subsnippet == name:
-                            aliases += f"\n➡️ " + subname
+                snippets_list = list(snippets.items())
+                embed.add_field(
+                    name="Snippets",
+                    value="\n".join(
+                        [
+                            f"{name}: {snippet}\nAliases: {', '.join([subname for subname, subsnippet in snippets_list if subsnippet == name])}"
+                            for name, snippet in snippets_list[:5]
+                        ]
+                    ),
+                    inline=False,
+                )
                             
-                        embed.add_field(
-                        name=name,
-                        value=(
-                            "> "
-                            + "\n> ".join(snippet[:200].split("\n"))
-                            + "..."
-                            + aliases
-                            if len(snippet) > 200
-                            else "> " + "\n> ".join(snippet.split("\n")) + aliases
-                        ),
-                        inline=False,
-                    )
-                    if len(embed.fields) > 25:
-                        fields1 = embed.fields[:25]
-                        fields2 = embed.fields[25:]
-                        embed1 = discord.Embed.from_dict(embed.to_dict())
-                        embed1.clear_fields()
-                        for field in fields1:
-                            embed1.add_field(field)
-                        embed2 = discord.Embed.from_dict(embed.to_dict())
-                        embed2.clear_fields()
-                        for field in fields2:
-                            embed2.add_field(field)
-                        embeds.append(embed1, embed2)
-                        await sympage(self.bot, ctx, [embed1, embed2])
+            try:
+                await ctx.reply(embed=embed, mention_author=False)
+            except discord.errors.HTTPException as exception: # almost always too many embed fields
+                if exception.code == 50035:
+                    file_content = "" # GITHUB COPILOT CODE LOL
+                    for name, snippet in list(snippets.items()):
+                        if snippet in snippets:
+                            continue
+                        aliases = ""
+                        for subname, subsnippet in list(snippets.items()):
+                            if subsnippet == name:
+                                aliases += f"\n➡️ " + subname
+                        file_content += f"{name}:\n{snippet}\nAliases:{aliases}\n\n"
+
+                    with open(f"temp/snippets-{ctx.guild.id}.txt", "w") as file:
+                        file.write(file_content)
+
+                    file_sent = await ctx.send(file=discord.File(f"temp/snippets-{ctx.guild.id}.txt"))
+                    if file_sent:
+                        os.remove(f"temp/snippets-{ctx.guild.id}.txt")
+                    
                     
                 
         else:
