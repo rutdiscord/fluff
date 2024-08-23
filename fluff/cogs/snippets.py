@@ -42,7 +42,7 @@ class Snippets(Cog):
                 for snippet in guild_snippets:
                         embed.add_field(
                             name = f"**{snippet}**",
-                            value = ("> " + guild_snippets[snippet]["content"][:60] + "..."
+                            value = ("> " + guild_snippets[snippet]["content"][:60] + "_..._"
                                         + f"\nAliases: {', '.join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"} "
                             ),
                             inline=False,
@@ -56,7 +56,7 @@ class Snippets(Cog):
                     for snippet in guild_snippets:
                         file_content += (
                             "**{snippet}** \n" +
-                            ("> " + guild_snippets[snippet]["content"][:100] + "..."
+                            ("> " + guild_snippets[snippet]["content"][:100] + "_..._"
                                         + f"\nAliases: {', '.join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"} "
                             )
                         )
@@ -95,6 +95,19 @@ class Snippets(Cog):
             return await ctx.reply(f"Snippet `{new_snippet}` already exists.")
 
     
+    @snippets.command(aliases=["amend"])
+    @commands.guild_only()
+    @commands.check(isadmin)
+    async def edit(self, ctx, snippet, * , new_content):
+        guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
+
+        try:
+            guild_snippets[snippet]["content"] = new_content
+            set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
+            return await ctx.reply(f"Snippet `{snippet}` edited successfully.")
+        except KeyError:
+            return await ctx.reply(f"Snippet `{snippet}` not found.")
+        
     @snippets.command(aliases=["alias"])
     @commands.guild_only()
     @commands.check(isadmin)
