@@ -36,7 +36,7 @@ class Snippets(Cog):
                 embed.add_field(
                     name = "No Snippets",
                     value = "There are no snippets available in this server.",
-                    inline=False,
+                    inline=True,
                 )
             else:
                 for snippet in guild_snippets:
@@ -45,7 +45,7 @@ class Snippets(Cog):
                             value = ("> " + guild_snippets[snippet]["content"][:60] + "_..._"
                                         + f'\nAliases: {", ".join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"}'
                             ),
-                            inline=False,
+                            inline=True,
                         )
 
             try:
