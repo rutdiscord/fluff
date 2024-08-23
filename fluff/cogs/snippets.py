@@ -179,32 +179,30 @@ class Snippets(Cog):
     async def dump(self, ctx):
         """This dumps snippets."""
         snippets = get_guildfile(ctx.guild.id, "snippets")
-        if not name:
-            new_msg = await ctx.reply("Checking for snippets...", mention_author=False)
-            if not snippets:
-                new_msg.edit(content="There are no configured snippets to dump.")
-            else:
-                processed_snippets = {}
-                for name, snippet in list(snippets.items()):
-                    if snippet in snippets:
-                        processed_snippets[name] = {
-                            "content": snippets[snippet],
-                            "aliases": []
-                        }
-                        continue
-                    aliases = ""
-                    for subname, subsnippet in list(snippets.items()):
-                        if subsnippet == name:
-                            processed_snippets[name]["aliases"].append(subname)
-                    
-                    with open(f"temp/snippets-{ctx.guild.id}-dump.txt", "w") as file:
-                        file.write(
-                            json.dumps(processed_snippets, indent=4)
-                        )
-                    
-                    file_sent = await ctx.send(file=discord.File(f"temp/snippets-{ctx.guild.id}-dump.txt"))
-                    if file_sent:
-                        os.remove(f"temp/snippets-{ctx.guild.id}-dump.txt")
+        new_msg = await ctx.reply("Checking for snippets...", mention_author=False)
+        if not snippets:
+            new_msg.edit(content="There are no configured snippets to dump.")
+        else:
+            processed_snippets = {}
+            for name, snippet in list(snippets.items()):
+                if snippet in snippets:
+                    processed_snippets[name] = {
+                        "content": snippets[snippet],
+                        "aliases": []
+                    }
+                    continue
+                for subname, subsnippet in list(snippets.items()):
+                    if subsnippet == name:
+                        processed_snippets[name]["aliases"].append(subname)
+                
+                with open(f"temp/snippets-{ctx.guild.id}-dump.txt", "w") as file:
+                    file.write(
+                        json.dumps(processed_snippets, indent=4)
+                    )
+                
+                file_sent = await ctx.send(file=discord.File(f"temp/snippets-{ctx.guild.id}-dump.txt"))
+                if file_sent:
+                    os.remove(f"temp/snippets-{ctx.guild.id}-dump.txt")
                     
 
                     
