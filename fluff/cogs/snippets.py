@@ -74,7 +74,7 @@ class Snippets(Cog):
                 if ctx.message.reference.resolved:
                     referenced_message = ctx.message.reference.resolved
                     await ctx.message.delete()
-                    return await referenced_message.reply(guild_snippets[name]["content"], mention_author=True)
+                    return await referenced_message.reply(guild_snippets[snippet]["content"], mention_author=True)
                 else:
                     return await ctx.reply(guild_snippets[name]["content"], mention_author=False)
             else:
@@ -83,7 +83,7 @@ class Snippets(Cog):
                         if ctx.message.reference.resolved:
                             referenced_message = ctx.message.reference.resolved
                             await ctx.message.delete()
-                            return await referenced_message.reply(guild_snippets[name]["content"], mention_author=True)
+                            return await referenced_message.reply(guild_snippets[snippet]["content"], mention_author=True)
                         else:
                             return await ctx.reply(guild_snippets[name]["content"], mention_author=False)
             return await ctx.reply(f"Snippet `{name}` not found.", mention_author=False)
