@@ -3,7 +3,7 @@ import json
 import os
 from discord.ext import commands
 from discord.ext.commands import Cog
-from helpers.checks import isadmin
+from helpers.checks import isadmin, ismanager
 from helpers.embeds import stock_embed
 from helpers.datafiles import get_guildfile, set_guildfile
 
@@ -43,33 +43,25 @@ class Snippets(Cog):
                     inline=False,
                 )
             else:
-                snippets_procd = {}
                 for name, snippet in list(snippets.items()):
-                    snippets_procd[name] = {
-                        "aliases": [],
-                        "data": ""
-                    }
-                    
                     if snippet in snippets:
                         continue
+                    aliases = ""
                     for subname, subsnippet in list(snippets.items()):
                         if subsnippet == name:
-                            snippets_procd[name]["aliases"].append(subname)
-                        embed_fields = []
-                        for name, snippet_data in snippets_procd.items():
-                            aliases = ", ".join(snippet_data["aliases"])
-                            snippet = snippet_data["data"]
-                            snippet_text = f"{name} ({aliases})\n{snippet[:100]}..."
-                            embed_fields.append((name, snippet_text))
-
-                        for i in range(0, len(embed_fields), 5):
-                            field_data = embed_fields[i:i+5]
-                            field_value = "\n".join([f"> {name} {snippet}" for name, snippet in field_data])
-                            embed.add_field(
-                                name="Snippets",
-                                value=field_value,
-                                inline=False
-                            )
+                            aliases += f"\n➡️ " + subname
+                        embed.add_field(
+                        name=name,
+                        value=(
+                            "> "
+                            + "\n> ".join(snippet[:200].split("\n"))
+                            + "..."
+                            + aliases
+                            if len(snippet) > 200
+                            else "> " + "\n> ".join(snippet.split("\n")) + aliases
+                        ),
+                        inline=False,
+                    )
                             
             try:
                 await ctx.reply(embed=embed, mention_author=False)
@@ -181,6 +173,43 @@ class Snippets(Cog):
             content=f"'{name.lower()}' has been edited.",
             mention_author=False
         )
+    
+    @commands.check(ismanager)
+    @rule.command()
+    async def dump(self, ctx):
+        """This dumps snippets."""
+        snippets = get_guildfile(ctx.guild.id, "snippets")
+        if not name:
+            new_msg = await ctx.reply("Checking for snippets...", mention_author=False)
+            if not snippets:
+                new_msg.edit(content="There are no configured snippets to dump.")
+            else:
+                processed_snippets = {}
+                for name, snippet in list(snippets.items()):
+                    if snippet in snippets:
+                        processed_snippets[name] = {
+                            "content": snippets[snippet],
+                            "aliases": []
+                        }
+                        continue
+                    aliases = ""
+                    for subname, subsnippet in list(snippets.items()):
+                        if subsnippet == name:
+                            processed_snippets[name]["aliases"].append(subname)
+                    
+                    with open(f"temp/snippets-{ctx.guild.id}-dump.txt", "w") as file:
+                        file.write(
+                            json.dumps(processed_snippets, indent=4)
+                        )
+                    
+                    file_sent = await ctx.send(file=discord.File(f"temp/snippets-{ctx.guild.id}-dump.txt"))
+                    if file_sent:
+                        os.remove(f"temp/snippets-{ctx.guild.id}-dump.txt")
+                    
+
+                    
+
+        
 
 async def setup(bot):
     await bot.add_cog(Snippets(bot))
