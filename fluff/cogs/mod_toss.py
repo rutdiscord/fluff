@@ -628,10 +628,7 @@ class ModToss(Cog):
                     inline=True,
                 )
             
-        upload_rsl = await upload(ctx, filename, f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}/", dotzip)
-
-        if upload_rsl: 
-            await ctx.channel.delete(reason="Fluff Mute Completed")
+            await upload(ctx, filename, f"data/servers/{ctx.guild.id}/toss/archives/sessions/{ctx.channel.id}/", dotzip)
 
         del tosses[ctx.channel.name]
         set_tossfile(ctx.guild.id, "tosses", json.dumps(tosses))
@@ -639,9 +636,7 @@ class ModToss(Cog):
         channel = notify_channel if notify_channel else logging_channel
         if channel:
             await channel.send(embed=embed)
-        else:
-            await ctx.message.add_reaction("📦")
-            await asyncio.sleep(5)
+            await ctx.channel.delete(reason="Fluff Mute")
         return
 
     # @Cog.listener()
