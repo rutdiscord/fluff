@@ -69,10 +69,12 @@ class Snippets(Cog):
                         fields2 = embed.fields[25:]
                         embed1 = discord.Embed.from_dict(embed.to_dict())
                         embed1.clear_fields()
-                        embed1.add_field(*fields1)
+                        for field in fields1:
+                            embed1.add_field(*field)
                         embed2 = discord.Embed.from_dict(embed.to_dict())
                         embed2.clear_fields()
-                        embed2.add_field(*fields2)
+                        for field in fields2:
+                            embed2.add_field(*field)
                         embeds.append(embed1, embed2)
                         await sympage(self.bot, ctx, [embed1, embed2])
                     
