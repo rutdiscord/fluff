@@ -7,10 +7,6 @@ from helpers.checks import isadmin, ismanager
 from helpers.embeds import stock_embed
 from helpers.datafiles import get_guildfile, set_guildfile
 
-'''
-TODO: Rework this god awful system
-'''
-
 class Snippets(Cog):
     """
     Commands for easily explaining things.
@@ -21,8 +17,8 @@ class Snippets(Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
-    @commands.group(aliases=["snip"], invoke_without_command=True)
-    async def rule(self, ctx, *, name=None):
+    @commands.group(aliases=["snippet", "rule"], invoke_without_command=True)
+    async def snippets(self, ctx, *, name=None):
         """This displays staff defined tags.
 
         Using this command by itself will show a list of tags.
@@ -30,52 +26,40 @@ class Snippets(Cog):
 
         - `name`
         The name of the rule snippet to post. Optional."""
-        snippets = get_guildfile(ctx.guild.id, "snippets")
+        guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
         if not name:
             embed = stock_embed(self.bot)
-            embed.title = "Configured Snippets"
+            embed.title = "Available Snippets"
             embed.color = discord.Color.red()
             embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
-            if not snippets:
+            if not guild_snippets:
                 embed.add_field(
-                    name="None",
-                    value="There are no configured snippets.",
+                    name = "No Snippets",
+                    value = "There are no snippets available in this server.",
                     inline=False,
                 )
             else:
-                for name, snippet in list(snippets.items()):
-                    if snippet in snippets:
-                        continue
-                    aliases = ""
-                    for subname, subsnippet in list(snippets.items()):
-                        if subsnippet == name:
-                            aliases += f"\n➡️ " + subname
+                for snippet in guild_snippets:
                         embed.add_field(
-                        name=name,
-                        value=(
-                            "> "
-                            + "\n> ".join(snippet[:200].split("\n"))
-                            + "..."
-                            + aliases
-                            if len(snippet) > 200
-                            else "> " + "\n> ".join(snippet.split("\n")) + aliases
-                        ),
-                        inline=False,
-                    )
-                            
+                            name = f"**{snippet}**",
+                            value = ("> " + guild_snippets[snippet]["content"][:60] + "..."
+                                        + f"\nAliases: {', '.join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"} "
+                            ),
+                            inline=False,
+                        )
+
             try:
                 await ctx.reply(embed=embed, mention_author=False)
             except discord.errors.HTTPException as exception: # almost always too many embed fields
                 if exception.code == 50035:
                     file_content = "" # GITHUB COPILOT CODE LOL
-                    for name, snippet in list(snippets.items()):
-                        if snippet in snippets:
-                            continue
-                        aliases = ""
-                        for subname, subsnippet in list(snippets.items()):
-                            if subsnippet == name:
-                                aliases += f"\n➡️ " + subname
-                        file_content += f"{name}:\n{snippet}\nAliases:{aliases}\n\n"
+                    for snippet in guild_snippets:
+                        file_content += (
+                            "**{snippet}** \n" +
+                            ("> " + guild_snippets[snippet]["content"][:100] + "..."
+                                        + f"\nAliases: {', '.join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"} "
+                            )
+                        )
 
                     with open(f"temp/snippets-{ctx.guild.id}.txt", "w") as file:
                         file.write(file_content)
@@ -84,126 +68,61 @@ class Snippets(Cog):
                     if file_sent:
                         os.remove(f"temp/snippets-{ctx.guild.id}.txt")
                     
-                    
+        else:
+            if name in guild_snippets:
+                return await ctx.reply(guild_snippets[name]["content"], mention_author=False)
+            else:
+                for snippet in guild_snippets:
+                    if name in guild_snippets[snippet]["aliases"]:
+                        return await ctx.reply(guild_snippets[snippet]["content"], mention_author=False)
+            return await ctx.reply(f"Snippet `{name}` not found.", mention_author=False)
                 
-        else:
-            if name.lower() not in snippets:
-                return
-            if snippets[name.lower()] in snippets:
-                return await ctx.reply(
-                    content=snippets[snippets[name.lower()]], mention_author=False
-                )
-            return await ctx.reply(content=snippets[name.lower()], mention_author=False)
-
-    @commands.check(isadmin)
-    @rule.command()
-    async def create(self, ctx, name, *, contents):
-        """This creates a new rule snippet.
-
-        You can set the `contents` to be the name of another
-        rule snippet to create an alias to that snippet. See the
-        [documentation](https://3gou.0ccu.lt/as-a-moderator/the-snippet-system/) for more details.
-
-        - `name`
-        The name of the snippet to create.
-        - `contents`
-        The contents of the snippet."""
-        snippets = get_guildfile(ctx.guild.id, "snippets")
-        if name.lower() in snippets:
-            return await ctx.reply(
-                content=f"`{name}` is already a snippet.",
-                mention_author=False,
-            )
-        elif len(contents.split()) == 1 and contents in snippets:
-            if snippets[contents] in snippets:
-                return await ctx.reply(
-                    content=f"You cannot create nested aliases.",
-                    mention_author=False,
-                )
-            snippets[name.lower()] = contents
-            set_guildfile(ctx.guild.id, "snippets", json.dumps(snippets))
-            await ctx.reply(
-                content=f"`{name.lower()}` has been saved as an alias.",
-                mention_author=False,
-            )
-        else:
-            snippets[name.lower()] = contents
-            set_guildfile(ctx.guild.id, "snippets", json.dumps(snippets))
-            await ctx.reply(
-                content=f"`{name.lower()}` has been saved.",
-                mention_author=False,
-            )
-
-    @commands.check(isadmin)
-    @rule.command()
-    async def delete(self, ctx, name):
-        """This deletes a rule snippet.
-
-        The name can be an alias as well. See the
-        [documentation](https://3gou.0ccu.lt/as-a-moderator/the-snippet-system/) for more details.
-
-        - `name`
-        The name of the rule snippet to delete."""
-        snippets = get_guildfile(ctx.guild.id, "snippets")
-        if name.lower() not in snippets:
-            return await ctx.reply(
-                content=f"`{name.lower()}` is not a snippet.",
-                mention_author=False,
-            )
-        del snippets[name.lower()]
-        set_guildfile(ctx.guild.id, "snippets", json.dumps(snippets))
-        await ctx.reply(
-            content=f"`{name.lower()}` has been deleted.",
-            mention_author=False,
-        )
-
-    @commands.check(isadmin)
-    @rule.command()
-    async def edit(self, ctx, name, *, new_content):
-        """This edits a rule snippet."""
-        snippets = get_guildfile(ctx.guild.id, "snippets")
-        if name.lower() not in snippets:
-            return await ctx.reply(
-                content=f"`{name.lower()}` is not a snippet.",
-                mention_author=False,
-            )
-        snippets[name.lower()] = new_content
-        set_guildfile(ctx.guild.id, "snippets", json.dumps(snippets))
-        await ctx.reply(
-            content=f"'{name.lower()}' has been edited.",
-            mention_author=False
-        )
-    
-    @commands.check(ismanager)
-    @rule.command()
-    async def dump(self, ctx):
-        """This dumps snippets."""
-        snippets = get_guildfile(ctx.guild.id, "snippets")
-        new_msg = await ctx.reply("Checking for snippets...", mention_author=False)
-        processed_snippets = {}
-        if not snippets:
-            new_msg.edit(content="There are no configured snippets to dump.")
-        else:
-            # THIS IS GOING TO GIVE ME NIGHTMARES
-            for name, snippet in list(snippets.items()):
-                if snippet in snippets:
-                    processed_snippets[name] = {
-                        "content": snippets[snippet],
-                    }
-                    continue
-
-        with open(f"temp/snippets-{ctx.guild.id}-dump.txt", "w") as file:
-            file.write(
-                json.dumps(processed_snippets, indent=4)
-            )
         
-        file_sent = await ctx.send(file=discord.File(f"temp/snippets-{ctx.guild.id}-dump.txt"))
-        if file_sent:
-            os.remove(f"temp/snippets-{ctx.guild.id}-dump.txt")
-                    
+    @snippets.command(aliases=["add"])
+    @commands.guild_only()
+    @commands.check(isadmin)
+    async def create(self, ctx, new_snippet, *, content):
+        guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
+        dict_new_snippet = guild_snippets.get(new_snippet,{})
+        if dict_new_snippet == {}:
+            guild_snippets[new_snippet] = {
+            "content": content,
+            "aliases": [],
+        }
+            set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
+            return await ctx.reply(f"Snippet `{new_snippet}` added successfully.")
+        else:
+            return await ctx.reply(f"Snippet `{new_snippet}` already exists.")
 
-                    
+    
+    @snippets.command(aliases=["alias"])
+    @commands.guild_only()
+    @commands.check(isadmin)
+    async def link(self, ctx, snippet, new_alias):
+        guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
 
+        try:
+            if new_alias in guild_snippets[snippet]["aliases"]:
+                return await ctx.reply(f"Alias `{new_alias}` already exists for snippet `{snippet}`.")
+            else:
+                guild_snippets[snippet]["aliases"].append(new_alias)
+                set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
+                return await ctx.reply(f"Alias `{new_alias}` added successfully for snippet `{snippet}`.")
+        except KeyError:
+            return await ctx.reply(f"Snippet `{snippet}` not found.")
+    
+    @snippets.command(aliases=["remove"])
+    @commands.guild_only()
+    @commands.check(isadmin)
+    async def delete(self, ctx, snippet):
+        guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
+
+        if snippet in guild_snippets:
+                del guild_snippets[snippet]
+                set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
+                return await ctx.reply(f"Snippet `{snippet}` deleted successfully.")
+        else:
+            return await ctx.reply(f"Snippet `{snippet}` not found.")
         
 
 async def setup(bot):
