@@ -45,7 +45,7 @@ class Snippets(Cog):
                             value = ("> " + guild_snippets[snippet]["content"][:60] + "_..._"
                                         + f'\nAliases: {", ".join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"}'
                             ),
-                            inline=False,
+                            inline=True,
                         )
 
             try:
@@ -56,7 +56,7 @@ class Snippets(Cog):
                     for snippet in guild_snippets:
                         file_content += (
                             "**{snippet}** \n" +
-                            ("> " + guild_snippets[snippet]["content"][:100] + "_..._"
+                            ("> " + guild_snippets[snippet]["content"][:100] + "..."
                              + f'\nAliases: {", ".join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"}'
                             )
                         )
