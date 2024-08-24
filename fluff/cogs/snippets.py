@@ -70,7 +70,7 @@ class Snippets(Cog):
                     
         else:
             if name in guild_snippets:
-                if isinstance(ctx.message.reference, discord.MessageReference):
+                if ctx.message.reference != None and isinstance(ctx.message.reference.resolved, discord.Message):
                     referenced_message = ctx.message.reference.resolved
                     await ctx.message.delete(delay=15)
                     return await referenced_message.reply(guild_snippets[name]["content"], mention_author=True)
