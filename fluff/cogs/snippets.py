@@ -26,7 +26,7 @@ class Snippets(Cog):
 
         - `name`
         The name of the rule snippet to post. Optional."""
-        guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
+        guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2").items()
 
         if not name:
             embed = stock_embed(self.bot)
@@ -74,7 +74,7 @@ class Snippets(Cog):
                     return await ctx.reply(guild_snippets[f"{name}"]["content"], mention_author=False)
             else:
                 for cur_snippet in guild_snippets:
-                    if name in cur_snippet.items():
+                    if name in cur_snippet:
                             return await ctx.reply(guild_snippets[f"{name}"]["content"], mention_author=False)
             return await ctx.reply(f"Snippet `{name}` not found.", mention_author=False)
                 
