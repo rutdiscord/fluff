@@ -366,16 +366,9 @@ class ModToss(Cog):
 
             def check(m):
                 return m.author in users and m.channel == toss_channel
-            
-            def delete_check(channel):
-                return channel.id in self.poketimers and channel.id == toss_channel.id
 
             try:
                 self.poketimers[str(toss_channel.id)] = self.bot.wait_for("message", timeout=300, check=check)
-                delete_event = await self.bot.wait_for("guild_channel_delete", timeout=300, check=delete_check)
-                if delete_event:
-                    self.poketimers[str(toss_channel.id)].cancel()
-                    del self.poketimers[str(toss_channel.id)]
             except asyncio.TimeoutError:
                     pokemsg = await toss_channel.send(ctx.author.mention)
                     await pokemsg.edit(content="⏰", delete_after=5)
@@ -822,8 +815,11 @@ class ModToss(Cog):
         try:
             msg = await self.bot.wait_for("message", timeout=300, check=check)
         except asyncio.TimeoutError:
-            pokemsg = await toss_channel.send(member.mention)
-            await pokemsg.edit(content="⏰", delete_after=5)
+            try:
+                pokemsg = await toss_channel.send(member.mention)
+                await pokemsg.edit(content="⏰", delete_after=5)
+            except discord.NotFound:
+                return
         except discord.NotFound:
             return
         except asyncio.exceptions.CancelledError:
@@ -909,6 +905,8 @@ class ModToss(Cog):
             tosses = get_tossfile(channel.guild.id, "tosses")
             if channel.name not in tosses:
                 return
+            await self.poketimers[str(channel.id)].cancel()
+            del self.poketimers[str(channel.id)]
             del tosses[channel.name]
             set_tossfile(channel.guild.id, "tosses", json.dumps(tosses))
 
