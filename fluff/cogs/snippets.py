@@ -71,11 +71,11 @@ class Snippets(Cog):
                     
         else:
             if name in guild_snippets:
-                    return await ctx.reply(guild_snippets[name]["content"], mention_author=False)
+                    return await ctx.reply(guild_snippets[f"{name}"]["content"], mention_author=False)
             else:
                 for cur_snippet in guild_snippets:
                     if name in cur_snippet["aliases"]:
-                            return await ctx.reply(guild_snippets[name]["content"], mention_author=False)
+                            return await ctx.reply(guild_snippets[f"{name}"]["content"], mention_author=False)
             return await ctx.reply(f"Snippet `{name}` not found.", mention_author=False)
                 
         
