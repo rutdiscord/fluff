@@ -72,8 +72,8 @@ class Snippets(Cog):
             if name in guild_snippets:
                 if isinstance(ctx.message.reference, discord.MessageReference):
                     referenced_message = ctx.message.reference.resolved
-                    await ctx.message.delete(delay=30)
-                    return await referenced_message.reply(f"", mention_author=True)
+                    await ctx.message.delete(delay=15)
+                    return await referenced_message.reply(guild_snippets[name]["content"], mention_author=True)
                 else:
                     return await ctx.reply(guild_snippets[name]["content"], mention_author=False)
             if name not in guild_snippets:
