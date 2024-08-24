@@ -3,7 +3,7 @@ import json
 import os
 from discord.ext import commands
 from discord.ext.commands import Cog
-from helpers.checks import isadmin, ismanager
+from helpers.checks import isadmin
 from helpers.embeds import stock_embed
 from helpers.datafiles import get_guildfile, set_guildfile
 
@@ -17,7 +17,7 @@ class Snippets(Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
-    @commands.group(aliases=["snippet"], invoke_without_command=True)
+    @commands.group(aliases=["snippet", "s"], invoke_without_command=True)
     async def snippets(self, ctx: commands.Context, *, name=None):
         """This displays staff defined tags.
 
