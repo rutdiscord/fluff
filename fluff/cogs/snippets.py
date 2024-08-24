@@ -26,7 +26,7 @@ class Snippets(Cog):
 
         - `name`
         The name of the rule snippet to post. Optional."""
-        guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2").items()
+        guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
 
         if not name:
             embed = stock_embed(self.bot)
@@ -71,11 +71,14 @@ class Snippets(Cog):
                     
         else:
             if name in guild_snippets:
-                    return await ctx.reply(guild_snippets[f"{name}"]["content"], mention_author=False)
-            else:
-                for cur_snippet in guild_snippets:
-                    if name in cur_snippet:
-                            return await ctx.reply(guild_snippets[f"{name}"]["content"], mention_author=False)
+                
+                if isinstance(ctx.message.reference, discord.MessageReference):
+                    referenced_message = ctx.message.reference.resolved
+                    await ctx.message.delete(delay=30)
+                    return await referenced_message.reply(guild_snippets[snippet]["content"], mention_author=True)
+                else:
+                    return await ctx.reply(guild_snippets[name]["content"], mention_author=False)
+                
             return await ctx.reply(f"Snippet `{name}` not found.", mention_author=False)
                 
         
@@ -88,7 +91,6 @@ class Snippets(Cog):
         if dict_new_snippet == {}:
             guild_snippets[new_snippet] = {
             "content": content,
-            "aliases": [],
         }
             set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
             return await ctx.reply(f"Snippet `{new_snippet}` added successfully.")
@@ -106,22 +108,6 @@ class Snippets(Cog):
             guild_snippets[snippet]["content"] = new_content
             set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
             return await ctx.reply(f"Snippet `{snippet}` edited successfully.")
-        except KeyError:
-            return await ctx.reply(f"Snippet `{snippet}` not found.")
-        
-    @snippets.command(aliases=["alias"])
-    @commands.guild_only()
-    @commands.check(isadmin)
-    async def link(self, ctx: commands.Context, snippet: str, new_alias: str):
-        guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
-
-        try:
-            if new_alias in guild_snippets[snippet]["aliases"]:
-                return await ctx.reply(f"Alias `{new_alias}` already exists for snippet `{snippet}`.")
-            else:
-                guild_snippets[snippet]["aliases"].append(new_alias)
-                set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
-                return await ctx.reply(f"Alias `{new_alias}` added successfully for snippet `{snippet}`.")
         except KeyError:
             return await ctx.reply(f"Snippet `{snippet}` not found.")
     
