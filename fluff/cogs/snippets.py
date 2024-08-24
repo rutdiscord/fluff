@@ -71,20 +71,10 @@ class Snippets(Cog):
                     
         else:
             if name in guild_snippets:
-                if isinstance(ctx.message.reference, discord.MessageReference):
-                    referenced_message = ctx.message.reference.resolved
-                    await ctx.message.delete(delay=30)
-                    return await referenced_message.reply(guild_snippets[snippet]["content"], mention_author=True)
-                else:
                     return await ctx.reply(guild_snippets[name]["content"], mention_author=False)
             else:
-                for snippet in guild_snippets:
-                    if name in guild_snippets[snippet]["aliases"]:
-                        if isinstance(ctx.message.reference, discord.MessageReference):
-                            referenced_message = ctx.message.reference.resolved
-                            await ctx.message.delete(delay=30)
-                            return await referenced_message.reply(guild_snippets[snippet]["content"], mention_author=True)
-                        else:
+                for cur_snippet in guild_snippets:
+                    if name in cur_snippet["aliases"]:
                             return await ctx.reply(guild_snippets[name]["content"], mention_author=False)
             return await ctx.reply(f"Snippet `{name}` not found.", mention_author=False)
                 
