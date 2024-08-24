@@ -17,7 +17,7 @@ class Snippets(Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
-    @commands.group(aliases=["snippet", "rule"], invoke_without_command=True)
+    @commands.group(aliases=["snippet"], invoke_without_command=True)
     async def snippets(self, ctx: commands.Context, *, name=None):
         """This displays staff defined tags.
 
@@ -43,7 +43,10 @@ class Snippets(Cog):
                 for snippet in guild_snippets:
                         embed.add_field(
                             name = f"**{snippet}**",
-                            value = ("> " + guild_snippets[snippet]["content"][:60] + "_..._"),
+                            value = ("> " + guild_snippets[snippet]["content"][:60] + "_..._"
+                                        + f'\nAliases: {", ".join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"}'
+                            )
+                            ,
                             inline=True,
                         )
 
@@ -67,13 +70,16 @@ class Snippets(Cog):
                     
         else:
             if name in guild_snippets:
-                
                 if isinstance(ctx.message.reference, discord.MessageReference):
                     referenced_message = ctx.message.reference.resolved
                     await ctx.message.delete(delay=30)
                     return await referenced_message.reply(f"", mention_author=True)
                 else:
                     return await ctx.reply(guild_snippets[name]["content"], mention_author=False)
+            if name not in guild_snippets:
+                for current_snippet in guild_snippets:
+                    if name in guild_snippets[current_snippet]["aliases"]:
+                        return await ctx.reply(guild_snippets[current_snippet]["content"], mention_author=False)
                 
             return await ctx.reply(f"Snippet `{name}` not found.", mention_author=False)
                 
@@ -87,12 +93,29 @@ class Snippets(Cog):
         if dict_new_snippet == {}:
             guild_snippets[new_snippet] = {
             "content": content,
+            "aliases" : []
         }
             set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
             return await ctx.reply(f"Snippet `{new_snippet}` added successfully.")
         else:
             return await ctx.reply(f"Snippet `{new_snippet}` already exists.")
 
+    @snippets.command(aliases=["alias"])
+    @commands.guild_only()
+    @commands.check(isadmin)
+    async def link(self, ctx: commands.Context, snippet: str, new_alias: str):
+        guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
+
+        try:
+            if new_alias in guild_snippets[snippet]["aliases"]:
+                return await ctx.reply(f"Alias `{new_alias}` already exists for snippet `{snippet}`.")
+            else:
+                guild_snippets[snippet]["aliases"].append(new_alias)
+                set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
+                return await ctx.reply(f"Alias `{new_alias}` added successfully for snippet `{snippet}`.")
+        except KeyError:
+            return await ctx.reply(f"Snippet `{snippet}` not found.")
+    
     
     @snippets.command(aliases=["amend"])
     @commands.guild_only()
