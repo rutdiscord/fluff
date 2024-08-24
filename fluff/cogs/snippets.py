@@ -79,7 +79,12 @@ class Snippets(Cog):
             if name not in guild_snippets:
                 for current_snippet in guild_snippets:
                     if name in guild_snippets[current_snippet]["aliases"]:
-                        return await ctx.reply(guild_snippets[current_snippet]["content"], mention_author=False)
+                        if ctx.message.reference != None and isinstance(ctx.message.reference.resolved, discord.Message):
+                            referenced_message = ctx.message.reference.resolved
+                            await ctx.message.delete(delay=15)
+                            return await referenced_message.reply(guild_snippets[current_snippet]["content"], mention_author=True)
+                        else:
+                            return await ctx.reply(guild_snippets[current_snippet]["content"], mention_author=False)
                 
             return await ctx.reply(f"Snippet `{name}` not found.", mention_author=False)
                 
