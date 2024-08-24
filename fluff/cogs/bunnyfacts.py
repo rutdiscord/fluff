@@ -99,7 +99,7 @@ class BunnyFacts(Cog):
         fact_embed.description = fact["fact"]
         await ctx.send(embed=fact_embed)
 
-    @bunfact.command(name="flopping", aliases=[])
+    @bunfact.command(name="flopping", aliases=["flop"])
     async def flopping(self, ctx: commands.Context):
         fact = self.facts.get(ctx.command.name, [])
         fact_embed = stock_embed(self.bot)
@@ -127,7 +127,7 @@ class BunnyFacts(Cog):
         fact_embed.description = fact["fact"]
         await ctx.send(embed=fact_embed)
 
-    @bunfact.command(name="thumping", aliases=[])
+    @bunfact.command(name="thumping", aliases=["thump"])
     async def thumping(self, ctx: commands.Context):
         fact = self.facts.get(ctx.command.name, [])
         fact_embed = stock_embed(self.bot)
@@ -141,7 +141,7 @@ class BunnyFacts(Cog):
         fact_embed.description = fact["fact"]
         await ctx.send(embed=fact_embed)
 
-    @bunfact.command(name="chinning", aliases=[])
+    @bunfact.command(name="chinning", aliases=["chin"])
     async def chinning(self, ctx: commands.Context):
         fact = self.facts.get(ctx.command.name, [])
         fact_embed = stock_embed(self.bot)
@@ -155,7 +155,7 @@ class BunnyFacts(Cog):
         fact_embed.description = fact["fact"]
         await ctx.send(embed=fact_embed)
 
-    @bunfact.command(name="honking", aliases=[])
+    @bunfact.command(name="honking", aliases=["honk"])
     async def honking(self, ctx: commands.Context):
         fact = self.facts.get(ctx.command.name, [])
         fact_embed = stock_embed(self.bot)
@@ -169,7 +169,7 @@ class BunnyFacts(Cog):
         fact_embed.description = fact["fact"]
         await ctx.send(embed=fact_embed)
 
-    @bunfact.command(name="grunting", aliases=[])
+    @bunfact.command(name="grunting", aliases=["grunt"])
     async def grunting(self, ctx: commands.Context):
         fact = self.facts.get(ctx.command.name, [])
         fact_embed = stock_embed(self.bot)
@@ -183,7 +183,7 @@ class BunnyFacts(Cog):
         fact_embed.description = fact["fact"]
         await ctx.send(embed=fact_embed)
 
-    @bunfact.command(name="boxing", aliases=[])
+    @bunfact.command(name="boxing", aliases=["box","lunge","boxing","lunging"])
     async def boxing(self, ctx: commands.Context):
         fact = self.facts.get(ctx.command.name, [])
         fact_embed = stock_embed(self.bot)
@@ -197,7 +197,7 @@ class BunnyFacts(Cog):
         fact_embed.description = fact["fact"]
         await ctx.send(embed=fact_embed)
 
-    @bunfact.command(name="purring", aliases=[])
+    @bunfact.command(name="purring", aliases=["purr"])
     async def purring(self, ctx: commands.Context):
         fact = self.facts.get(ctx.command.name, [])
         fact_embed = stock_embed(self.bot)
