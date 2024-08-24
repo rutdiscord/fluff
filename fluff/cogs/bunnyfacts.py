@@ -24,7 +24,7 @@ class BunnyFacts(Cog):
                 "https://elizabethannemartins.com/wp-content/uploads/2016/05/tumblr_mn7spsxk191ss93ulo1_400.gif?w=350&h=276",
                 "https://files.catbox.moe/m8us2w.gif",
                 "https://files.catbox.moe/p2fg1y.gif"},
-            "fact": "A funky little jump along with a flick of the back legs (or head, if it\'s a smaller binky!). It\'s a way rabbits express excess energy they can\'t contain, usually joy. A binkying bunny is a very happy bunny!\n\n**Why do rabbits binky?**\n Nobody really knows why rabbits binky. All we know is that it\'s an instinct, an inexplicable expression of joy, much like laughing is for humans.\nBaby rabbits binky more often than adult rabbits - they\'re more energetic while adults are generally sleepier and calmer. Like puppies!\n[Link](https://bunnylady.com/bunny-binkies/)"
+            "fact": "A funky little jump along with a flick of the back legs (or head, if it\'s a smaller binky!). It\'s a way rabbits express excess energy they can\'t contain, usually joy. A binkying bunny is a very happy bunny!\n\n**Why do rabbits binky?**\n Nobody really knows why rabbits binky. All we know is that it\'s an instinct, an inexplicable expression of joy, much like laughing is for humans.\n\n Baby rabbits binky more often than adult rabbits - they\'re more energetic while adults are generally sleepier and calmer. Like puppies!\n[Link](https://bunnylady.com/bunny-binkies/)"
             },
             "flopping": {
             "summary": "Is that bunny dead? (no)",
@@ -75,7 +75,7 @@ class BunnyFacts(Cog):
             }
         }
 
-    @commands.group(invoke_without_command=True)
+    @commands.group(invoke_without_command=True, aliases=["bunfacts"])
     async def bunfact(self, ctx: commands.Context):
             help_embed = stock_embed(self.bot)
             help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
