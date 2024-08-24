@@ -70,9 +70,8 @@ class Snippets(Cog):
                         os.remove(f"temp/snippets-{ctx.guild.id}.txt")
                     
         else:
-            potential_resolved_ref = ctx.message.reference.resolved
             if name in guild_snippets:
-                if isinstance(potential_resolved_ref, discord.Message):
+                if isinstance(ctx.message.reference, discord.MessageReference):
                     referenced_message = ctx.message.reference.resolved
                     await ctx.message.delete(delay=30)
                     return await referenced_message.reply(guild_snippets[snippet]["content"], mention_author=True)
@@ -81,7 +80,7 @@ class Snippets(Cog):
             else:
                 for snippet in guild_snippets:
                     if name in guild_snippets[snippet]["aliases"]:
-                        if isinstance(potential_resolved_ref, discord.Message):
+                        if isinstance(ctx.message.reference, discord.MessageReference):
                             referenced_message = ctx.message.reference.resolved
                             await ctx.message.delete(delay=30)
                             return await referenced_message.reply(guild_snippets[snippet]["content"], mention_author=True)
