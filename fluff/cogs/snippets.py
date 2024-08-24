@@ -25,7 +25,7 @@ class Snippets(Cog):
         Giving a name will post that rule snippet in the chat.
 
         - `name`
-        The name of the rule snippet to post. Optional."""
+        The name of the snippet to post. Optional."""
         guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
 
         if not name:
@@ -51,9 +51,9 @@ class Snippets(Cog):
 
             try:
                 await ctx.reply(embed=embed, mention_author=False)
-            except discord.errors.HTTPException as exception: # almost always too many embed fields
+            except discord.errors.HTTPException as exception: # Over 25 embed fields
                 if exception.code == 50035:
-                    file_content = "" # GITHUB COPILOT CODE LOL
+                    file_content = ""
                     for snippet in guild_snippets:
                         file_content += (
                             "**{snippet}** \n" +
@@ -75,7 +75,7 @@ class Snippets(Cog):
                 if isinstance(ctx.message.reference, discord.MessageReference):
                     referenced_message = ctx.message.reference.resolved
                     await ctx.message.delete(delay=30)
-                    return await referenced_message.reply(guild_snippets[snippet]["content"], mention_author=True)
+                    return await referenced_message.reply(guild_snippets[name]["content"], mention_author=True)
                 else:
                     return await ctx.reply(guild_snippets[name]["content"], mention_author=False)
                 
