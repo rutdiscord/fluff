@@ -115,6 +115,19 @@ class Snippets(Cog):
                 return await ctx.reply(f"Alias `{new_alias}` added successfully for snippet `{snippet}`.")
         except KeyError:
             return await ctx.reply(f"Snippet `{snippet}` not found.")
+
+    @snippets.command(aliases=["unalias"])
+    @commands.guild_only()
+    @commands.check(isadmin)
+    async def unlink(self, ctx: commands.Context, unaliased: str):
+        guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
+
+        for snippet in guild_snippets:
+            if unaliased in guild_snippets[snippet]["aliases"]:
+                guild_snippets[snippet]["aliases"].remove(unaliased)
+                set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
+                return await ctx.reply(f"Alias `{unaliased}` removed successfully.")
+        return await ctx.reply(f"Alias `{unaliased}` not found.")
     
     
     @snippets.command(aliases=["amend"])
