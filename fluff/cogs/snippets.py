@@ -57,9 +57,7 @@ class Snippets(Cog):
                     for snippet in guild_snippets:
                         file_content += (
                             "**{snippet}** \n" +
-                            ("> " + guild_snippets[snippet]["content"][:100] + "..."
-                             + f'\nAliases: {", ".join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"}'
-                            )
+                            ("> " + guild_snippets[snippet]["content"][:100] + "...")
                         )
 
                     with open(f"temp/snippets-{ctx.guild.id}.txt", "w") as file:
@@ -75,7 +73,7 @@ class Snippets(Cog):
                 if isinstance(ctx.message.reference, discord.MessageReference):
                     referenced_message = ctx.message.reference.resolved
                     await ctx.message.delete(delay=30)
-                    return await referenced_message.reply(guild_snippets[name]["content"], mention_author=True)
+                    return await referenced_message.reply(f"", mention_author=True)
                 else:
                     return await ctx.reply(guild_snippets[name]["content"], mention_author=False)
                 
