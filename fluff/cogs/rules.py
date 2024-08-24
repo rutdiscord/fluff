@@ -22,6 +22,13 @@ class Rules(Cog):
     @commands.guild_only()
     @commands.group(aliases=["r", "rules"], invoke_without_command=True)
     async def rule(self, ctx: commands.Context, *, name=None):
+        """This displays defined server rules.
+
+        Using this command by itself will show a list of rules.
+        Giving a name will post that rule in the chat.
+
+        - `name`
+        The name of the rule to post. Optional."""
         guild_rules = get_guildfile(ctx.guild.id, "rules")
         summary_embed = stock_embed(self.bot)
         summary_embed.title = "Rules"

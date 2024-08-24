@@ -88,17 +88,23 @@ class Snippets(Cog):
     @commands.guild_only()
     @commands.check(isadmin)
     async def create(self, ctx: commands.Context, new_snippet: str, *, content: str):
-        guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
-        dict_new_snippet = guild_snippets.get(new_snippet,{})
-        if dict_new_snippet == {}:
-            guild_snippets[new_snippet] = {
-            "content": content,
-            "aliases" : []
-        }
-            set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
-            return await ctx.reply(f"Snippet `{new_snippet}` added successfully.")
-        else:
-            return await ctx.reply(f"Snippet `{new_snippet}` already exists.")
+            """Creates a new snippet with the given name and content.
+            
+            - `new_snippet` 
+            The name of the snippet to create.
+            - `content`
+            Content of the snippet."""
+            guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
+            dict_new_snippet = guild_snippets.get(new_snippet,{})
+            if dict_new_snippet == {}:
+                guild_snippets[new_snippet] = {
+                    "content": content,
+                    "aliases" : []
+                }
+                set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
+                return await ctx.reply(f"Snippet `{new_snippet}` added successfully.")
+            else:
+                return await ctx.reply(f"Snippet `{new_snippet}` already exists.")
 
     @snippets.command(aliases=["alias"])
     @commands.guild_only()
