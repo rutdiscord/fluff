@@ -70,8 +70,9 @@ class Snippets(Cog):
                         os.remove(f"temp/snippets-{ctx.guild.id}.txt")
                     
         else:
+            potential_resolved_ref = ctx.message.reference.resolved
             if name in guild_snippets:
-                if ctx.message.reference.resolved:
+                if isinstance(potential_resolved_ref, discord.Message):
                     referenced_message = ctx.message.reference.resolved
                     await ctx.message.delete(delay=30)
                     return await referenced_message.reply(guild_snippets[snippet]["content"], mention_author=True)
