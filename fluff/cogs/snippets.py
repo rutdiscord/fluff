@@ -81,7 +81,7 @@ class Snippets(Cog):
             else:
                 for snippet in guild_snippets:
                     if name in guild_snippets[snippet]["aliases"]:
-                        if ctx.message.reference.resolved:
+                        if isinstance(potential_resolved_ref, discord.Message):
                             referenced_message = ctx.message.reference.resolved
                             await ctx.message.delete(delay=30)
                             return await referenced_message.reply(guild_snippets[snippet]["content"], mention_author=True)
