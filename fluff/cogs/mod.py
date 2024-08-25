@@ -109,6 +109,12 @@ class Mod(Cog):
             target = ctx.guild.get_member(target.id)
             if self.check_if_target_is_staff(target):
                 return await ctx.send("I cannot ban Staff members.")
+            
+        # Check if already banned
+        user = await self.bot.fetch_user(target.id)
+        attempt_fetch_ban = await ctx.guild.fetch_ban(user)
+        if isinstance(attempt_fetch_ban, discord.BanEntry):
+            return await ctx.reply(f"This user appears to be banned! `{attempt_fetch_ban.reason}`")
 
         if reason:
             add_userlog(ctx.guild.id, target.id, ctx.author, reason, "bans")
