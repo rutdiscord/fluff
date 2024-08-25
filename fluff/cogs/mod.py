@@ -112,7 +112,11 @@ class Mod(Cog):
             
         # Check if already banned
         user = await self.bot.fetch_user(target.id)
-        attempt_fetch_ban = await ctx.guild.fetch_ban(user)
+        attempt_fetch_ban = None
+        try:
+            attempt_fetch_ban = await ctx.guild.fetch_ban(user)
+        except discord.NotFound:
+            pass
         if isinstance(attempt_fetch_ban, discord.BanEntry):
             return await ctx.reply(f"This user appears to be banned! `{attempt_fetch_ban.reason}`")
 
