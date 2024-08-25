@@ -43,8 +43,8 @@ class Snippets(Cog):
                 for snippet in guild_snippets:
                         embed.add_field(
                             name = f"**{snippet}**",
-                            value = ("> " + guild_snippets[snippet]["content"][:60] + "_..._"
-                                        + f'\n**Aliases**: _{discord.utils.remove_markdown(", ".join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None")}_'
+                            value = ("> " + discord.utils.remove_markdown(guild_snippets[snippet]["content"][:60]) + "_..._"
+                                        + f'\n**Aliases**: _{", ".join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"}_'
                             )
                             ,
                             inline=True,
