@@ -336,6 +336,8 @@ class Reply(Cog):
         ):
             try:
                 await message.add_reaction("<:pleaseping:1258418052651942053>")
+            except discord.errors.NotFound:
+                await message.channel.send(f"*thump thump* {message.author.mention} Quickdeleting a message that violates ping preferences is not cool!", delete_after=5.0)
             except discord.errors.Forbidden as err:
                     if err.code == 90001:
                         return 
@@ -348,7 +350,7 @@ class Reply(Cog):
             try:
                 await message.add_reaction("<:noping:1258418038504689694>")
             except discord.errors.NotFound:
-                await message.channel.send(f"*thump thump* {message.author.mention} Quickdeleting a message that violates ping preferences is not cool!")
+                await message.channel.send(f"*thump thump* {message.author.mention} Quickdeleting a message that violates ping preferences is not cool!", delete_after=5.0)
             except discord.errors.Forbidden as err:
                     if err.code == 90001:
                         return self.bot.dispatch("autotoss_blocked", message, message.author)
@@ -371,6 +373,8 @@ class Reply(Cog):
             ):
                 try:
                     await message.add_reaction("<:waitbeforeping:1258418064781738076>")
+                except discord.errors.NotFound:
+                    await message.channel.send(f"*thump thump* {message.author.mention} Quickdeleting a message that violates ping preferences is not cool!", delete_after=5.0)
                 except discord.errors.Forbidden as err:
                         if err.code == 90001:
                             return self.bot.dispatch("autotoss_blocked", message, message.author)
