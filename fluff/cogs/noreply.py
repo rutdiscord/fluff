@@ -340,7 +340,7 @@ class Reply(Cog):
                pass
             except discord.errors.Forbidden as err:
                     if err.code == 90001:
-                        return 
+                        pass 
             pokemsg = await message.reply(content=refmessage.author.mention,mention_author=False)
             await self.bot.await_message(message.channel, refmessage.author, 86400)
             return await pokemsg.delete()
