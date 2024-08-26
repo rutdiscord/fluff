@@ -347,6 +347,8 @@ class Reply(Cog):
         elif preference == "noreplyping" and refmessage.author in message.mentions:
             try:
                 await message.add_reaction("<:noping:1258418038504689694>")
+            except discord.errors.NotFound as err:
+                await message.channel.send(f"*thump thump* {message.author.mention} Quickdeleting a message that violates ping preferences is not cool!")
             except discord.errors.Forbidden as err:
                     if err.code == 90001:
                         return self.bot.dispatch("autotoss_blocked", message, message.author)
