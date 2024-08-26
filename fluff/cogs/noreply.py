@@ -337,7 +337,7 @@ class Reply(Cog):
             try:
                 await message.add_reaction("<:pleaseping:1258418052651942053>")
             except discord.errors.NotFound:
-                await message.channel.send(f"*thump thump* {message.author.mention} Quickdeleting a message that violates ping preferences is not cool!", delete_after=5.0)
+               pass
             except discord.errors.Forbidden as err:
                     if err.code == 90001:
                         return 
