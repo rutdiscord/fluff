@@ -183,7 +183,7 @@ class BunnyFacts(Cog):
         fact_embed.description = fact["fact"]
         await ctx.send(embed=fact_embed)
 
-    @bunfact.command(name="boxing", aliases=["box","lunge","boxing","lunging"])
+    @bunfact.command(name="boxing", aliases=["box","lunge","lunging"])
     async def boxing(self, ctx: commands.Context):
         fact = self.facts.get(ctx.command.name, [])
         fact_embed = stock_embed(self.bot)
