@@ -48,11 +48,11 @@ class Tenure(Cog):
         if tenure_threshold < tenure_days:
            if tenure_role not in ctx.author.roles:
             await ctx.author.add_roles(tenure_role, reason="Fluff Tenure")
-            return await ctx.reply(f"You joined around {tenure_days} days ago! You've been here long enough to be assigned the {tenure_role.name} role!",mention_author=False)
+            return await ctx.reply(f"You joined around {tenure_days} ({tenure_dt}) days ago! You've been here long enough to be assigned the {tenure_role.name} role!",mention_author=False)
            else:
-            await ctx.reply(f"You joined around {tenure_days} days ago, and you've already been assigned the {tenure_role.name} role!",mention_author=False)
+            await ctx.reply(f"You joined around {tenure_days}  ({tenure_dt}) days ago, and you've already been assigned the {tenure_role.name} role!",mention_author=False)
         else:
-            await ctx.reply(f"You joined around {tenure_days} days ago! Not long enough, though.. try again in {(timedelta(days=tenure_threshold)-tenure_dt).days} days!",mention_author=False)
+            await ctx.reply(f"You joined around {tenure_days} ({tenure_dt}) days ago! Not long enough, though.. try again in {(timedelta(days=tenure_threshold)-tenure_dt).days} days!",mention_author=False)
     
     @commands.check(ismanager)
     @tenure.command()
