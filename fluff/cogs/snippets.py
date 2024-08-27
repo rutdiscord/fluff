@@ -27,7 +27,7 @@ class Snippets(Cog):
         - `name`
         The name of the snippet to post. Optional."""
         guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
-
+        name = name.lower()
         if not name:
             embed = stock_embed(self.bot)
             embed.title = "Available Snippets"
@@ -99,6 +99,7 @@ class Snippets(Cog):
             The name of the snippet to create.
             - `content`
             Content of the snippet."""
+            new_snippet = new_snippet.lower()
             guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
             dict_new_snippet = guild_snippets.get(new_snippet,{})
             if dict_new_snippet == {}:
@@ -116,7 +117,7 @@ class Snippets(Cog):
     @commands.check(isadmin)
     async def link(self, ctx: commands.Context, snippet: str, new_alias: str):
         guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
-
+        snippet = snippet.lower()
         try:
             if new_alias in guild_snippets[snippet]["aliases"]:
                 return await ctx.reply(f"Alias `{new_alias}` already exists for snippet `{snippet}`.")
@@ -132,7 +133,7 @@ class Snippets(Cog):
     @commands.check(isadmin)
     async def unlink(self, ctx: commands.Context, unaliased: str):
         guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
-
+        unaliased = unaliased.lower()
         for snippet in guild_snippets:
             if unaliased in guild_snippets[snippet]["aliases"]:
                 guild_snippets[snippet]["aliases"].remove(unaliased)
@@ -146,7 +147,7 @@ class Snippets(Cog):
     @commands.check(isadmin)
     async def edit(self, ctx: commands.Context, snippet: str, * , new_content: str):
         guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
-
+        snippet = snippet.lower()
         try:
             guild_snippets[snippet]["content"] = new_content
             set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
@@ -159,6 +160,7 @@ class Snippets(Cog):
     @commands.check(isadmin)
     async def delete(self, ctx: commands.Context, snippet: str):
         guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
+        snippet = snippet.lower()
 
         if snippet in guild_snippets:
                 del guild_snippets[snippet]
