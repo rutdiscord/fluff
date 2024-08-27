@@ -374,7 +374,7 @@ class ModToss(Cog):
         guild = ctx.guild
         toss_role = self.bot.pull_role(guild, get_config(guild.id, "toss", "tossrole"))
         if ctx.channel.name in get_config(ctx.guild.id, "toss", "tosschannels"):
-            return await ctx.reply(f"I've let {toss_role.mention} use images!"), await ctx.channel.set_permissions(toss_role, embed_links=True, attach_files=True)
+            return await ctx.reply(f"I've let {toss_role.mention} use images!", mention_author=False), await ctx.channel.set_permissions(toss_role, embed_links=True, attach_files=True)
         else:
             return await ctx.reply("This isn't a toss session.. I'm not doing that!", mention_author=False)
 
