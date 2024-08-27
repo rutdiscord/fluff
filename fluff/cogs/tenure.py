@@ -1,10 +1,9 @@
 import discord
 import asyncio
-import json
 from discord.ext.commands import Cog
 from discord.ext import commands
 from helpers.sv_config import get_config
-from helpers.datafiles import get_userfile, set_userfile
+from helpers.datafiles import get_guildfile, set_guildfile
 from helpers.checks import ismanager
 from datetime import datetime, timedelta, UTC
 from config import logchannel
@@ -42,7 +41,6 @@ class Tenure(Cog):
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
         
-        user_status = get_userfile(ctx.author.id, "tenure")["bl"]
         tenure_dt = await self.check_joindelta(ctx.author)
         tenure_days = tenure_dt.days
         tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
@@ -102,12 +100,6 @@ class Tenure(Cog):
         if not self.enabled(msg.guild):
             return
         
-        tenure_user = get_userfile(msg.author.id, "tenure")
-
-        if "bl" not in tenure_user:
-            tenure_user["bl"] = False
-            set_userfile(msg.author.id, "tenure", json.dumps(tenure_user))
-            
         tenureconfig = self.get_tenureconfig(msg.guild)
         tenure_dt = await self.check_joindelta(msg.author)
         tenure_days = tenure_dt.days
