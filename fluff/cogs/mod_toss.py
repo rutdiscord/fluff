@@ -296,9 +296,9 @@ class ModToss(Cog):
                 failed_roles, previous_roles = await self.perform_toss(
                     us, ctx.author, toss_channel
                 )
-                await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a toss channel for {member.global_name} ({member.id})")
-                await toss_channel.set_permissions(member.guild.default_role, read_messages=False)
-                await toss_channel.set_permissions(member, read_messages=True)
+                await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a toss channel for {us.global_name} ({us.id})")
+                await toss_channel.set_permissions(us.guild.default_role, read_messages=False)
+                await toss_channel.set_permissions(us, read_messages=True)
             except commands.MissingPermissions:
                 errors += f"\n- {self.username_system(us)}\n  Missing permissions to toss this user."
                 continue
