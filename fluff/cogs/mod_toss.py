@@ -104,29 +104,29 @@ class ModToss(Cog):
                     tosses[c] = {"tossed": {}, "untossed": [], "left": []}
                     set_tossfile(guild.id, "tosses", json.dumps(tosses))
 
-                overwrites = {
-                    guild.default_role: discord.PermissionOverwrite(
-                        read_messages=False
-                    ),
-                    guild.me: discord.PermissionOverwrite(read_messages=True),
-                }
-                if bot_role:
-                    overwrites[bot_role] = discord.PermissionOverwrite(
-                        read_messages=True
-                    )
-                for staff_role in staff_roles:
-                    if not staff_role:
-                        continue
-                    overwrites[staff_role] = discord.PermissionOverwrite(
-                        read_messages=True
-                    )
+                # overwrites = {
+                #     guild.default_role: discord.PermissionOverwrite(
+                #         read_messages=False
+                #     ),
+                #     guild.me: discord.PermissionOverwrite(read_messages=True),
+                # }
+                # if bot_role:
+                #     overwrites[bot_role] = discord.PermissionOverwrite(
+                #         read_messages=True
+                #     )
+                # for staff_role in staff_roles:
+                #     if not staff_role:
+                #         continue
+                #     overwrites[staff_role] = discord.PermissionOverwrite(
+                #         read_messages=True
+                #     )
                 toss_channel = await guild.create_text_channel(
                     c,
                     reason="Fluff Toss",
                     category=self.bot.pull_category(
                         guild, get_config(guild.id, "toss", "tosscategory")
                     ),
-                    overwrites=overwrites,
+                    # overwrites=overwrites,
                     topic=get_config(guild.id, "toss", "tosstopic"),
                 )
 
