@@ -283,11 +283,11 @@ class Basic(Cog):
             {
                 "name": "Banning & Unbanning",
                 "value": """This information is here for posterity. Trial staff are unable to use these commands.
-        `pls ban` will ban users. If you add a reason to this, the user will be DMed the reason. The user will also be DMed the ban appeal form.
-        `pls dban` or `pls bandel` with a variable from 0-7 (referring to days) at the end will ban a user and purge their messages from the last x days. You may also provide a reason. It will be DMed to them. 
-        `pls massban` can be used with user IDs to massban. It will not DM the users.
-        `pls unban` unbans a user. The reason can't be sent to the user. 
-        `pls sban` bans a user without DMing them the reason.""",
+`pls ban` will ban users. If you add a reason to this, the user will be DMed the reason. The user will also be DMed the ban appeal form.
+`pls dban` or `pls bandel` with a variable from 0-7 (referring to days) at the end will ban a user and purge their messages from the last x days. You may also provide a reason. It will be DMed to them. 
+`pls massban` can be used with user IDs to massban. It will not DM the users.
+`pls unban` unbans a user. The reason can't be sent to the user. 
+`pls sban` bans a user without DMing them the reason.""",
                 "inline": False
             },
             {
@@ -308,9 +308,9 @@ class Basic(Cog):
             {
                 "name": "Miscellaneous Moderation",
                 "value": """`pls speak [channel] [text]` will make me repeat what you say in a specific channel.
-        `pls reply [message link] [text]` will make me repeat what you said, replying to somebody else.
-        `pls react [message link] [emoji]` will make me react to someone's message with an emote. I can only use emotes I have access to!
-        `pls typing [channel] [duration]` will make me look like I'm typing in a channel for however long you set.""",
+`pls reply [message link] [text]` will make me repeat what you said, replying to somebody else.
+`pls react [message link] [emoji]` will make me react to someone's message with an emote. I can only use emotes I have access to!
+`pls typing [channel] [duration]` will make me look like I'm typing in a channel for however long you set.""",
                 "inline": False
             },
             {
