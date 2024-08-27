@@ -366,6 +366,18 @@ class ModToss(Cog):
             
             
 
+    @commands.bot_has_permissions(manage_roles=True, manage_channels=True)
+    @commands.check(ismod)
+    @commands.guild_only()
+    @commands.command(aliases=["unlockimgs"])
+    async def unlockimg(self, ctx: commands.Context):
+        guild = ctx.guild
+        toss_role = get_config(guild.id, "toss", "tossrole")
+        if ctx.channel.name in get_config(ctx.guild.id, "toss", "tosschannels"):
+            return await ctx.reply(f"I've let {toss_role.mention} use images!"), await ctx.channel.set_permissions(toss_role, embed_links=True, attach_files=True)
+        else:
+            return await ctx.reply("This isn't a toss session.. I'm not doing that!", mention_author=False)
+
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.bot_has_permissions(manage_roles=True, manage_channels=True)
     @commands.check(ismod)
