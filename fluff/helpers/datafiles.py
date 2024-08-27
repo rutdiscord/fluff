@@ -110,19 +110,6 @@ def set_tossfile(serverid, filename, contents):
 # Default Fills
 
 
-def fill_usertrack(serverid, userid, usertracks=None):
-    if not usertracks:
-        usertracks = get_guildfile(serverid, "usertrack")
-    uid = str(userid)
-    if uid not in usertracks:
-        usertracks[uid] = {
-            "jointime": 0,
-            "truedays": 0,
-        }
-
-    return usertracks, uid
-
-
 def fill_userlog(serverid, userid):
     userlogs = get_guildfile(serverid, "userlog")
     uid = str(userid)

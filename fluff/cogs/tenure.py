@@ -3,7 +3,8 @@ import asyncio
 from discord.ext.commands import Cog
 from discord.ext import commands
 from helpers.sv_config import get_config
-from helpers.checks import ismanager, isadmin
+from helpers.datafiles import get_userfile, set_userfile
+from helpers.checks import ismanager
 from datetime import datetime, timedelta, UTC
 from config import logchannel
 class Tenure(Cog):
@@ -29,7 +30,7 @@ class Tenure(Cog):
         )
     
     @commands.guild_only()
-    @commands.cooldown(1, 60, commands.BucketType.guild)
+    @commands.cooldown(1, 60, commands.BucketType.member)
     @commands.group(invoke_without_command=True)
     async def tenure(self, ctx):
         """This shows the user their tenure in the server.
@@ -40,6 +41,7 @@ class Tenure(Cog):
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
         
+        user_status = get_userfile(ctx.author.id, "tenure")["bl"]
         tenure_dt = await self.check_joindelta(ctx.author)
         tenure_days = tenure_dt.days
         tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
@@ -55,6 +57,7 @@ class Tenure(Cog):
             await ctx.reply(f"You joined around {tenure_days} (to be more exact, `{tenure_dt} (UTC)`) days ago! Not long enough, though.. try again in {(timedelta(days=tenure_threshold)-tenure_dt).days} days!",mention_author=False)
     
     @commands.check(ismanager)
+    @commands.cooldown(1, 43200, commands.BucketType.guild)
     @tenure.command()
     async def force_sync(self,ctx):
        """THIS WILL FORCEFULLY SYNCHRONIZE THE SERVER MEMBERS WITH THE TENURE ROLE.
@@ -97,6 +100,13 @@ class Tenure(Cog):
         
         if not self.enabled(msg.guild):
             return
+        
+        tenure_user = get_userfile(msg.author.id, "tenure")
+        
+        if "bl" not in tenure_user:
+            tenure_user["bl"] = False
+            set_userfile(msg.author.id, "tenure", tenure_user)
+            
         tenureconfig = self.get_tenureconfig(msg.guild)
         tenure_dt = await self.check_joindelta(msg.author)
         tenure_days = tenure_dt.days
