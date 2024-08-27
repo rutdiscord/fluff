@@ -296,8 +296,8 @@ class Basic(Cog):
                 "inline": True
             },
             {
-                "name": "Archiving & Closing Sessions",
-                "value": """When you're done with a session, close the muted channel with `pls close`. I will automatically send the archive to the Google Drive for you!""",
+                "name": "Session Commands",
+                "value": """Some commands are to be used inside of a toss session. Most imperatively is the `pls close` command, which closes the session that the command is invoked in. Sometimes though, a user may need to send an image or two during a toss session, which is why `pls unlockimages` is used to enable those permissions.""",
                 "inline": True
             },
             {
@@ -319,8 +319,8 @@ class Basic(Cog):
                 "inline": False
             },
             {
-                "name": "Rule Snippets",
-                "value": """If you need to call up a specific rule, you can use `pls rule [rulename]`. You can check the list of rule snippets with `pls rule`. You can create new rule snippets with `pls rule create`, and create an alias to an existing rule with `pls rule create [new name] [main name]`. You can delete a rule snippet with `pls rule delete`. You can edit a rule snippet with `pls rule edit`.""",
+                "name": "Rules and Snippets",
+                "value": """If you need to call up a specific rule, you can use `pls rule [rulename]`. Some rules have specific information which needs to be recalled repetitively, which is done with `pls snippets [snippet]`. All rules and snippets can be summarized by calling `pls rule` or `pls snippets` on their own.""",
                 "inline": True
             },
             {

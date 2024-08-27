@@ -369,7 +369,7 @@ class ModToss(Cog):
     @commands.bot_has_permissions(manage_roles=True, manage_channels=True)
     @commands.check(ismod)
     @commands.guild_only()
-    @commands.command(aliases=["unlockimgs"])
+    @commands.command(aliases=["unlockimage", "unlockimages", "unlockimgs", "unlockembeds", "unlockembed"])
     async def unlockimg(self, ctx: commands.Context):
         guild = ctx.guild
         toss_role = self.bot.pull_role(guild, get_config(guild.id, "toss", "tossrole"))
