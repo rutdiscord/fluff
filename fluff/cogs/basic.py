@@ -338,10 +338,10 @@ class Basic(Cog):
        embed2 = stock_embed(self.bot)
 
        for field in first_half:
-           embed1.add_field(name=field["name"], value=field["value"], inline=True)
+           embed1.add_field(name=field["name"], value=field["value"], inline=field["inline"])
 
        for field in second_half:
-           embed2.add_field(name=field["name"], value=field["value"], inline=True)
+           embed2.add_field(name=field["name"], value=field["value"], inline=field["inline"])
 
        await sympage(self.bot, ctx, [embed1, embed2], ["1️⃣","2️⃣"])
 
