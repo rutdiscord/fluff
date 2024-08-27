@@ -290,14 +290,14 @@ class ModToss(Cog):
         else:
             addition = False
             toss_channel = await self.new_session(ctx.guild)
+            await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a toss channel for {us.global_name} ({us.id})")
 
         for us in users:
             try:
                 failed_roles, previous_roles = await self.perform_toss(
                     us, ctx.author, toss_channel
                 )
-                await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a toss channel for {us.global_name} ({us.id})")
-                await toss_channel.set_permissions(us.guild.default_role, read_messages=False)
+
                 await toss_channel.set_permissions(us, read_messages=True)
             except commands.MissingPermissions:
                 errors += f"\n- {self.username_system(us)}\n  Missing permissions to toss this user."
@@ -845,12 +845,12 @@ class ModToss(Cog):
             )
         else:
             toss_channel = await self.new_session(message.guild)
+            await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a toss channel for {msgauthor.global_name} ({msgauthor.id})")
+
             try:
                 failed_roles, previous_roles = await self.perform_toss(
                         msgauthor, msgauthor.guild.me, toss_channel
                     )
-                await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a toss channel for {msgauthor.global_name} ({msgauthor.id})")
-                await toss_channel.set_permissions(msgauthor.guild.default_role, read_messages=False)
                 await toss_channel.set_permissions(msgauthor, read_messages=True)
                 await message.reply(f"{self.username_system(message.author)} has been automatically muted for blocking Fluff.")           
                 await toss_channel.send(
@@ -962,12 +962,11 @@ class ModToss(Cog):
             )
         else:
             toss_channel = await self.new_session(message.guild)
+            await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a toss channel for {msgauthor.global_name} ({msgauthor.id})")
             try:
                 failed_roles, previous_roles = await self.perform_toss(
                         msgauthor, msgauthor.guild.me, toss_channel
                     )
-                await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a toss channel for {msgauthor.global_name} ({msgauthor.id})")
-                await toss_channel.set_permissions(msgauthor.guild.default_role, read_messages=False)
                 await toss_channel.set_permissions(msgauthor, read_messages=True)
                 await message.reply(f"{self.username_system(message.author)} has been automatically muted for reaching the threshold for reply ping preference violation.")           
                 await toss_channel.send(
