@@ -113,6 +113,7 @@ class ModToss(Cog):
                     topic=get_config(guild.id, "toss", "tosstopic"),
                 )
 
+                await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a new toss session")
                 return toss_channel
 
     async def perform_toss(self, user, staff, toss_channel):
@@ -273,7 +274,6 @@ class ModToss(Cog):
         else:
             addition = False
             toss_channel = await self.new_session(ctx.guild)
-            await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a toss session for {us.global_name} ({us.id})")
 
         for us in users:
             try:
@@ -666,7 +666,6 @@ class ModToss(Cog):
             del tosses["LEFTGUILD"]
         set_tossfile(member.guild.id, "tosses", json.dumps(tosses))
 
-        await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a toss session for {member.global_name} ({member.id})")
         await toss_channel.set_permissions(member.guild.default_role, read_messages=False)
         await toss_channel.set_permissions(member, read_messages=True)
 
@@ -828,7 +827,6 @@ class ModToss(Cog):
             )
         else:
             toss_channel = await self.new_session(message.guild)
-            await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a toss session for {msgauthor.global_name} ({msgauthor.id})")
 
             try:
                 failed_roles, previous_roles = await self.perform_toss(
@@ -945,7 +943,6 @@ class ModToss(Cog):
             )
         else:
             toss_channel = await self.new_session(message.guild)
-            await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a toss session for {msgauthor.global_name} ({msgauthor.id})")
             try:
                 failed_roles, previous_roles = await self.perform_toss(
                         msgauthor, msgauthor.guild.me, toss_channel
