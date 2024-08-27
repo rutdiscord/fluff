@@ -296,7 +296,9 @@ class ModToss(Cog):
                 failed_roles, previous_roles = await self.perform_toss(
                     us, ctx.author, toss_channel
                 )
-                await toss_channel.set_permissions(us, read_messages=True)
+                await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a toss channel for {member.global_name} ({member.id})")
+                await toss_channel.set_permissions(member.guild.default_role, read_messages=False)
+                await toss_channel.set_permissions(member, read_messages=True)
             except commands.MissingPermissions:
                 errors += f"\n- {self.username_system(us)}\n  Missing permissions to toss this user."
                 continue
@@ -681,7 +683,10 @@ class ModToss(Cog):
             del tosses["LEFTGUILD"]
         set_tossfile(member.guild.id, "tosses", json.dumps(tosses))
 
+        await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a toss channel for {member.global_name} ({member.id})")
+        await toss_channel.set_permissions(member.guild.default_role, read_messages=False)
         await toss_channel.set_permissions(member, read_messages=True)
+
         tossmsg = await toss_channel.send(
             content=f"🔁 {self.username_system(member)} rejoined while tossed.\n{get_config(member.guild.id, 'toss', 'tossmsg_rejoin')}"
         )
@@ -844,6 +849,8 @@ class ModToss(Cog):
                 failed_roles, previous_roles = await self.perform_toss(
                         msgauthor, msgauthor.guild.me, toss_channel
                     )
+                await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a toss channel for {msgauthor.global_name} ({msgauthor.id})")
+                await toss_channel.set_permissions(msgauthor.guild.default_role, read_messages=False)
                 await toss_channel.set_permissions(msgauthor, read_messages=True)
                 await message.reply(f"{self.username_system(message.author)} has been automatically muted for blocking Fluff.")           
                 await toss_channel.send(
@@ -959,6 +966,8 @@ class ModToss(Cog):
                 failed_roles, previous_roles = await self.perform_toss(
                         msgauthor, msgauthor.guild.me, toss_channel
                     )
+                await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a toss channel for {msgauthor.global_name} ({msgauthor.id})")
+                await toss_channel.set_permissions(msgauthor.guild.default_role, read_messages=False)
                 await toss_channel.set_permissions(msgauthor, read_messages=True)
                 await message.reply(f"{self.username_system(message.author)} has been automatically muted for reaching the threshold for reply ping preference violation.")           
                 await toss_channel.send(
