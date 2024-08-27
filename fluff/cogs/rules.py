@@ -85,14 +85,14 @@ class Rules(Cog):
     @commands.guild_only()
     @commands.check(isadmin)
     async def delete(self, ctx: commands.Context, rule: str):
-        guild_Rules = get_guildfile(ctx.guild.id, "rules")
+        guild_rules = get_guildfile(ctx.guild.id, "rules")
 
-        if rule in guild_Rules:
-                del guild_Rules[rule]
-                set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_Rules))
-                return await ctx.reply(f"Snippet `{rule}` deleted successfully.")
+        if rule in guild_rules:
+                del guild_rules[rule]
+                set_guildfile(ctx.guild.id, "rules", json.dumps(guild_rules))
+                return await ctx.reply(f"Rule `{rule}` deleted successfully.")
         else:
-            return await ctx.reply(f"Snippet `{rule}` not found.")
+            return await ctx.reply(f"Rule `{rule}` not found.")
     
 async def setup(bot):
     await bot.add_cog(Rules(bot))
