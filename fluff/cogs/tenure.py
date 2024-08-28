@@ -98,13 +98,10 @@ class Tenure(Cog):
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
         
-        tenure = get_guildfile(ctx.guild.id, "tenure")
-        if not tenure["bl"]:
-            tenure["bl"] = []
-            pass
+        tenure = get_guildfile(msg.guild.id, "tenure").get("bl",[])
         for user in users:
-            if user.id not in tenure["bl"]:
-                tenure["bl"].append(user.id)
+            if user.id not in tenure:
+                tenure.append(user.id)
         
         set_guildfile(ctx.guild.id, "tenure_blacklist", tenure)
         await ctx.reply(f"Users have been blacklisted from being tenured.", mention_author=False)
@@ -129,7 +126,7 @@ class Tenure(Cog):
         logchannel_cached = self.bot.get_channel(logchannel)
         tenure_bl = get_guildfile(msg.guild.id, "tenure").get("bl",[])
 
-        if msg.author.id in tenure_bl["bl"]:
+        if msg.author.id in tenure_bl:
             return False
         
         if tenureconfig["threshold"] < tenure_days:
