@@ -105,16 +105,15 @@ class Tenure(Cog):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
         
         tenure = get_guildfile(ctx.guild.id, "tenure")
-        tenure_bl = None
         if "bl" in tenure:
-            tenure_bl = tenure["bl"]
+            pass
         else:
             tenure["bl"]  = []
-            tenure_bl = tenure["bl"]
+            return set_guildfile(ctx.guild.id, "tenure", json.dumps(tenure))
 
         for user in users:
-            if user.id not in tenure_bl:
-                tenure_bl.append(str(user.id))
+            if user.id not in tenure["bl"]:
+                tenure["bl"].append(str(user.id))
         
         set_guildfile(ctx.guild.id, "tenure", json.dumps(tenure))
         await ctx.reply("Users blacklisted from being tenured.", mention_author=False)
@@ -130,18 +129,17 @@ class Tenure(Cog):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
         
         tenure = get_guildfile(ctx.guild.id, "tenure")
-        tenure_bl = None
         if "bl" in tenure:
-            tenure_bl = tenure["bl"]
+            pass
         else:
             tenure["bl"]  = []
-            tenure_bl = tenure["bl"]
+            return set_guildfile(ctx.guild.id, "tenure", json.dumps(tenure))
 
         for user in users:
-            if user.id in tenure_bl:
-                del tenure_bl[tenure_bl.index(user.id)]
+            if user.id in tenure["bl"]:
+                del tenure["bl"][tenure["bl"].index(user.id)]
         
-        set_guildfile(ctx.guild.id, "tenure", json.dumps({"bl": tenure_bl}))
+        set_guildfile(ctx.guild.id, "tenure", json.dumps(tenure))
         await ctx.reply("Users whitelisted for being tenured.", mention_author=False)
 
 
@@ -164,14 +162,13 @@ class Tenure(Cog):
         tenure_days = tenure_dt.days
         logchannel_cached = self.bot.get_channel(logchannel)
         tenure = get_guildfile(msg.guild.id, "tenure")
-        tenure_bl = None
         if "bl" in tenure:
-            tenure_bl = tenure["bl"]
+                pass
         else:
-            tenure["bl"]  = []
-            tenure_bl = tenure["bl"]
+                tenure["bl"]  = []
+                return set_guildfile(msg.guild.id, "tenure", json.dumps(tenure))
 
-        if msg.author.id in tenure_bl:
+        if msg.author.id in tenure["bl"]:
             return False
         
         if tenureconfig["threshold"] < tenure_days:
