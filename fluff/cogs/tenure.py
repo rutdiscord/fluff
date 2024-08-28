@@ -145,9 +145,9 @@ class Tenure(Cog):
         tenure_dt = await self.check_joindelta(msg.author)
         tenure_days = tenure_dt.days
         logchannel_cached = self.bot.get_channel(logchannel)
-        tenure = get_aguildfile(msg.guild.id, "tenure")
-        
-        if msg.author.id in tenure["bl"]:
+        tenure = get_aguildfile(msg.guild.id, "tenure_bl")
+
+        if msg.author.id in tenure:
             return False
         
         if tenureconfig["threshold"] < tenure_days:
