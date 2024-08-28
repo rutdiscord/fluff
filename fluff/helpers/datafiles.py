@@ -83,6 +83,27 @@ def set_guildfile(serverid, filename, contents):
     with open(f"data/servers/{serverid}/{filename}.json", "w") as f:
         f.write(contents)
 
+# Guild array files
+
+def make_aguildfile(serverid, filename):
+    if not os.path.exists(f"data/servers/{serverid}"):
+        os.makedirs(f"data/servers/{serverid}")
+    with open(f"data/servers/{serverid}/{filename}.json", "w") as f:
+        f.write("[]")
+        return json.loads("[]")
+
+
+def get_aguildfile(serverid, filename):
+    if not os.path.exists(f"data/servers/{serverid}/{filename}.json"):
+        make_guildfile(serverid, filename)
+    with open(f"data/servers/{serverid}/{filename}.json", "r") as f:
+        return json.load(f)
+
+
+def set_aguildfile(serverid, filename, contents):
+    with open(f"data/servers/{serverid}/{filename}.json", "w") as f:
+        f.write(contents)
+
 
 # Toss Files
 

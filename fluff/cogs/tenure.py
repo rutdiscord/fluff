@@ -3,7 +3,7 @@ import json
 from discord.ext.commands import Cog
 from discord.ext import commands
 from helpers.sv_config import get_config
-from helpers.datafiles import get_guildfile, set_guildfile
+from helpers.datafiles import get_aguildfile, set_aguildfile
 from helpers.checks import ismanager, isadmin
 from datetime import datetime, timedelta, UTC
 from config import logchannel
@@ -45,13 +45,7 @@ class Tenure(Cog):
         tenure_days = tenure_dt.days
         tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
         tenure_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role"))
-        tenure = get_guildfile(ctx.guild.id, "tenure")
-        tenure_bl = None
-        if "bl" in tenure:
-            tenure_bl = tenure["bl"]
-        else:
-            tenure["bl"]  = []
-            tenure_bl = tenure["bl"]
+        tenure_bl = get_aguildfile(ctx.guild.id, "tenure_bl")
 
         if str(ctx.author.id) in tenure_bl:
             return await ctx.reply("You're blacklisted from being Tenured, go away! *thump*", mention_author=False)
@@ -104,18 +98,13 @@ class Tenure(Cog):
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
         
-        tenure = get_guildfile(ctx.guild.id, "tenure")
-        if "bl" in tenure:
-            pass
-        else:
-            tenure["bl"]  = []
-            return set_guildfile(ctx.guild.id, "tenure", json.dumps(tenure))
+        tenure_bl = get_aguildfile(ctx.guild.id, "tenure_bl")
 
         for user in users:
-            if user.id not in tenure["bl"]:
-                tenure["bl"].append(str(user.id))
+            if user.id not in tenure_bl:
+                tenure_bl.append(str(user.id))
         
-        set_guildfile(ctx.guild.id, "tenure", json.dumps(tenure))
+        set_aguildfile(ctx.guild.id, "tenure_bl", json.dumps(tenure_bl))
         await ctx.reply("Users blacklisted from being tenured.", mention_author=False)
 
     @tenure.command(aliases=["enable", "wl", "allow"])
@@ -128,18 +117,13 @@ class Tenure(Cog):
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
         
-        tenure = get_guildfile(ctx.guild.id, "tenure")
-        if "bl" in tenure:
-            pass
-        else:
-            tenure["bl"]  = []
-            return set_guildfile(ctx.guild.id, "tenure", json.dumps(tenure))
+        tenure_bl = get_aguildfile(ctx.guild.id, "tenure_bl")
 
         for user in users:
-            if user.id in tenure["bl"]:
-                del tenure["bl"][tenure["bl"].index(user.id)]
+            if user.id in tenure_bl:
+                del tenure_bl[tenure_bl.index(str(user.id))]
         
-        set_guildfile(ctx.guild.id, "tenure", json.dumps(tenure))
+        set_aguildfile(ctx.guild.id, "tenure_bl", json.dumps(tenure_bl))
         await ctx.reply("Users whitelisted for being tenured.", mention_author=False)
 
 
@@ -161,13 +145,8 @@ class Tenure(Cog):
         tenure_dt = await self.check_joindelta(msg.author)
         tenure_days = tenure_dt.days
         logchannel_cached = self.bot.get_channel(logchannel)
-        tenure = get_guildfile(msg.guild.id, "tenure")
-        if "bl" in tenure:
-                pass
-        else:
-                tenure["bl"]  = []
-                return set_guildfile(msg.guild.id, "tenure", json.dumps(tenure))
-
+        tenure = get_aguildfile(msg.guild.id, "tenure")
+        
         if msg.author.id in tenure["bl"]:
             return False
         
