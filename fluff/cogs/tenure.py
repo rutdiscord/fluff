@@ -46,7 +46,11 @@ class Tenure(Cog):
         tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
         tenure_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role"))
         tenure = get_guildfile(ctx.guild.id, "tenure")
-        tenure_bl = tenure.get("bl",[])
+        tenure_bl = None
+        if tenure["bl"]:
+            tenure_bl = tenure["bl"]
+        else:
+            tenure["bl"]  = []
 
         if ctx.author.id in tenure_bl:
             return await ctx.reply("You're blacklisted from being Tenured, go away! *thump*", mention_author=False)
@@ -100,7 +104,11 @@ class Tenure(Cog):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
         
         tenure = get_guildfile(ctx.guild.id, "tenure")
-        tenure_bl = tenure.get("bl",[])
+        tenure_bl = None
+        if tenure["bl"]:
+            tenure_bl = tenure["bl"]
+        else:
+            tenure["bl"]  = []
         for user in users:
             if user.id not in tenure_bl:
                 tenure_bl.append(str(user.id))
@@ -127,7 +135,11 @@ class Tenure(Cog):
         tenure_days = tenure_dt.days
         logchannel_cached = self.bot.get_channel(logchannel)
         tenure = get_guildfile(msg.guild.id, "tenure")
-        tenure_bl = tenure.get("bl",[])
+        tenure_bl = None
+        if tenure["bl"]:
+            tenure_bl = tenure["bl"]
+        else:
+            tenure["bl"]  = []
 
         if msg.author.id in tenure_bl:
             return False
