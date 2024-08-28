@@ -116,7 +116,33 @@ class Tenure(Cog):
                 tenure_bl.append(str(user.id))
         
         set_guildfile(ctx.guild.id, "tenure", json.dumps(tenure))
-        await ctx.reply(f"Users have been blacklisted from being tenured. `{tenure}`", mention_author=False)
+        await ctx.reply("Users blacklisted from being tenured.", mention_author=False)
+
+    @tenure.command(aliases=["enable", "wl", "allow"])
+    @commands.check(isadmin)
+    async def whitelist(self, ctx, users: commands.Greedy[discord.Member]):
+        """This will whitelist users to be tenured.
+
+        - `users`
+        A list of users to whitelist for being tenured."""
+        if not self.enabled(ctx.guild):
+            return await ctx.reply(self.nocfgmsg, mention_author=False)
+        
+        tenure = get_guildfile(ctx.guild.id, "tenure")
+        tenure_bl = None
+        if "bl" in tenure:
+            tenure_bl = tenure["bl"]
+        else:
+            tenure["bl"]  = []
+            tenure_bl = tenure["bl"]
+
+        for user in users:
+            if user.id in tenure_bl:
+                tenure_bl.remove(str(user.id))
+        
+        set_guildfile(ctx.guild.id, "tenure", json.dumps(tenure))
+        await ctx.reply("Users whitelisted for being tenured.", mention_author=False)
+
 
     @Cog.listener()
     async def on_message(self, msg):
