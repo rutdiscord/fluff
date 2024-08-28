@@ -98,7 +98,7 @@ class Tenure(Cog):
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
         
-        tenure = get_guildfile(msg.guild.id, "tenure").get("bl",[])
+        tenure = get_guildfile(ctx.guild.id, "tenure").get("bl",[])
         for user in users:
             if user.id not in tenure:
                 tenure.append(user.id)
