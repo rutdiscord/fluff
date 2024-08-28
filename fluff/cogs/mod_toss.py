@@ -943,10 +943,15 @@ class ModToss(Cog):
         if self.get_session(msgauthor) and toss_role in msgauthor.roles:
                 error += (
                     f"\n- {self.username_system(msgauthor)}\n  This user is already tossed."
-                )
-                return error
-                
+                )    
 
+        if len(error) > 0:
+            return await notify_channel.send(
+                f"Error in toss command from {msgauthor.mention}'s reply ping preference violation...\n```diff"
+                + error
+                + "\n```\n"
+            )
+        
         if all(
             [
                 c in [g.name for g in message.guild.channels]
