@@ -104,16 +104,32 @@ class ModToss(Cog):
                     tosses[c] = {"tossed": {}, "untossed": [], "left": []}
                     set_tossfile(guild.id, "tosses", json.dumps(tosses))
 
+                overwrites = {
+                    guild.default_role: discord.PermissionOverwrite(
+                        read_messages=False
+                    ),
+                    guild.me: discord.PermissionOverwrite(read_messages=True),
+                }
+                if bot_role:
+                    overwrites[bot_role] = discord.PermissionOverwrite(
+                        read_messages=True
+                    )
+                for staff_role in staff_roles:
+                    if not staff_role:
+                        continue
+                    overwrites[staff_role] = discord.PermissionOverwrite(
+                        read_messages=True
+                    )
                 toss_channel = await guild.create_text_channel(
                     c,
                     reason="Fluff Toss",
                     category=self.bot.pull_category(
                         guild, get_config(guild.id, "toss", "tosscategory")
                     ),
+                    overwrites=overwrites,
                     topic=get_config(guild.id, "toss", "tosstopic"),
                 )
 
-                await toss_channel.edit(sync_permissions=True, reason=f"Fluff is creating a new toss session")
                 return toss_channel
 
     async def perform_toss(self, user, staff, toss_channel):
@@ -280,7 +296,6 @@ class ModToss(Cog):
                 failed_roles, previous_roles = await self.perform_toss(
                     us, ctx.author, toss_channel
                 )
-
                 await toss_channel.set_permissions(us, read_messages=True)
             except commands.MissingPermissions:
                 errors += f"\n- {self.username_system(us)}\n  Missing permissions to toss this user."
@@ -365,18 +380,6 @@ class ModToss(Cog):
                     return
             
             
-
-    @commands.bot_has_permissions(manage_roles=True, manage_channels=True)
-    @commands.check(ismod)
-    @commands.guild_only()
-    @commands.command(aliases=["unlockimage", "unlockimages", "unlockimgs", "unlockembeds", "unlockembed"])
-    async def unlockimg(self, ctx: commands.Context):
-        guild = ctx.guild
-        toss_role = self.bot.pull_role(guild, get_config(guild.id, "toss", "tossrole"))
-        if ctx.channel.name in get_config(ctx.guild.id, "toss", "tosschannels"):
-            return await ctx.reply(f"I've let {toss_role.mention} use images!", mention_author=False), await ctx.channel.set_permissions(toss_role, embed_links=True, attach_files=True)
-        else:
-            return await ctx.reply("This isn't a toss session.. I'm not doing that!", mention_author=False)
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.bot_has_permissions(manage_roles=True, manage_channels=True)
@@ -678,9 +681,7 @@ class ModToss(Cog):
             del tosses["LEFTGUILD"]
         set_tossfile(member.guild.id, "tosses", json.dumps(tosses))
 
-        await toss_channel.set_permissions(member.guild.default_role, read_messages=False)
         await toss_channel.set_permissions(member, read_messages=True)
-
         tossmsg = await toss_channel.send(
             content=f"🔁 {self.username_system(member)} rejoined while tossed.\n{get_config(member.guild.id, 'toss', 'tossmsg_rejoin')}"
         )
@@ -839,7 +840,6 @@ class ModToss(Cog):
             )
         else:
             toss_channel = await self.new_session(message.guild)
-
             try:
                 failed_roles, previous_roles = await self.perform_toss(
                         msgauthor, msgauthor.guild.me, toss_channel
