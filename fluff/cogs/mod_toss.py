@@ -136,6 +136,10 @@ class ModToss(Cog):
         toss_role = self.bot.pull_role(
             user.guild, get_config(user.guild.id, "toss", "tossrole")
         )
+
+        if toss_role in user.roles:
+            return False
+        
         roles = []
         for rx in user.roles:
             if rx != user.guild.default_role and rx != toss_role:
@@ -940,6 +944,8 @@ class ModToss(Cog):
                 error += (
                     f"\n- {self.username_system(msgauthor)}\n  This user is already tossed."
                 )
+                return error
+                
 
         if all(
             [
@@ -949,7 +955,7 @@ class ModToss(Cog):
         ):
             await message.add_reaction("🚫")
             return await notify_channel.send(
-                f"Error in toss command from {msgauthor.mention}...\n- No toss channels available.\n```diff"
+                f"Error in toss command from {msgauthor.mention}'s reply ping preference violation...\n- No toss channels available.\n```diff"
                 + error
                 + "\n```\n"
             )
