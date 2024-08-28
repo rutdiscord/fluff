@@ -140,6 +140,7 @@ class Tenure(Cog):
         for user in users:
             if user.id in tenure_bl:
                 tenure_bl.remove(str(user.id))
+                tenure["bl"] = tenure_bl
         
         set_guildfile(ctx.guild.id, "tenure", json.dumps({"bl": tenure_bl}))
         await ctx.reply("Users whitelisted for being tenured.", mention_author=False)
