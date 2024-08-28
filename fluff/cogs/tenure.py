@@ -1,9 +1,8 @@
 import discord
-import json
+import asyncio
 from discord.ext.commands import Cog
 from discord.ext import commands
 from helpers.sv_config import get_config
-from helpers.datafiles import get_aguildfile, set_aguildfile
 from helpers.checks import ismanager, isadmin
 from datetime import datetime, timedelta, UTC
 from config import logchannel
@@ -30,7 +29,7 @@ class Tenure(Cog):
         )
     
     @commands.guild_only()
-    @commands.cooldown(1, 60, commands.BucketType.member)
+    @commands.cooldown(1, 60, commands.BucketType.guild)
     @commands.group(invoke_without_command=True)
     async def tenure(self, ctx):
         """This shows the user their tenure in the server.
@@ -45,10 +44,6 @@ class Tenure(Cog):
         tenure_days = tenure_dt.days
         tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
         tenure_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role"))
-        tenure_bl = get_aguildfile(ctx.guild.id, "tenure_bl")
-
-        if str(ctx.author.id) in tenure_bl:
-            return await ctx.reply("You're blacklisted from being Tenured, go away! *thump*", mention_author=False)
 
         if tenure_threshold < tenure_days:
            if tenure_role not in ctx.author.roles:
@@ -60,7 +55,6 @@ class Tenure(Cog):
             await ctx.reply(f"You joined around {tenure_days} (to be more exact, `{tenure_dt} (UTC)`) days ago! Not long enough, though.. try again in {(timedelta(days=tenure_threshold)-tenure_dt).days} days!",mention_author=False)
     
     @commands.check(ismanager)
-    @commands.cooldown(1, 43200, commands.BucketType.guild)
     @tenure.command()
     async def force_sync(self,ctx):
        """THIS WILL FORCEFULLY SYNCHRONIZE THE SERVER MEMBERS WITH THE TENURE ROLE.
@@ -88,43 +82,6 @@ class Tenure(Cog):
                 else:
                     return
 
-    @tenure.command(aliases=["disable", "bl", "ignore"])
-    @commands.check(isadmin)
-    async def blacklist(self, ctx, users: commands.Greedy[discord.Member]):
-        """This will blacklist users from being tenured.
-
-        - `users`
-        A list of users to blacklist from being tenured."""
-        if not self.enabled(ctx.guild):
-            return await ctx.reply(self.nocfgmsg, mention_author=False)
-        
-        tenure_bl = get_aguildfile(ctx.guild.id, "tenure_bl")
-
-        for user in users:
-            if user.id not in tenure_bl:
-                tenure_bl.append(str(user.id))
-        
-        set_aguildfile(ctx.guild.id, "tenure_bl", json.dumps(tenure_bl))
-        await ctx.reply("Users blacklisted from being tenured.", mention_author=False)
-
-    @tenure.command(aliases=["enable", "wl", "allow"])
-    @commands.check(isadmin)
-    async def whitelist(self, ctx, users: commands.Greedy[discord.Member]):
-        """This will whitelist users to be tenured.
-
-        - `users`
-        A list of users to whitelist for being tenured."""
-        if not self.enabled(ctx.guild):
-            return await ctx.reply(self.nocfgmsg, mention_author=False)
-        
-        tenure_bl = get_aguildfile(ctx.guild.id, "tenure_bl")
-
-        for user in users:
-            if user.id in tenure_bl:
-                del tenure_bl[tenure_bl.index(str(user.id))]
-        
-        set_aguildfile(ctx.guild.id, "tenure_bl", json.dumps(tenure_bl))
-        await ctx.reply("Users whitelisted for being tenured.", mention_author=False)
 
 
     @Cog.listener()
@@ -140,22 +97,16 @@ class Tenure(Cog):
         
         if not self.enabled(msg.guild):
             return
-        
         tenureconfig = self.get_tenureconfig(msg.guild)
         tenure_dt = await self.check_joindelta(msg.author)
         tenure_days = tenure_dt.days
         logchannel_cached = self.bot.get_channel(logchannel)
-        tenure = get_aguildfile(msg.guild.id, "tenure_bl")
 
-        if msg.author.id in tenure:
-            return False
-        
         if tenureconfig["threshold"] < tenure_days:
             if tenureconfig["role"] not in msg.author.roles:
                 await msg.author.add_roles(tenureconfig["role"], reason="Fluff Tenure")
                 if logchannel_cached:
                     await logchannel_cached.send(f":infinity: **{msg.guild.name}** {msg.author.mention} has been assigned the {tenureconfig['role'].name} role.")
-
         
 
 async def setup(bot: discord.Client):
