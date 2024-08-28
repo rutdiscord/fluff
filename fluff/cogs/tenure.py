@@ -4,7 +4,7 @@ from discord.ext.commands import Cog
 from discord.ext import commands
 from helpers.sv_config import get_config
 from helpers.datafiles import get_guildfile, set_guildfile
-from helpers.checks import ismanager
+from helpers.checks import ismanager, isadmin
 from datetime import datetime, timedelta, UTC
 from config import logchannel
 class Tenure(Cog):
@@ -45,6 +45,10 @@ class Tenure(Cog):
         tenure_days = tenure_dt.days
         tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
         tenure_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role"))
+        tenure_bl = get_guildfile(ctx.guild.id, "tenure_blacklist")
+
+        if ctx.author.id in tenure_bl:
+            return await ctx.reply("You're blacklisted from being Tenured, go away! *thump*", mention_author=False)
 
         if tenure_threshold < tenure_days:
            if tenure_role not in ctx.author.roles:
@@ -84,7 +88,26 @@ class Tenure(Cog):
                 else:
                     return
 
+    @tenure.command(aliases=["disable", "bl", "ignore"])
+    @commands.check(isadmin)
+    async def blacklist(self, ctx, users: commands.Greedy[discord.Member]):
+        """This will blacklist users from being tenured.
 
+        - `users`
+        A list of users to blacklist from being tenured."""
+        if not self.enabled(ctx.guild):
+            return await ctx.reply(self.nocfgmsg, mention_author=False)
+        
+        tenure = get_guildfile(ctx.guild.id, "tenure")
+        if not tenure["bl"]:
+            tenure["bl"] = []
+            pass
+        for user in users:
+            if user.id not in tenure["bl"]:
+                tenure["bl"].append(user.id)
+        
+        set_guildfile(ctx.guild.id, "tenure_blacklist", tenure)
+        await ctx.reply(f"Users have been blacklisted from being tenured.", mention_author=False)
 
     @Cog.listener()
     async def on_message(self, msg):
@@ -104,12 +127,21 @@ class Tenure(Cog):
         tenure_dt = await self.check_joindelta(msg.author)
         tenure_days = tenure_dt.days
         logchannel_cached = self.bot.get_channel(logchannel)
+        tenure = get_guildfile(msg.guild.id, "tenure")
 
+        if not tenure["bl"]:
+            tenure["bl"] = []
+            pass
+
+        if msg.author.id in tenure["bl"]:
+            return False
+        
         if tenureconfig["threshold"] < tenure_days:
             if tenureconfig["role"] not in msg.author.roles:
                 await msg.author.add_roles(tenureconfig["role"], reason="Fluff Tenure")
                 if logchannel_cached:
                     await logchannel_cached.send(f":infinity: **{msg.guild.name}** {msg.author.mention} has been assigned the {tenureconfig['role'].name} role.")
+
         
 
 async def setup(bot: discord.Client):

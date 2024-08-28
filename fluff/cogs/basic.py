@@ -191,7 +191,7 @@ class Basic(Cog):
             "Staff List": "`pls staff` will show all active staff.",
             "Join Graph": "`pls joingraph` shows a graph of users who have joined.",
             "Join Score": "`pls joinscore` shows when you joined in comparison to other users.",
-            "Rule Snippets": "`pls rule` will display a list of rule snippets. You can individually call them with their names, `pls rule [name]`. Useful for people who are confused about the rules!",
+            "Rules and Snippets": "`pls rule` will display a list of rules, while `pls snippets` will display frequently recalled information that is good to have on hand.",
             "Ping Preferences": "`pls replyconfig` will allow you to change your ping preferences, AKA whether you'd like to be pinged always, never, or after a delay.",
             "Rolling the Dice": "`pls choose [options separated by spaces]` will choose something at random for you.",
             "Timer": "`pls timer [duration in minutes, max 60]` I will start a timer for you and ping you when it's done. By default I will set it for 5 minutes.",
