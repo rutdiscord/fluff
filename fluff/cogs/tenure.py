@@ -45,7 +45,7 @@ class Tenure(Cog):
         tenure_days = tenure_dt.days
         tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
         tenure_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role"))
-        tenure_bl = get_guildfile(ctx.guild.id, "tenure_blacklist")
+        tenure_bl = get_guildfile(ctx.guild.id, "tenure").get("bl",[])
 
         if ctx.author.id in tenure_bl:
             return await ctx.reply("You're blacklisted from being Tenured, go away! *thump*", mention_author=False)
@@ -127,13 +127,9 @@ class Tenure(Cog):
         tenure_dt = await self.check_joindelta(msg.author)
         tenure_days = tenure_dt.days
         logchannel_cached = self.bot.get_channel(logchannel)
-        tenure = get_guildfile(msg.guild.id, "tenure")
+        tenure_bl = get_guildfile(msg.guild.id, "tenure").get("bl",[])
 
-        if not tenure["bl"]:
-            tenure["bl"] = []
-            pass
-
-        if msg.author.id in tenure["bl"]:
+        if msg.author.id in tenure_bl["bl"]:
             return False
         
         if tenureconfig["threshold"] < tenure_days:
