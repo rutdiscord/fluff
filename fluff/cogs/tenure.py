@@ -52,7 +52,7 @@ class Tenure(Cog):
         else:
             tenure["bl"]  = []
             tenure_bl = tenure["bl"]
-            
+
         if str(ctx.author.id) in tenure_bl:
             return await ctx.reply("You're blacklisted from being Tenured, go away! *thump*", mention_author=False)
 
@@ -141,7 +141,7 @@ class Tenure(Cog):
             if user.id in tenure_bl:
                 tenure_bl.remove(str(user.id))
         
-        set_guildfile(ctx.guild.id, "tenure", json.dumps(tenure))
+        set_guildfile(ctx.guild.id, "tenure", {"bl": tenure_bl})
         await ctx.reply("Users whitelisted for being tenured.", mention_author=False)
 
 
