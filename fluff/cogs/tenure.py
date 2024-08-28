@@ -103,7 +103,7 @@ class Tenure(Cog):
         tenure_bl = tenure.get("bl",[])
         for user in users:
             if user.id not in tenure_bl:
-                tenure.append(user.id)
+                tenure_bl.append(user.id)
         
         set_guildfile(ctx.guild.id, "tenure_blacklist", json.dumps(tenure))
         await ctx.reply(f"Users have been blacklisted from being tenured.", mention_author=False)
