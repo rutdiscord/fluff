@@ -27,7 +27,6 @@ class Snippets(Cog):
         - `name`
         The name of the snippet to post. Optional."""
         guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
-        name = name.lower()
         if not name:
             embed = stock_embed(self.bot)
             embed.title = "Available Snippets"
@@ -69,6 +68,7 @@ class Snippets(Cog):
                         os.remove(f"temp/snippets-{ctx.guild.id}.txt")
                     
         else:
+            name = name.lower()
             if name in guild_snippets:
                 if ctx.message.reference != None and isinstance(ctx.message.reference.resolved, discord.Message):
                     referenced_message = ctx.message.reference.resolved
