@@ -105,7 +105,7 @@ class Tenure(Cog):
             if user.id not in tenure_bl:
                 tenure_bl.append(user.id)
         
-        set_guildfile(ctx.guild.id, "tenure_blacklist", json.dumps(tenure))
+        set_guildfile(ctx.guild.id, "tenure", json.dumps(tenure))
         await ctx.reply(f"Users have been blacklisted from being tenured.", mention_author=False)
 
     @Cog.listener()
