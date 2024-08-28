@@ -1,5 +1,5 @@
 import discord
-import asyncio
+import json
 from discord.ext.commands import Cog
 from discord.ext import commands
 from helpers.sv_config import get_config
@@ -45,7 +45,8 @@ class Tenure(Cog):
         tenure_days = tenure_dt.days
         tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
         tenure_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role"))
-        tenure_bl = get_guildfile(ctx.guild.id, "tenure").get("bl",[])
+        tenure = get_guildfile(ctx.guild.id, "tenure")
+        tenure_bl = tenure.get("bl",[])
 
         if ctx.author.id in tenure_bl:
             return await ctx.reply("You're blacklisted from being Tenured, go away! *thump*", mention_author=False)
@@ -98,12 +99,13 @@ class Tenure(Cog):
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
         
-        tenure = get_guildfile(ctx.guild.id, "tenure").get("bl",[])
+        tenure = get_guildfile(ctx.guild.id, "tenure")
+        tenure_bl = tenure.get("bl",[])
         for user in users:
-            if user.id not in tenure:
+            if user.id not in tenure_bl:
                 tenure.append(user.id)
         
-        set_guildfile(ctx.guild.id, "tenure_blacklist", tenure)
+        set_guildfile(ctx.guild.id, "tenure_blacklist", json.dumps(tenure))
         await ctx.reply(f"Users have been blacklisted from being tenured.", mention_author=False)
 
     @Cog.listener()
@@ -124,7 +126,8 @@ class Tenure(Cog):
         tenure_dt = await self.check_joindelta(msg.author)
         tenure_days = tenure_dt.days
         logchannel_cached = self.bot.get_channel(logchannel)
-        tenure_bl = get_guildfile(msg.guild.id, "tenure").get("bl",[])
+        tenure = get_guildfile(msg.guild.id, "tenure")
+        tenure_bl = tenure.get("bl",[])
 
         if msg.author.id in tenure_bl:
             return False
