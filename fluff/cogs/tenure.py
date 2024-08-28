@@ -52,7 +52,8 @@ class Tenure(Cog):
         else:
             tenure["bl"]  = []
             tenure_bl = tenure["bl"]
-        if ctx.author.id in tenure_bl:
+            
+        if str(ctx.author.id) in tenure_bl:
             return await ctx.reply("You're blacklisted from being Tenured, go away! *thump*", mention_author=False)
 
         if tenure_threshold < tenure_days:
