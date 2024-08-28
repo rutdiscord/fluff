@@ -4,7 +4,7 @@ import os
 from discord.ext import commands
 from discord.ext.commands import Cog
 from helpers.checks import isadmin
-from helpers.embeds import stock_embed
+from helpers.embeds import stock_embed, sympage
 from helpers.datafiles import get_guildfile, set_guildfile
 
 class Snippets(Cog):
@@ -27,11 +27,18 @@ class Snippets(Cog):
         - `name`
         The name of the snippet to post. Optional."""
         guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
+
         if not name:
             embed = stock_embed(self.bot)
-            embed.title = "Available Snippets"
+            embed.title = "Available Snippets [1/2]"
             embed.color = discord.Color.red()
             embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
+            
+            embed_two = stock_embed(self.bot)
+            embed_two.title = "Available Snippets [2/2]"
+            embed_two.color = discord.Color.red()
+            embed_two.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
+
             if not guild_snippets:
                 embed.add_field(
                     name = "No Snippets",
@@ -39,18 +46,27 @@ class Snippets(Cog):
                     inline=True,
                 )
             else:
-                for snippet in guild_snippets:
+                # this is an incredibly stupid way to do this but it works
+                for snippet_onehalf in guild_snippets[:len(guild_snippets)//2]:
                         embed.add_field(
                             name = f"**{snippet}**",
-                            value = ("> " + discord.utils.remove_markdown(guild_snippets[snippet]["content"][:60]) + "_..._"
-                                        + f'\n**Aliases**: _{", ".join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"}_'
+                            value = ("> " + discord.utils.remove_markdown(guild_snippets[snippet_onehalf]["content"][:60]) + "_..._"
+                                        + f'\n**Aliases**: _{", ".join(guild_snippets[snippet_onehalf]["aliases"]) if len(guild_snippets[snippet_onehalf]["aliases"]) > 0 else "None"}_'
                             )
                             ,
                             inline=True,
                         )
-
+                for snippet_twohalf in guild_snippets[len(guild_snippets)//2:]:
+                        embed_two.add_field(
+                            name = f"**{snippet}**",
+                            value = ("> " + discord.utils.remove_markdown(guild_snippets[snippet_twohalf]["content"][:60]) + "_..._"
+                                        + f'\n**Aliases**: _{", ".join(guild_snippets[snippet_twohalf]["aliases"]) if len(guild_snippets[snippet_twohalf]["aliases"]) > 0 else "None"}_'
+                            )
+                            ,
+                            inline=True,
+                        )
             try:
-                await ctx.reply(embed=embed, mention_author=False)
+                await sympage(self.bot, ctx, [embed, embed_two])
             except discord.errors.HTTPException as exception: # Over 25 embed fields
                 if exception.code == 50035:
                     file_content = ""
