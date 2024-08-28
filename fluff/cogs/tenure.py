@@ -45,7 +45,7 @@ class Tenure(Cog):
         tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
         tenure_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role"))
 
-        if tenure_threshold < tenure_days:
+        if tenure_days >= tenure_threshold:
            if tenure_role not in ctx.author.roles:
             await ctx.author.add_roles(tenure_role, reason="Fluff Tenure")
             return await ctx.reply(f"You joined around {tenure_days} (to be more exact, `{tenure_dt} (UTC)`) days ago! You've been here long enough to be assigned the {tenure_role.name} role!",mention_author=False)
