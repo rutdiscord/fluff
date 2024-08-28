@@ -51,7 +51,7 @@ class Tenure(Cog):
             tenure_bl = tenure["bl"]
         else:
             tenure["bl"]  = []
-
+            tenure_bl = tenure["bl"]
         if ctx.author.id in tenure_bl:
             return await ctx.reply("You're blacklisted from being Tenured, go away! *thump*", mention_author=False)
 
@@ -109,6 +109,7 @@ class Tenure(Cog):
             tenure_bl = tenure["bl"]
         else:
             tenure["bl"]  = []
+            tenure_bl = tenure["bl"]
 
         for user in users:
             if user.id not in tenure_bl:
@@ -141,6 +142,7 @@ class Tenure(Cog):
             tenure_bl = tenure["bl"]
         else:
             tenure["bl"]  = []
+            tenure_bl = tenure["bl"]
 
         if msg.author.id in tenure_bl:
             return False
