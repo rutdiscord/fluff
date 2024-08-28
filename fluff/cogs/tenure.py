@@ -47,7 +47,7 @@ class Tenure(Cog):
         tenure_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role"))
         tenure = get_guildfile(ctx.guild.id, "tenure")
         tenure_bl = None
-        if tenure["bl"]:
+        if "bl" in tenure:
             tenure_bl = tenure["bl"]
         else:
             tenure["bl"]  = []
@@ -105,10 +105,11 @@ class Tenure(Cog):
         
         tenure = get_guildfile(ctx.guild.id, "tenure")
         tenure_bl = None
-        if tenure["bl"]:
+        if "bl" in tenure:
             tenure_bl = tenure["bl"]
         else:
             tenure["bl"]  = []
+
         for user in users:
             if user.id not in tenure_bl:
                 tenure_bl.append(str(user.id))
@@ -136,7 +137,7 @@ class Tenure(Cog):
         logchannel_cached = self.bot.get_channel(logchannel)
         tenure = get_guildfile(msg.guild.id, "tenure")
         tenure_bl = None
-        if tenure["bl"]:
+        if "bl" in tenure:
             tenure_bl = tenure["bl"]
         else:
             tenure["bl"]  = []
