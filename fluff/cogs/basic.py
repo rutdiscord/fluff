@@ -71,9 +71,12 @@ class Basic(Cog):
         time = minutes * 60
         await ctx.message.add_reaction("⏳")
         await asyncio.sleep(time)
-        await ctx.message.remove_reaction("⏳", self.bot.user)
-        msg = await ctx.channel.send(content=ctx.author.mention)
-        await msg.edit(content="⌛", delete_after=5)
+        try:
+            await ctx.message.remove_reaction("⏳", self.bot.user)
+            msg = await ctx.channel.send(content=ctx.author.mention)
+            await msg.edit(content="⌛", delete_after=5)
+        except discord.errors.NotFound:
+            return 
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.group(invoke_without_command=True)
