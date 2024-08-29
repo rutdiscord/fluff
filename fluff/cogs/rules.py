@@ -49,10 +49,11 @@ class Rules(Cog):
                         value=f"> {io.StringIO(guild_rule[1]).readline()}",
                         inline=False,
                     )
+                return await ctx.reply(embed=summary_embed, mention_author=False)
         elif name in guild_rules:
             return await ctx.reply(content=f"{guild_rules[name]}", mention_author=False)
-
-        return await ctx.reply(embed=summary_embed, mention_author=False)
+        else:
+            return await ctx.reply(content=f"Rule `{name}` not found.", mention_author=False)
         
     @commands.check(isadmin)
     @rule.command(aliases=["add"])
