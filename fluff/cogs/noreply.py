@@ -114,12 +114,12 @@ class Reply(Cog):
             message.guild, get_config(message.guild.id, "logging", "modlog")
             )
 
-            async def notify_modlog():
-                return await modlog_channel.send(f"♾ **{message_author.global_name}** (**{message_author.id}**) has received a reply ping preference violation. Their current violation count is {violation_count}, which is their **last** violation before being automatically muted.")
+            async def notify_modlog(additional=None):
+                return await modlog_channel.send(f":infinity: **{message_author.global_name}** (**{message_author.id}**) has received a reply ping preference violation. Their current violation count is {violation_count}. ({additional})")
 
             try:
                 if self.violations[message.guild.id][message.author.id] == (noreply_thres-1):
-                        await notify_modlog()
+                        await notify_modlog(additional="Next violation will result in penalty.")
                         await message.reply(
                         content=f"# {message.author.mention}, your next violation will result in penalty.\n"
                         + f"You have currently received {str(violation_count)} violations.\n"
@@ -128,7 +128,7 @@ class Reply(Cog):
                     )
                         
                 elif self.violations[message.guild.id][message.author.id] % noreply_remind == 0:
-                        await notify_modlog()
+                        await notify_modlog("Reminder sent.")
                         return await message.author.send(
                         content="**Do not reply ping users who do not wish to be pinged.**\n"
                         + f"You have currently received {str(violation_count)} violations.\n"
