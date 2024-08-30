@@ -40,7 +40,7 @@ class Snippets(Cog):
                     inline=True,
                 )
             else:
-                for snippet_onehalf in guild_snippets:
+                for snippet in guild_snippets:
                         embed.add_field(
                             name = f"**{snippet}**",
                             value = ("> " + discord.utils.remove_markdown(guild_snippets[snippet_onehalf]["content"][:60]) + "_..._"
