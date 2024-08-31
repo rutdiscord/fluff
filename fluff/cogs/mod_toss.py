@@ -382,7 +382,7 @@ class ModToss(Cog):
                     await pokemsg.edit(content="🫳⏰", delete_after=5)
                 except discord.errors.NotFound:
                     return
-            
+
             
 
     @commands.cooldown(1, 5, commands.BucketType.guild)

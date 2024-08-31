@@ -1,390 +1,335 @@
+# This Cog contained code from Tosser2, which was made by OblivionCreator.
 import discord
 import json
 import os
 import asyncio
 import random
+import zipfile
 from datetime import datetime, timezone, timedelta
 from discord.ext import commands
 from discord.ext.commands import Cog
 from io import BytesIO
 from helpers.checks import ismod
-from helpers.datafiles import add_userlog, rule_userlog, get_rulefile, set_rulefile
-from helpers.placeholders import random_msg
-from helpers.embeds import (
-    stock_embed,
-    mod_embed,
-    author_embed,
-    createdat_embed,
-    joinedat_embed,
-)
+from helpers.archive import log_channel, get_members
+from helpers.embeds import stock_embed
 from helpers.sv_config import get_config
-from helpers.google import upload
 
-class RulePush(Cog):
+class RulePush(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.busy = False
-        self.kick_timers = dict()
-        self.nocfgmsg = "Rulepushing isn't enabled for this server."
+        self.user_timers = {}
+        self.load_sessions()
 
-    def enabled(self, g):
-        return all(
-            (
-                self.bot.pull_role(g, get_config(g.id, "rulepush", "rulepushrole")),
-                self.bot.pull_category(g, get_config(g.id, "rulepush", "rulepushcategory")),
-                get_config(g.id, "rulepush", "rulepushchannels"),
-            )
-        )
-    
-    def principal_period(self, s):
-        i = (s + s).find(s, 1, -1)
-        return None if i == -1 else s[:1]
-    
-    def is_rulepushed(self, member, hard=True):
-        rulepush = [
-            r
-            for r in member.guild.roles
-            if r
-            == self.bot.pull_role(
-                member.guild, get_config(member.guild.id, "rulepush", "rulepushrole")
-            )
-        ]
-        if rulepush:
-            if (
-                self.bot.pull_role(
-                    member.guild, get_config(member.guild.id, "rulepush", "rulepushrole")
-                )
-                in member.roles
-            ):
-                if hard:
-                    return len([r for r in member.roles if not (r.managed)]) == 2
-                return True
-            
-    def get_session(self, member):
-        rulepushes = get_rulefile(member.guild.id, "rulepushes")
-        if not rulepushes:
-            return None
-        session = None
-        if "LEFTGUILD" in rulepushes and str(member.id) in rulepushes["LEFTGUILD"]:
-            session = False
-            for channel in rulepushes:
-                if channel == "LEFTGUILD":
-                    continue
-                if str(member.id) in rulepushes[channel]["rulepushed"]:
-                    session = channel
-                    break
-                return session
-            
-    async def new_session(self, guild):
-        staff_roles = [
-            self.bot.pull_role(guild, get_config(guild.id, "staff", "modrole"))
-            self.bot.pull_role(guild, get_config(guild.id, "staff", "adminrole"))
-        ]
-        bot_role = self.bot.pull_role(guild, get_config(guild.id, "staff", "botrole"))
-        rulepushes = get_rulefile(guild.id, "rulepushes")
-
-        for c in get_config(guild.id, "rulepush", "rulepushchannels"):
-            if c not in [g.name for g in guild.channels]:
-                if c not in rulepushes:
-                    rulepushes[c] = {"rulepushed": {}, "unrulepushed": [], "left": []}
-                    set_rulefile(guild.id, "rulepushes", json.dumps(rulepushes))  
-
-                overwrites = {
-                guild.default_role: discord.PermissionOverwrite(
-                    read_messages=False
-                ),
-                guild.me: discord.PermissionOverwrite(read_messages=True),
-            }
-            if bot_role:
-                overwrites[bot_role] = discord.PermissionOverwrite(
-                    read_messages=True
-                )
-            for staff_role in staff_roles:
-                if not staff_role:
-                    continue
-                overwrites[staff_role] = discord.PermissionOverwrite(
-                    read_messages=True
-                )
-            rulepushchannel = await guild.create_text_channel(
-                c,
-                reason="Fluff Rule Push",
-                category=self.bot.pull_category(
-                    guild, get_config(guild.id, "rulepush", "rulepushcategory")
-                )
-                overwrites=overwrites,
-                topic=get_config(guild.id, "rulepush", "rulepushtopic"),
-            )
-
-            return rulepushchannel
-        
-    async def perform_rulepush(self, user, staff, rulepushchannel):
-        rulepushrole = self.bot.pull_role(
-            user.guild, get_config(user.guild.id, "rulepush", "rulepushrole"),
-        )
-
-        if rulepushrole in user.roles:
-            return False
-        
-        roles = []
-        for rx in user.roles:
-            if rx != user.guild.default_role and rx != rulepushrole:
-                roles.append(rx)
-
-        rulepushes = get_rulefile(user.guild.id, "rulepushes")
-        rulepushes[rulepushchannel.name]["rulepushed"][str(user.id)] = [role.id for role in roles]
-        set_rulefile(user.guild.id, "rulepushes", json.dumps(rulepushes))
-
-        await user.add_roles(rulepushrole, reason = "User Rule Pushed.")
-        fail_roles = []
-        if roles:
-            for rr in roles:
-                if not rr.is_assignable():
-                    fail_roles.append(rr)
-                    roles.remove(rr)
-                await user.remove_roles(
-                    *roles,
-                    reason=f"User Rule Pushed by {staff} ({staff.id})",
-                    atomic=False,
-                )
-            
-            return fail_roles, roles
-        
-    @commands.bot_has_permissions(embed_links=True)
-    @commands.check(ismod)
-    @commands.guild_only()
-    @commands.command(aliases=["rulepushed", "rulespushed"])
-    async def pushed(self, ctx):
-        """This shows open rulepush sessions.
-        
-        Use this in a rule push channel to show who's in it.
-        
-        No arguments."""
-        if not self.enabled(ctx.guild):
-            return await ctx.reply(self.nocfgmsg, mention_author=False)
-        embed = stock_embed(self.bot)
-        embed.title = "Rule Push Sessions..."
-        embed.color = ctx.author.color
-        rulepushes = get_rulefile(ctx.guild.id, "rulepushes")
-
-        if ctx.channel.name in get_config(ctx.guild.id, "rulepush", "rulepushchannels"):
-            channels = [ctx.channel.name]
+    def load_sessions(self):
+        if os.path.exists("rule_sessions.json"):
+            with open("rule_sessions.json", "r") as f:
+                self.sessions = json.load(f)
         else:
-            channels = get_config(ctx.guild.id, "rulepush", "rulepushchannels")
+            self.sessions = {"current": {}, "left": [], "kicks": {}}
 
-        for c in channels:
-            if c in [g.name for g in ctx.guild.channels]:
-                if c not in rulepushes or not rulepushes[c]["rulepushed"]:
-                    embed.add_field(
-                        name=f"🟡 #{c}",
-                        value="__Empty__\n> Please close the channel.",
-                        inline=True,
-                    )
-                else:
-                    userlist = "\n".join(
-                        [
-                            f"> {self.username_system(user)}"
-                            for user in [
-                                await self.bot.fetch_user(str(u))
-                                for u in rulepushes[c]["rulepushed"].keys()
-                            ]
-                        ]
-                    )
-                    embed.add_field(
-                        name=f"🔴 #{c}",
-                        value=f"__Occupied__\n{userlist}",
-                        inline=True,
-                    )
-            else:
-                embed.add_field(name=f"🟢 #{c}", value="__Available__", inline=True)
-        await ctx.reply(embed=embed,mention_author=False)
+    def save_sessions(self):
+        with open("rule_sessions.json", "w") as f:
+            json.dump(self.sessions, f, indent=4)
 
-    @commands.cooldown(1, 5, commands.BucketType.guild)
-    @commands.bot_has_permissions(
-        manage_roles=True, manage_channels=True, add_reactions=True
-    )
-    
-    @commands.check(ismod)
-    @commands.guild_only()
-    @commands.command(aliases=["pushrule"])
-    async def rulepush(self, ctx, users: commands.Greedy[discord.Member]):
-        """This pushes a user to read the rules.
-        
-        - `users` 
-        The users to rulepush."""
-        if not self.enabled(ctx.guild):
-            return await ctx.reply(self.nocfgmsg, mention_author=False)
-        
+    @commands.command()
+    @commands.has_permissions(manage_roles=True)
+    async def rulepush(self, ctx, *users: discord.Member):
         staff_roles = [
             self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "staff", "modrole")),
-            self.bot.pull_role(
-                ctx.guild, get_config(ctx.guild.id, "staff", "adminrole")
-            ),
+            self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "staff", "adminrole")),
         ]
-        rulepushrole = self.bot.pull_role(
-            ctx.guild, get_config(ctx.guild.id, "rulepush", "rulepushrole")
-        )
-        if not any (staff_roles) or not rulepushrole:
+        rulepush_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "rulepush", "rulepushrole"))
+        if not any(staff_roles) or not rulepush_role:
             return await ctx.reply(
-                content="PLACEHOLDER no staff or rule push role configured.",
+                content="No staff or rulepush role configured",
                 mention_author=False,
             )
-        notify_channel = self.bot.pull_channel(
-            ctx.guild, get_config(ctx.guild.id, "rulepush", "notificationchannel")
-        )
+        notify_channel = self.bot.pull_channel(ctx.guild, get_config(ctx.guild.id, "rulepush", "notificationchannel"))
         if not notify_channel:
-            notify_channel = self.bot.pull_channel(
-                ctx.guild, get_config(ctx.guild.id, "staff", "staffchannel")
-            )
-        modlog_channel = self.bot.pull_channel(
-            ctx.guild, get_config(ctx.guild.id, "logging", "modlog")
-        )
+            notify_channel = self.bot.pull_channel(ctx.guild, get_config(ctx.guild.id, "staff", "staffchannel"))
+        modlog_channel = self.bot.pull_channel(ctx.guild, get_config(ctx.guild.id, "logging", "modlog"))
 
         errors = ""
         for us in users:
             if us.id == ctx.author.id:
-                errors += f"\n- {self.username_system(us)}\n You cannot push yourself to read the rules!\nYou should know them by now..."
-            elif us.id == self.bot.application_id:
-                errors += f"\n- {self.username_system(us)}\n You can't make me read the rules!\nI can't even read..."
-            elif self.get_session(us) and rulepushrole in us.roles:
-                errors += (
-                    f"\n- {self.username_system(us)}\n This user is currently reading the rules."
-                )
+                errors += f"\n- {us.display_name}\n  You cannot rulepush yourself."
+            elif us.id == self.bot.user.id:
+                errors += f"\n- {us.display_name}\n  You cannot rulepush the bot."
+            elif self.get_session(us) and rulepush_role in us.roles:
+                errors += f"\n- {us.display_name}\n  This user is already rulepushed."
             else:
                 continue
-            users.remove(us)
+            users = [u for u in users if u.id != us.id]
         if not users:
             await ctx.message.add_reaction("🚫")
             return await notify_channel.send(
-                f"Error in rulepush command from {ctx.author.mention} ... nobody was pushed to read the rules. \n```diff"
+                f"Error in rulepush command from {ctx.author.mention}...\n- Nobody was rulepushed.\n```diff"
                 + errors
                 + "\n```\n"
             )
-        
+
         if ctx.channel.name in get_config(ctx.guild.id, "rulepush", "rulepushchannels"):
             addition = True
-            rulepushchannel = ctx.channel
+            rulepush_channel = ctx.channel
         elif all(
-            [   
-                c in [g.name for g in ctx.guild.channels]
-                for c in get_config(ctx.guild.id, "rulepush", "rulepushchannels")
-            ]
+            [c in [g.name for g in ctx.guild.channels] for c in get_config(ctx.guild.id, "rulepush", "rulepushchannels")]
         ):
             await ctx.message.add_reaction("🚫")
             return await notify_channel.send(
-                f"Error in rulepush command from {ctx.author.mention}...\n- No channels for rulepushing available.\n```diff"
+                f"Error in rulepush command from {ctx.author.mention}...\n- No rulepush channels available.\n```diff"
                 + errors
                 + "\n```\n"
             )
         else:
             addition = False
-            rulepushchannel = await self.new_session (ctx.guild)
+            rulepush_channel = await self.new_session(ctx.guild)
 
         for us in users:
             try:
-                failed_roles, previous_roles = await self.perform_rulepush(
-                    us, ctx.author, rulepushchannel
-                )
-                await rulepushchannel.set_permissions(us, read_messages = True)
+                await self.start_rule_push(us)
+                await rulepush_channel.set_permissions(us, read_messages=True)
             except commands.MissingPermissions:
-                errors += f"\n- {self.username_system(us)}\n Missing permissions to rulepush this user."
+                errors += f"\n- {us.display_name}\n  Missing permissions to rulepush this user."
                 continue
-
-            rule_userlog(
-                ctx.guild.id,
-                us.id,
-                ctx.author,
-                ctx.message.jump_url,
-                rulepushchannel.id,
-            )
 
             if notify_channel:
                 embed = stock_embed(self.bot)
-                author_embed(embed,us, True)
+                embed.set_author(name=us.display_name, icon_url=us.avatar_url)
                 embed.color = ctx.author.color
-                embed.title = "📖 Rule Push"
-                embed.description = f"{us.mention} was rulepushed by {ctx.author.mention} [`#{ctx.channel.name}`] [[Jump]({ctx.message.jump_url})]\n> This is taking place in {rulepushchannel.mention}..."
-                createdat_embed (embed, us)
-                joinedat_embed(embed, us)
-                prevlist = []
-                if len (previous_roles) > 0:
-                    for role in previous_roles:
-                        prevlist.append("<@&" + str(role.id) + ">")
-                    prevlist = ",".join(reversed(prevlist))
-                else:
-                    prevlist = "None"
-                    embed.add_field(
-                        name="🎨 Previous Roles"
-                        value=prevlist
-                        inline=False
-                )
-                if failed_roles:
-                    faillist = []
-                    for role in failed_roles:
-                        faillist.append("<@&" + str(role.id) + ">")
-                    faillist = ",".join(reversed(faillist))
-                    embed.add_field(
-                        name="🚫 Failed Roles",
-                        value=faillist,
-                        inline=False,
-                    )
-                    await notify_channel.send(embed=embed)
-                
+                embed.title = "📖 RulePush"
+                embed.description = f"{us.mention} was rulepushed by {ctx.author.mention} [`#{ctx.channel.name}`] [[Jump]({ctx.message.jump_url})]\n> This rulepush takes place in {rulepush_channel.mention}..."
+                embed.add_field(name="🎨 Previous Roles", value="N/A", inline=False)
+                await notify_channel.send(embed=embed)
+
             if modlog_channel and modlog_channel != notify_channel:
                 embed = stock_embed(self.bot)
                 embed.color = discord.Color.from_str("#FF0000")
-                embed.title = "📖 Rule Push"
-                embed.description = f"{us.mention} was rulepushed by {ctx.author.mention} [`#{ctx.channel.name}`] [[Jump]({ctx.message.jump_url})]\n> This is taking place in {rulepushchannel.mention}..."
-                mod_embed(embed, us, ctx.author)
+                embed.title = "📖 RulePush"
+                embed.description = f"{us.mention} was rulepushed by {ctx.author.mention} [`#{ctx.channel.name}`] [[Jump]({ctx.message.jump_url})]"
+                embed.set_author(name=us.display_name, icon_url=us.avatar_url)
                 await modlog_channel.send(embed=embed)
-                
+
         await ctx.message.add_reaction("📖")
 
         if errors and notify_channel:
             return await notify_channel.send(
-                f"Error in rulepush command from {ctx.author.mention}...\n- Some users could not be rulepushed. \n```diff"
+                f"Error in rulepush command from {ctx.author.mention}...\n- Some users could not be rulepushed.\n```diff"
                 + errors
                 + "\n```\n"
             )
-        
+
         if not addition:
-            rulepush_pings = ", ".join([us.mention for users])
-            await rulepushchannel.send(
-                f"{rulepush_pings}\nYou have been pushed to read the rules due to suspicious activity indicating you have not read them.\n{get_config(ctx.guild.id, 'rulepush', 'rulepushmsg')}"
+            rulepush_pings = ", ".join([us.mention for us in users])
+            await rulepush_channel.send(
+                f"{rulepush_pings}\nYou have been pushed to read the rules due to suspicious activity indicating you have not read them\nYou must solve a puzzle before accessing the server again.\n{get_config(ctx.guild.id, 'rulepush', 'intro_message')}"
             )
 
-            async def check_user_compliance(self, user, channel):
+            def check(m):
+                return m.author in users and m.channel == rulepush_channel
+
+    async def start_rule_push(self, member):
+        guild = member.guild
+        role = discord.utils.get(guild.roles, name="RulePushRole")
+        category = discord.utils.get(guild.categories, name="RulePushCategory")
+        
+        if not role or not category:
+            return
+
+        overwrites = {
+            guild.default_role: discord.PermissionOverwrite(read_messages=False),
+            member: discord.PermissionOverwrite(read_messages=True, send_messages=True)
+        }
+
+        channel = await guild.create_text_channel(f"rule-push-{member.name}", overwrites=overwrites, category=category)
+        intro_message = get_config(guild.id, "rulepush", "intro_message")
+        await channel.send(intro_message)
+
+        self.user_timers[member.id] = {
+            'channel': channel,
+            'timer': self.bot.loop.call_later(43200, self.kick_user, member),
+            'kick': True
+        }
+
+        self.sessions["current"][member.id] = {"channel": channel.id, "start_time": datetime.utcnow().isoformat()}
+        self.save_sessions()
+
+    async def kick_user(self, member):
+        if self.user_timers[member.id]['kick']:
+            await member.kick(reason="Failed to solve rule puzzle in time.")
+            await self.user_timers[member.id]['channel'].delete()
+            self.sessions["left"].append(member.id)
+            del self.sessions["current"][member.id]
+            self.save_sessions()
+            del self.user_timers[member.id]
+
+        notify_channel = self.bot.pull_channel(member.guild, get_config(member.guild.id, "rulepush", "notificationchannel"))
+        if not notify_channel:
+            notify_channel = self.bot.pull_channel(member.guild, get_config(member.guild.id, "staff", "staffchannel"))
+        modlog_channel = self.bot.pull_channel(member.guild, get_config(member.guild.id, "logging", "modlog"))
+
+        if notify_channel:
+            embed = stock_embed(self.bot)
+            embed.set_author(name=member.display_name, icon_url=member.avatar_url)
+            embed.color = discord.Color.orange()
+            embed.title = "⏰ RulePush Timed Out"
+            embed.description = f"{member.mention} has been kicked for not completing the rulepush puzzle within 12 hours."
+            await notify_channel.send(embed=embed)
+
+        if modlog_channel and modlog_channel != notify_channel:
+            embed = stock_embed(self.bot)
+            embed.set_author(name=member.display_name, icon_url=member.avatar_url)
+            embed.color = discord.Color.orange()
+            embed.title = "⏰ RulePush Timed Out"
+            embed.description = f"{member.mention} has been kicked for not completing the rulepush puzzle within 12 hours."
+            await modlog_channel.send(embed=embed)
+
+    def get_session(self, member):
+        return self.sessions["current"].get(str(member.id))
+
+    def setup(bot):
+        bot.add_cog(RulePush(bot))
+
+    @commands.Cog.listener()
+    async def on_message(self, message):
+        if message.author.bot:
+            return
+
+        member = message.author
+        if member.id in self.user_timers:
+            channel = self.user_timers[member.id]['channel']
+            if message.channel == channel:
                 keywords = {"pineapple", "pancake", "coconut"}
-                found_keywords = set()
+                if not any(keyword in message.content.lower() for keyword in keywords):
+                    await message.delete()
+                else:
+                    self.user_timers[member.id]['kick'] = False
+                    await channel.send("Congratulations! Please be mindful of the rules.\nYou may be pushed to read the rules again at a later date if you participate in further suspicious activity.\n**You will be free to participate in the server in 60 seconds...**")
+                    await asyncio.sleep(60)
+                    await channel.delete()
+                    del self.user_timers[member.id]
+                    del self.sessions["current"][member.id]
+                    self.save_sessions()
 
-                async for message in channel.history(limit=100):
-                    for keyword in keywords:
-                        if keyword in message.content.lower():
-                            found_keywords.add(keyword)
+                    ctx = await self.bot.get_context(message)
+                    us = member
 
-                    if found_keywords == keywords:
-                        notify_message = await channel.send(
-                            f"{user.mention} You have read the rules! Please be mindful of them. You may be pushed to read the rules again at a later date with further suspicious activity. You will be free to participate in the server in 60 seconds..."
-                        )
+                    notify_channel = self.bot.pull_channel(ctx.guild, get_config(ctx.guild.id, "rulepush", "notificationchannel"))
+                    if not notify_channel:
+                        notify_channel = self.bot.pull_channel(ctx.guild, get_config(ctx.guild.id, "staff", "staffchannel"))
+                    modlog_channel = self.bot.pull_channel(ctx.guild, get_config(ctx.guild.id, "logging", "modlog"))
 
-                        await asyncio.sleep(60)
+                    if notify_channel:
+                        embed = stock_embed(self.bot)
+                        embed.set_author(name=us.display_name, icon_url=us.avatar_url)
+                        embed.color = discord.Color.green()
+                        embed.title = "🎉 RulePush Completed"
+                        embed.description = f"{us.mention} has successfully completed the rulepush puzzle and has been released."
+                        await notify_channel.send(embed=embed)
 
-                        rulepushes = get_rulefile(ctx.guild.id "rulepushes")
-                        if not users:
-                            users = [
-                                ctx.guild.get_member(int(u))
-                                for u in rulepushes[ctx.channel.name]["rulepushed"].keys()
-                            ]
+                    if modlog_channel and modlog_channel != notify_channel:
+                        embed = stock_embed(self.bot)
+                        embed.set_author(name=us.display_name, icon_url=us.avatar_url)
+                        embed.color = discord.Color.green()
+                        embed.title = "🎉 RulePush Completed"
+                        embed.description = f"{us.mention} has successfully completed the rulepush puzzle and has been released."
+                        await modlog_channel.send(embed=embed)
 
-                        set_rulefile(ctx.guild.id, "rulepushes", json.dumps("rulepushes"))
-                        self.busy = False   
+    @commands.command()
+    @commands.has_permissions(kick_members=True)
+    async def kick(self, ctx, member: discord.Member, *, reason= None):
+        await member.kick(reason="Could not read the rules in time.")
+        self.sessions["kicks"][member.id] = datetime.utcnow().isoformat()
+        self.savesessions()
+        await ctx.send(f'Kicked {member.mention}')
 
-                        self.bot.pull_role(g, get_config(g.id, "rulepush", "rulepushrole"))
-                        if rulepushrole:
-                            await user.remove_roles(rulepushrole, reason = "Rules read.")
+    @commands.Cog.listener()
+    async def on_member_remove(self, member):
+        if member.id in self.user_timers:
+            self.user_timers[member.id]['timer'].cancel()
+            del self.user_timers[member.id]
+            self.sessions["left"].append(member.id)
+            self.save_sessions()
 
+            rulepush_role = self.bot.pull_role(member.guild, get_config(member.guild.id, "rulepush", "rulepushrole"))
+            if rulepush_role in member.roles:
+                kick_time_str = self.sessions["kicks"].get(member.id)
+                if kick_time_str:
+                    kick_time = datetime.fromisoformat(kick_time_str)
+                    if datetime.utcnow() - kick_time < timedelta(hours=1):
+                        return
                     
+                await member.guild.ban(member, reason="Attempting to evade the rules by leaving the server.")
+                self.sessions["left"].remove(member.id)
+                self.save_sessions()
 
+                notify_channel = self.bot.pull_channel(member.guild, get_config(member.guild.id, "rulepush", "notificationchannel"))
+                if not notify_channel:
+                    notify_channel = self.bot.pull_channel(member.guild, get_config(member.guild.id, "staff", "staffchannel"))
+                modlog_channel = self.bot.pull_channel(member.guild, get_config(member.guild.id, "logging", "modlog"))
 
-                
+                # Create and send embed messages
+                if notify_channel:
+                    embed = stock_embed(self.bot)
+                    embed.set_author(name=member.display_name, icon_url=member.avatar_url)
+                    embed.color = discord.Color.red()
+                    embed.title = "🚫 RulePush Violation"
+                    embed.description = f"{member.mention} has been banned for attempting to leave while rulepushed."
+                    await notify_channel.send(embed=embed)
 
+                if modlog_channel and modlog_channel != notify_channel:
+                    embed = stock_embed(self.bot)
+                    embed.set_author(name=member.display_name, icon_url=member.avatar_url)
+                    embed.color = discord.Color.red()
+                    embed.title = "🚫 RulePush Violation"
+                    embed.description = f"{member.mention} has been banned for attempting to leave while rulepushed."
+                    await modlog_channel.send(embed=embed)
 
+        else:
+            return
+
+    @commands.Cog.listener()
+    async def on_member_ban(self, guild, user):
+        if user.id in self.sessions["left"]:
+            self.sessions["left"].remove(user.id)
+            self.save_sessions()
+
+    @commands.Cog.listener()
+    async def on_member_join(self, member):
+        if member.id in self.sessions["left"]:
+            self.sessions["left"].remove(member.id)
+            self.sessions["current"][member.id] = {"start_time": datetime.utcnow().isoformat()}
+            self.save_sessions()
+            await self.start_rule_push(member)
+
+            notify_channel = self.bot.pull_channel(member.guild, get_config(member.guild.id, "rulepush", "notificationchannel"))
+            if not notify_channel:
+                notify_channel = self.bot.pull_channel(member.guild, get_config(member.guild.id, "staff", "staffchannel"))
+            modlog_channel = self.bot.pull_channel(member.guild, get_config(member.guild.id, "logging", "modlog"))
+
+            if notify_channel:
+                embed = stock_embed(self.bot)
+                embed.set_author(name=member.display_name, icon_url=member.avatar_url)
+                embed.color = discord.Color.orange()
+                embed.title = "⚠️ RulePush Rejoin"
+                embed.description = f"{member.mention} has rejoined the server after being kicked while rulepushed."
+                await notify_channel.send(embed=embed)
+
+            if modlog_channel and modlog_channel != notify_channel:
+                embed = stock_embed(self.bot)
+                embed.set_author(name=member.display_name, icon_url=member.avatar_url)
+                embed.color = discord.Color.orange()
+                embed.title = "⚠️ RulePush Rejoin"
+                embed.description = f"{member.mention} has rejoined the server after being kicked while rulepushed."
+                await modlog_channel.send(embed=embed)
+
+    async def start_rule_push(self, member):
+        guild = member.guild
+        rulepush_role = self.bot.pull_role(guild, get_config(guild.id, "rulepush", "rulepushrole"))
+        if not rulepush_role:
+            return
+
+        await member.add_roles(rulepush_role)
+        self.sessions["current"][member.id] = {"start_time": datetime.utcnow().isoformat()}
+        self.save_sessions()
+
+     
