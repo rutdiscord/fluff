@@ -1,4 +1,3 @@
-# This Cog contained code from Tosser2, which was made by OblivionCreator.
 import discord
 import json
 import os
@@ -10,9 +9,18 @@ from discord.ext import commands
 from discord.ext.commands import Cog
 from io import BytesIO
 from helpers.checks import ismod
+from helpers.datafiles import add_userlog, toss_userlog, get_tossfile, set_tossfile
+from helpers.placeholders import random_msg
 from helpers.archive import log_channel, get_members
-from helpers.embeds import stock_embed
+from helpers.embeds import (
+    stock_embed,
+    mod_embed,
+    author_embed,
+    createdat_embed,
+    joinedat_embed,
+)
 from helpers.sv_config import get_config
+from helpers.google import upload
 
 class RulePush(commands.Cog):
     def __init__(self, bot):
@@ -34,11 +42,7 @@ class RulePush(commands.Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command()
-    @commands.has_permissions(manage_roles=True)
-    async def rulepush(self, ctx, *users: discord.Member):
-        if not self.enabled(ctx.guild):
-            return await ctx.reply(self.nocfg, mention_author=False)
-        
+    async def rulepush(self, ctx, users: commands.Greedy[discord.Member]):
         staff_roles = [
             self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "staff", "modrole")),
             self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "staff", "adminrole")),
@@ -100,25 +104,19 @@ class RulePush(commands.Cog):
             )
         else:
             addition = False
-            rulepush_channel = await self.new_session(ctx.guild)
+            rulepush_channel = self.bot.pull_channel(
+                ctx.guild.id, get_config(ctx.guild.id, "rulepush", "rulepushchannels")
+                )
 
         for us in users:
             try:
-                failed_roles, previous_roles = await self.perform_rulepush(
+                failed_roles, previous_roles = await self.start_rule_push(
                     us, ctx.author, rulepush_channel
                 )
                 await rulepush_channel.set_permissions(us, read_messages=True)
             except commands.MissingPermissions:
                 errors += f"\n- {us.display_name}\n  Missing permissions to rulepush this user."
                 continue
-
-            rulepush_userlog(
-                ctx.guild.id,
-                us.id,
-                ctx.author,
-                ctx.message.jump_url,
-                rulepush_channel.id,
-            )
 
             if notify_channel:
                 embed = stock_embed(self.bot)
@@ -234,9 +232,6 @@ class RulePush(commands.Cog):
     def get_session(self, member):
         return self.sessions["current"].get(str(member.id))
 
-    def setup(bot):
-        bot.add_cog(RulePush(bot))
-
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
@@ -282,8 +277,6 @@ class RulePush(commands.Cog):
                         embed.description = f"{us.mention} has successfully completed the rulepush puzzle and has been released."
                         await modlog_channel.send(embed=embed)
 
-    @commands.command()
-    @commands.has_permissions(kick_members=True)
     async def kick(self, ctx, member: discord.Member, *, reason= None):
         await member.kick(reason="Could not read the rules in time.")
         self.sessions["kicks"][member.id] = datetime.utcnow().isoformat()
@@ -380,4 +373,5 @@ class RulePush(commands.Cog):
         self.sessions["current"][member.id] = {"start_time": datetime.utcnow().isoformat()}
         self.save_sessions()
 
-     
+async def setup(bot):
+    await bot.add_cog(RulePush(bot))
