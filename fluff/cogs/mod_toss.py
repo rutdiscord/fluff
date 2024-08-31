@@ -213,7 +213,6 @@ class ModToss(Cog):
                 embed.add_field(name=f"🟢 #{c}", value="__Available__", inline=True)
         await ctx.reply(embed=embed, mention_author=False)
 
-    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.bot_has_permissions(
         manage_roles=True, manage_channels=True, add_reactions=True
     )
