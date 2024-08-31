@@ -108,4 +108,4 @@ drive:
   # Set the ID of the Google Drive folder that the file should be uploaded to.
 
 metadata:
-  version: 17
+  version: 22
