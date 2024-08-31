@@ -107,40 +107,40 @@ properties:
         type:
           - string
           - "null"
-  rulepush:
-    type: object
-    properties:
-      rulepushrole:
-        type:
-          - integer
-          - string
-          - "null"
-        minimum: 100000000000000000
-      rulepushcategory:
-        type:
-          - integer
-          - string
-          - "null"
-        minimum: 100000000000000000
-      notificationchannel:
-        type:
-          - integer
-          - string
-          - "null"
-        minimum: 100000000000000000
-      rulepushchannels:
+rulepush:
+  type: object
+  properties:
+    rulepushrole:
+      type: 
+        - integer
+        - string
+        - "null"
+      minimum: 100000000000000000
+    rulepushcategory:
+      type: 
+        - integer
+        - string
+        - "null"
+      minimum: 100000000000000000
+    notificationchannel:
+      type: 
+        - integer
+        - string
+        - "null"
+      minimum: 100000000000000000
+    rulepushchannels:
+      type: 
+        - array
+        - "null"
+      items:
         type: 
-          - array
-          - "null"
-        items:
-          type:
-            - integer
-            - string
-          minimum: 100000000000000000
-      intro_message:
-        type:
+          - integer
           - string
-          - "null"
+        minimum: 100000000000000000
+    intro_message:
+      type: 
+        - string
+        - "null"
   reaction:
     type: object
     properties:
