@@ -131,7 +131,7 @@ class Tenure(Cog):
                 await msg.author.remove_roles(tenureconfig["role"], reason="Fluff Tenure (Prohibition enforcement)"),
                 await logchannel_cached.send(f":infinity: **{msg.guild.name}** {msg.author.mention} has been removed from the {tenureconfig['role'].name} role due to being prohibited.")
             )
-        elif tenureconfig["role"] not in msg.author and tenureconfig["threshold"] < tenure_days:
+        elif tenureconfig["role"] not in msg.author.roles and tenureconfig["threshold"] < tenure_days:
             return (
                 await msg.author.add_roles(tenureconfig["role"], reason="Fluff Tenure (Automatic assignment)"),
                 await logchannel_cached.send(f":infinity: **{msg.guild.name}** {msg.author.mention} has been assigned the {tenureconfig['role'].name} role.")
