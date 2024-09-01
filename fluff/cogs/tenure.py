@@ -94,7 +94,7 @@ class Tenure(Cog):
                 
     @commands.check(isadmin)
     @tenure.command(aliases=["blacklist", "bl"])
-    async def disable(self, ctx: commands.Context, user: discord.Member):
+    async def disable(self, ctx: commands.Context, user: discord.Member, *, reason: str = "No reason provided"):
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
         
@@ -105,7 +105,7 @@ class Tenure(Cog):
 
         if tenure_disabled_role not in user.roles:
             await user.add_roles(tenure_disabled_role, reason="Fluff Tenure (Prohibition)")
-            tenure_disabled_users[str(user.id)]
+            tenure_disabled_users[str(user.id)] = reason
 
     @Cog.listener()
     async def on_message(self, msg):
@@ -126,12 +126,12 @@ class Tenure(Cog):
         tenure_days = tenure_dt.days
         logchannel_cached = self.bot.get_channel(logchannel)
 
-        if all(tenureconfig["role_disabled"] in msg.author.roles, msg.author.id in tenureconfig["disabled_users"], tenureconfig["role"] in msg.author.roles):
+        if all([tenureconfig["role_disabled"] in msg.author.roles, msg.author.id in tenureconfig["disabled_users"], tenureconfig["role"] in msg.author.roles]):
             return (
                 await msg.author.remove_roles(tenureconfig["role"], reason="Fluff Tenure (Prohibition enforcement)"),
                 await logchannel_cached.send(f":infinity: **{msg.guild.name}** {msg.author.mention} has been removed from the {tenureconfig['role'].name} role due to being prohibited.")
             )
-        elif all(tenureconfig["role"] not in msg.author, tenureconfig["threshold"] < tenure_days):
+        elif all([tenureconfig["role"] not in msg.author, tenureconfig["threshold"] < tenure_days]):
             return (
                 await msg.author.add_roles(tenureconfig["role"], reason="Fluff Tenure (Automatic assignment)"),
                 await logchannel_cached.send(f":infinity: **{msg.guild.name}** {msg.author.mention} has been assigned the {tenureconfig['role'].name} role.")
