@@ -134,7 +134,8 @@ class Tenure(Cog):
                 tenureconfig["disabled_users"][msg.author.id] = "Automatic prohibition enforcement"
                 set_guildfile(msg.guild.id, "tenure_disabled", json.dumps(tenureconfig["disabled_users"]))
             return await msg.author.remove_roles(tenureconfig["role"], reason="Fluff Tenure (Prohibition enforcement)")
-        elif tenureconfig["role"] not in msg.author.roles and tenureconfig["threshold"] < tenure_days:
+        
+        if tenureconfig["role"] not in msg.author.roles and tenureconfig["threshold"] < tenure_days:
             return await msg.author.add_roles(tenureconfig["role"], reason="Fluff Tenure (Automatic assignment)")
         
 
