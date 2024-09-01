@@ -22,6 +22,19 @@ from helpers.embeds import (
 from helpers.sv_config import get_config
 from helpers.google import upload
 
+"""
+    JSON format for rulepushes:
+    {
+        "pushed": {
+            "user_id": [
+            roles: [role_id, role_id, ...], 
+            channel: "channel_id"
+            ],
+        },
+
+        "idle_kicked": [user_id, user_id, ...]
+    }
+"""
 class RulePush(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -38,7 +51,7 @@ class RulePush(commands.Cog):
         for c in get_config(guild.id, "rulepush", "rulepushchannels"):
             if c not in [g.name for g in guild.channels]:
                 if c not in tosses:
-                    tosses[c] = {"pushed": {}, "unpushed": [], "left": []}
+                    tosses[c] = {"pushed": {}, "idle_kicked": []}
                     set_tossfile(guild.id, "rulepushes", json.dumps(tosses))
 
                 overwrites = {
@@ -134,7 +147,7 @@ class RulePush(commands.Cog):
             )
         else:
             addition = False
-            rulepush_channel = self.new_session(ctx.guild)
+            rulepush_channel = await self.new_session(ctx.guild)
         for us in users:
             try:
                 failed_roles, previous_roles = await self.start_rule_push(
@@ -200,7 +213,7 @@ class RulePush(commands.Cog):
                 f"{rulepush_pings}\nYou have been pushed to read the rules due to suspicious activity indicating you have not read them\nYou must solve a puzzle before accessing the server again.\n{get_config(ctx.guild.id, 'rulepush', 'intro_message')}"
             )
 
-    async def start_rule_push(self, member, rolepush_channel):
+    async def start_rule_push(self, member, channel: discord.abc.MessageableChannel):
         guild = member.guild
         role = self.bot.pull_role(guild,
                                   get_config(guild.id, "rulepush", "rulepushrole")
@@ -213,9 +226,8 @@ class RulePush(commands.Cog):
             return
         elif role in member.roles:
             return False
+        
 
-
-        channel = await self.new_session(guild)
         intro_message = get_config(guild.id, "rulepush", "intro_message")
         await channel.send(intro_message)
         
@@ -225,24 +237,21 @@ class RulePush(commands.Cog):
                 roles.append(rx)
         
         pushes = get_tossfile(member.guild.id, "rulepushes")
-        pushes[rolepush_channel.name]["pushed"][str(member.id)] = [role.id for role in roles]
+        pushes[channel.name]["pushed"][str(member.id)] = [role.id for role in roles]
         set_tossfile(member.guild.id, "rulepushes", json.dumps(pushes))
 
         await member.add_roles(role, reason="User pushed to read rules")
-        self.user_timers[member.id] = {
-            'channel': channel,
-            'timer': self.bot.loop.call_later(43200, self.kick_user, member),
-            'kick': True
-        }
-
-    async def kick_user(self, member):
-        if self.user_timers[member.id]['kick']:
-            await member.kick(reason="Failed to solve rule puzzle in time.")
-            await self.user_timers[member.id]['channel'].delete()
-            self.sessions["left"].append(member.id)
-            del self.sessions["current"][member.id]
-            self.save_sessions()
-            del self.user_timers[member.id]
+        try:
+            self.user_timers[member.id] = self.bot.loop.call_later(43200, self.kick_user, member)
+        except asyncio.CancelledError:
+            return
+        except asyncio.TimeoutError:
+            return self.kick_user(member)
+        
+    async def kick_user(self, member: discord.Member):
+        pushes = get_tossfile(member.guild.id, "rulepushes")
+        await member.kick(reason="Failed to solve rule puzzle in time.")
+        del self.user_timers[member.id]
 
         notify_channel = self.bot.pull_channel(member.guild, get_config(member.guild.id, "rulepush", "notificationchannel"))
         if not notify_channel:
@@ -270,7 +279,7 @@ class RulePush(commands.Cog):
         if not pushes:
             return None
         session = None
-        if "LEFTGUILD" in pushes and str(member.id) in pushes["LEFTGUILD"]:
+        if "idle_kicked" in pushes and str(member.id) in pushes["idle_kicked"]:
             session = False
         
 
@@ -336,10 +345,10 @@ class RulePush(commands.Cog):
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         if member.id in self.user_timers:
+            pushes = get_tossfile(member.guild.id, "rulepushes")
             self.user_timers[member.id]['timer'].cancel()
             del self.user_timers[member.id]
-            self.sessions["left"].append(member.id)
-            self.save_sessions()
+            
 
             rulepush_role = self.bot.pull_role(member.guild, get_config(member.guild.id, "rulepush", "rulepushrole"))
             if rulepush_role in member.roles:
@@ -348,10 +357,9 @@ class RulePush(commands.Cog):
                     kick_time = datetime.fromisoformat(kick_time_str)
                     if datetime.now(tz=timezone.utc) - kick_time < timedelta(hours=1):
                         return
-                    
+                pushes["left"].remove(member.id)
                 await member.guild.ban(member, reason="Attempting to evade the rules by leaving the server.")
-                self.sessions["left"].remove(member.id)
-                self.save_sessions()
+
 
                 notify_channel = self.bot.pull_channel(member.guild, get_config(member.guild.id, "rulepush", "notificationchannel"))
                 if not notify_channel:
@@ -380,17 +388,17 @@ class RulePush(commands.Cog):
 
     @commands.Cog.listener()
     async def on_member_ban(self, guild, user):
-        if user.id in self.sessions["left"]:
-            self.sessions["left"].remove(user.id)
-            self.save_sessions()
+        pushes = get_tossfile(guild.id, "rulepushes")
+        if user.id in pushes["left"]:
+            pushes["left"].remove(user.id)
+            set_tossfile(guild.id, "rulepushes", json.dumps(pushes))
 
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        if member.id in self.sessions["left"]:
-            self.sessions["left"].remove(member.id)
-            self.sessions["current"][member.id] = {"start_time": datetime.now(tz=timezone.utc).timestamp()}
-            self.save_sessions()
-            await self.start_rule_push(self.bot, member)
+        rulepushes = get_tossfile(member.guild.id, "rulepushes")
+        if member.id in rulepushes["left"]:
+            rolepush_rejoin = await self.new_session(member.guild)
+            await self.start_rule_push(self.bot, member, rolepush_rejoin)
 
             notify_channel = self.bot.pull_channel(member.guild, get_config(member.guild.id, "rulepush", "notificationchannel"))
             if not notify_channel:

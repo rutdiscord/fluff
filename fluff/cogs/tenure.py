@@ -44,11 +44,14 @@ class Tenure(Cog):
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
         
+        tenure_config = self.get_tenureconfig(ctx.guild)
+        tenure_threshold = tenure_config["threshold"]
+        tenure_role = tenure_config["role"]
+        tenure_disabled_role = tenure_config["role_disabled"]
+        tenure_disabled_users = tenure_config["disabled_users"]
+
         tenure_dt = await self.check_joindelta(ctx.author)
         tenure_days = tenure_dt.days
-        tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
-        tenure_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role"))
-        tenure_disabled_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role_disabled"))
 
         if tenure_disabled_role in ctx.author.roles and ctx.author.id in get_guildfile(ctx.guild.id, "tenure_disabled"):
             return await ctx.reply(f"You have been prohibited from receiving the {tenure_role.name} role. Please contact staff if this is in error.", mention_author=False)
@@ -64,7 +67,7 @@ class Tenure(Cog):
     
     @commands.check(ismanager)
     @tenure.command()
-    async def force_sync(self,ctx):
+    async def force_sync(self, ctx):
        """THIS WILL FORCEFULLY SYNCHRONIZE THE SERVER MEMBERS WITH THE TENURE ROLE.
 
        THIS IS VERY TIME CONSUMING.
@@ -89,8 +92,21 @@ class Tenure(Cog):
                     await member.add_roles(tenure_role, reason="Fluff Tenure")
                 else:
                     return
+                
+    @commands.check(isadmin)
+    @tenure.command(aliases=["blacklist", "bl"])
+    async def disable(self, ctx: commands.Context, user: discord.Member):
+        if not self.enabled(ctx.guild):
+            return await ctx.reply(self.nocfgmsg, mention_author=False)
+        
+        tenure_config = self.get_tenureconfig(ctx.guild)
+        tenure_role = tenure_config["role"]
+        tenure_disabled_role = tenure_config["role_disabled"]
+        tenure_disabled_users = tenure_config["disabled_users"]
 
-
+        if tenure_disabled_role not in user.roles:
+            await user.add_roles(tenure_disabled_role, reason="Fluff Tenure (Prohibition)")
+            tenure_disabled_users[str(user.id)]
 
     @Cog.listener()
     async def on_message(self, msg):
