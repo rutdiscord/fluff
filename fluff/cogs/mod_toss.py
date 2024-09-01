@@ -10,7 +10,7 @@ from discord.ext import commands
 from discord.ext.commands import Cog
 from io import BytesIO
 from helpers.checks import ismod
-from helpers.datafiles import add_userlog, toss_userlog, get_tossfile, set_tossfile
+from helpers.datafiles import toss_userlog, get_tossfile, set_tossfile
 from helpers.placeholders import random_msg
 from helpers.archive import log_channel, get_members
 from helpers.embeds import (

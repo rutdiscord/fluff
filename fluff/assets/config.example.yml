@@ -68,23 +68,26 @@ toss:
   tossmsg_noreply_blocked:
 
 rulepush:
-# The role ID to add to users when they are rule pushed.
-rulepushrole:
+  # The role ID to add to users when they are rule pushed.
+  rulepushrole:
 
-# The category ID for rulepush sessions to be created in.
-rulepushcategory:
+  # The category ID for rulepush sessions to be created in.
+  rulepushcategory:
 
-# The channel that the bot will send its rulepush notifications to.
-# If left blank, the bot will use the Staff channel instead.
-# (This is likely the same channel you have set for the toss notification channel)
-notificationchannel:
+  # The channel that the bot will send its rulepush notifications to.
+  # If left blank, the bot will use the Staff channel instead.
+  # (This is likely the same channel you have set for the toss notification channel)
+  notificationchannel:
 
-# The channel names that the bot will use when creating sessions.
-# You may only have up to 25.
-rulepushchannels:
+  # The channel names that the bot will use when creating sessions.
+  # You may only have up to 25.
+  rulepushchannels:
 
-# Introductory message for rulepush channels.
-intro_message:
+  # Pause here to discuss tolerance..
+  rulepushtopic:
+
+  # Introductory message for rulepush channels.
+  intro_message:
 
 reaction:
   # If the bot may automatically adjust names to be readable.
