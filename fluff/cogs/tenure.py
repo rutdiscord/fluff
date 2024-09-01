@@ -2,6 +2,7 @@ import discord
 from discord.ext.commands import Cog
 from discord.ext import commands
 from helpers.sv_config import get_config
+from helpers.datafiles import get_guildfile, set_guildfile
 from helpers.checks import ismanager, isadmin
 from datetime import datetime, timedelta, UTC
 from config import logchannel
@@ -15,14 +16,17 @@ class Tenure(Cog):
     
     def get_tenureconfig(self, guild: discord.Guild):
         return {
+            "role_disabled": self.bot.pull_role(guild, get_config(guild.id, "tenure", "role_disabled")),
             "role": self.bot.pull_role(guild, get_config(guild.id, "tenure", "role")),
             "threshold": get_config(guild.id, "tenure", "threshold"),
+            "disabled_users": get_guildfile(guild.id, "tenure_disabled"),
         }
     
     def enabled(self, guild: discord.Guild):
         return all(
         (
             self.bot.pull_role(guild, get_config(guild.id, "tenure", "role")),
+            self.bot.pull_role(guild, get_config(guild.id, "tenure", "role_disabled")),
             get_config(guild.id, "tenure", "threshold"),
         )
         )
@@ -43,9 +47,13 @@ class Tenure(Cog):
         tenure_days = tenure_dt.days
         tenure_threshold = get_config(ctx.guild.id, "tenure", "threshold")
         tenure_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role"))
+        tenure_disabled_role = self.bot.pull_role(ctx.guild, get_config(ctx.guild.id, "tenure", "role_disabled"))
+
+        if tenure_disabled_role in ctx.author.roles and ctx.author.id in get_guildfile(ctx.guild.id, "tenure_disabled"):
+            return await ctx.reply(f"You have been prohibited from receiving the {tenure_role.name} role. Please contact staff if this is in error.", mention_author=False)
 
         if tenure_days >= tenure_threshold:
-           if tenure_role not in ctx.author.roles:
+           if tenure_role not in ctx.author.roles :
             await ctx.author.add_roles(tenure_role, reason="Fluff Tenure")
             return await ctx.reply(f"You joined around {tenure_days} (to be more exact, `{tenure_dt} hours:minutes (hours:minutes:ss.mmmmmm, UTC)`) days ago! You've been here long enough to be assigned the {tenure_role.name} role!",mention_author=False)
            else:
@@ -96,16 +104,22 @@ class Tenure(Cog):
         
         if not self.enabled(msg.guild):
             return
+        
         tenureconfig = self.get_tenureconfig(msg.guild)
         tenure_dt = await self.check_joindelta(msg.author)
         tenure_days = tenure_dt.days
         logchannel_cached = self.bot.get_channel(logchannel)
 
-        if tenureconfig["threshold"] < tenure_days:
-            if tenureconfig["role"] not in msg.author.roles:
-                await msg.author.add_roles(tenureconfig["role"], reason="Fluff Tenure")
-                if logchannel_cached:
-                    await logchannel_cached.send(f":infinity: **{msg.guild.name}** {msg.author.mention} has been assigned the {tenureconfig['role'].name} role.")
+        if all(tenureconfig["role_disabled"] in msg.author.roles, msg.author.id in tenureconfig["disabled_users"], tenureconfig["role"] in msg.author.roles):
+            return (
+                await msg.author.remove_roles(tenureconfig["role"], reason="Fluff Tenure (Prohibition enforcement)"),
+                await logchannel_cached.send(f":infinity: **{msg.guild.name}** {msg.author.mention} has been removed from the {tenureconfig['role'].name} role due to being prohibited.")
+            )
+        elif all(tenureconfig["role"] not in msg.author, tenureconfig["threshold"] < tenure_days):
+            return (
+                await msg.author.add_roles(tenureconfig["role"], reason="Fluff Tenure (Automatic assignment)"),
+                await logchannel_cached.send(f":infinity: **{msg.guild.name}** {msg.author.mention} has been assigned the {tenureconfig['role'].name} role.")
+            )
         
 
 async def setup(bot: discord.Client):

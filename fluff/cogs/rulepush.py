@@ -97,7 +97,7 @@ class RulePush(commands.Cog):
                 errors += f"\n- {us.display_name}\n  You cannot rulepush the bot."
             elif self.get_session(us) and rulepush_role in us.roles:
                 errors += (
-                    f"\n- {us.display_name}\n  This user is already rulepushed."
+                    f"\n- {us.display_name}\n  This user has already rulepushed."
                 )
             else:
                 continue
@@ -206,6 +206,11 @@ class RulePush(commands.Cog):
             return
         elif role in member.roles:
             return False
+
+
+        channel = await self.new_session(guild)
+        intro_message = get_config(guild.id, "rulepush", "intro_message")
+        await channel.send(intro_message)
         
         roles = []
         for rx in member.roles:
@@ -214,16 +219,9 @@ class RulePush(commands.Cog):
         
         pushes = get_tossfile(member.guild.id, "rulepushes")
         pushes[rolepush_channel.name]["pushed"][str(member.id)] = [role.id for role in roles]
+        set_tossfile(member.guild.id, "rulepushes", json.dumps(pushes))
 
-        overwrites = {
-            guild.default_role: discord.PermissionOverwrite(read_messages=False),
-            member: discord.PermissionOverwrite(read_messages=True, send_messages=True)
-        }
-
-        channel = await guild.create_text_channel(f"rule-push-{member.name}", overwrites=overwrites, category=category)
-        intro_message = get_config(guild.id, "rulepush", "intro_message")
-        await channel.send(intro_message)
-
+        await member.add_roles(role, reason="User pushed to read rules")
         self.user_timers[member.id] = {
             'channel': channel,
             'timer': self.bot.loop.call_later(43200, self.kick_user, member),
@@ -262,7 +260,7 @@ class RulePush(commands.Cog):
 
     def get_session(self, member):
         pushes = get_tossfile(member.guild.id, "rulepushes")
-        if not pushes
+        if not pushes:
             return None
         session = None
         if "LEFTGUILD" in pushes and str(member.id) in pushes["LEFTGUILD"]:
