@@ -1,8 +1,5 @@
 import json
-import os
-import re
 import discord
-import asyncio
 from discord.ext import commands, tasks
 from helpers.placeholders import random_msg
 from helpers.datafiles import get_guildfile, set_guildfile

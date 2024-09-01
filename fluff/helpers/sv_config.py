@@ -1,7 +1,5 @@
 import yaml
 import shutil
-import copy
-import json
 import os
 from jsonschema import validate
 

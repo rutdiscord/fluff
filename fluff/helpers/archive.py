@@ -2,12 +2,6 @@
 # 🖤 If by any chance you're reading, we all miss you.
 # https://github.com/Roadcrosser/archiver
 import discord
-import json
-import os
-import httplib2
-import re
-import datetime
-import asyncio
 import textwrap
 import zipfile
 from io import BytesIO

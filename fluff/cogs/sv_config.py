@@ -1,11 +1,8 @@
-import json
 import os
 import discord
-import datetime
-import asyncio
 import yaml
 from helpers.checks import isadmin, ismanager
-from discord.ext.commands import Cog, Context, Bot
+from discord.ext.commands import Cog, Bot
 from discord.ext import commands
 from helpers.embeds import stock_embed, author_embed
 from helpers.sv_config import fill_config, make_config, set_raw_config, validate_config
