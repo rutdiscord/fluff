@@ -1,5 +1,4 @@
 import discord
-import asyncio
 from discord.ext.commands import Cog
 from discord.ext import commands
 from helpers.sv_config import get_config

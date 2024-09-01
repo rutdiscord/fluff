@@ -1,14 +1,8 @@
 import asyncio
 import traceback
-import datetime
 import discord
-import time
 import json
-import math
-import parsedatetime
 from helpers.datafiles import get_guildfile, set_guildfile
-from helpers.sv_config import get_config
-from helpers.placeholders import random_msg
 from discord.ext.commands import Cog
 
 
@@ -28,7 +22,6 @@ class Common(Cog):
         self.bot.await_reaction = self.await_reaction
         self.bot.convert_temperature = self.convert_temperature
         self.bot.filesize = self.filesize
-        self.bot.parse_time = self.parse_time
         self.bot.c_to_f = self.c_to_f
         self.bot.f_to_c = self.f_to_c
         self.bot.c_to_k = self.c_to_k
@@ -80,12 +73,6 @@ class Common(Cog):
 
     def f_to_k(self, f):
         return 5.0 / 9.0 * (f + 459.67)
-
-    def parse_time(self, delta_str):
-        cal = parsedatetime.Calendar()
-        time_struct, parse_status = cal.parse(delta_str)
-        res_timestamp = math.floor(time.mktime(time_struct))
-        return res_timestamp
 
     async def aioget(self, url):
         try:

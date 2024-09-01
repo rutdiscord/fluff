@@ -2,8 +2,6 @@ import discord
 from discord.ext.commands import Cog
 from discord.ext import commands, tasks
 import json
-import re
-import datetime
 import asyncio
 from helpers.datafiles import get_guildfile, set_guildfile
 from helpers.sv_config import get_config
