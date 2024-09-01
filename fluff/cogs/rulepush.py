@@ -26,18 +26,48 @@ class RulePush(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
         self.user_timers = {}
-        self.load_sessions()
 
-    def load_sessions(self):
-        if os.path.exists("rule_sessions.json"):
-            with open("rule_sessions.json", "r") as f:
-                self.sessions = json.load(f)
-        else:
-            self.sessions = {"current": {}, "left": [], "kicks": {}}
+    async def new_session(self, guild):
+        staff_roles = [
+            self.bot.pull_role(guild, get_config(guild.id, "staff", "modrole")),
+            self.bot.pull_role(guild, get_config(guild.id, "staff", "adminrole")),
+        ]
+        bot_role = self.bot.pull_role(guild, get_config(guild.id, "staff", "botrole"))
+        tosses = get_tossfile(guild.id, "rulepushes")
 
-    def save_sessions(self):
-        with open("rule_sessions.json", "w") as f:
-            json.dump(self.sessions, f, indent=4)
+        for c in get_config(guild.id, "rulepush", "rulepushchannels"):
+            if c not in [g.name for g in guild.channels]:
+                if c not in tosses:
+                    tosses[c] = {"pushed": {}, "unpushed": [], "left": []}
+                    set_tossfile(guild.id, "rulepushes", json.dumps(tosses))
+
+                overwrites = {
+                    guild.default_role: discord.PermissionOverwrite(
+                        read_messages=False
+                    ),
+                    guild.me: discord.PermissionOverwrite(read_messages=True),
+                }
+                if bot_role:
+                    overwrites[bot_role] = discord.PermissionOverwrite(
+                        read_messages=True
+                    )
+                for staff_role in staff_roles:
+                    if not staff_role:
+                        continue
+                    overwrites[staff_role] = discord.PermissionOverwrite(
+                        read_messages=True
+                    )
+                toss_channel = await guild.create_text_channel(
+                    c,
+                    reason="Fluff Rule Push",
+                    category=self.bot.pull_category(
+                        guild, get_config(guild.id, "rulepush", "rulepushcategory")
+                    ),
+                    overwrites=overwrites,
+                    topic=get_config(guild.id, "rulepush", "rulepushtopic"),
+                )
+
+                return toss_channel
 
     @commands.check(ismod)
     @commands.guild_only()
@@ -104,14 +134,11 @@ class RulePush(commands.Cog):
             )
         else:
             addition = False
-            rulepush_channel = self.bot.pull_channel(
-                ctx.guild.id, get_config(ctx.guild.id, "rulepush", "rulepushchannels")
-                )
-
+            rulepush_channel = self.new_session(ctx.guild)
         for us in users:
             try:
                 failed_roles, previous_roles = await self.start_rule_push(
-                    us, ctx.author, rulepush_channel
+                    us, rulepush_channel
                 )
                 await rulepush_channel.set_permissions(us, read_messages=True)
             except commands.MissingPermissions:
@@ -173,13 +200,27 @@ class RulePush(commands.Cog):
                 f"{rulepush_pings}\nYou have been pushed to read the rules due to suspicious activity indicating you have not read them\nYou must solve a puzzle before accessing the server again.\n{get_config(ctx.guild.id, 'rulepush', 'intro_message')}"
             )
 
-    async def start_rule_push(self, member):
+    async def start_rule_push(self, member, rolepush_channel):
         guild = member.guild
-        role = discord.utils.get(guild.roles, name="RulePushRole")
-        category = discord.utils.get(guild.categories, name="RulePushCategory")
+        role = self.bot.pull_role(guild,
+                                  get_config(guild.id, "rulepush", "rulepushrole")
+                                  )
+        category = self.bot.pull_category(
+                        guild, get_config(guild.id, "rulepush", "rulepushcategory")
+                    )
         
         if not role or not category:
             return
+        elif role in member.roles:
+            return False
+        
+        roles = []
+        for rx in member.roles:
+            if rx != member.guild.default_role and rx != role:
+                roles.append(rx)
+        
+        pushes = get_tossfile(member.guild.id, "rulepushes")
+        pushes[rolepush_channel.name]["pushed"][str(member.id)] = [role.id for role in roles]
 
         overwrites = {
             guild.default_role: discord.PermissionOverwrite(read_messages=False),
@@ -195,9 +236,6 @@ class RulePush(commands.Cog):
             'timer': self.bot.loop.call_later(43200, self.kick_user, member),
             'kick': True
         }
-
-        self.sessions["current"][member.id] = {"channel": channel.id, "start_time": datetime.utcnow().isoformat()}
-        self.save_sessions()
 
     async def kick_user(self, member):
         if self.user_timers[member.id]['kick']:
@@ -230,7 +268,13 @@ class RulePush(commands.Cog):
             await modlog_channel.send(embed=embed)
 
     def get_session(self, member):
-        return self.sessions["current"].get(str(member.id))
+        pushes = get_tossfile(member.guild.id, "rulepushes")
+        if not pushes
+            return None
+        session = None
+        if "LEFTGUILD" in pushes and str(member.id) in pushes["LEFTGUILD"]:
+            session = False
+        
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -242,16 +286,24 @@ class RulePush(commands.Cog):
             channel = self.user_timers[member.id]['channel']
             if message.channel == channel:
                 keywords = {"pineapple", "pancake", "coconut"}
-                if not any(keyword in message.content.lower() for keyword in keywords):
-                    await message.delete()
-                else:
+
+                if 'keywords_sent' not in self.user_timers[member.id]:
+                    self.user_timers[member.id]['keywords_sent'] = []
+                
+                for keyword in keywords:
+                    if keyword in message.content.lower():
+                        self.user_timers[member.id]['keywords_sent'].append(keyword)
+
+                if self.user_timers[member.id]['keywords_sent'] == keywords:
                     self.user_timers[member.id]['kick'] = False
                     await channel.send("Congratulations! Please be mindful of the rules.\nYou may be pushed to read the rules again at a later date if you participate in further suspicious activity.\n**You will be free to participate in the server in 60 seconds...**")
-                    await asyncio.sleep(60)
+                    await asyncio.sleep(30)
                     await channel.delete()
                     del self.user_timers[member.id]
                     del self.sessions["current"][member.id]
                     self.save_sessions()
+                else:
+                    await message.delete()
 
                     ctx = await self.bot.get_context(message)
                     us = member
@@ -263,7 +315,7 @@ class RulePush(commands.Cog):
 
                     if notify_channel:
                         embed = stock_embed(self.bot)
-                        embed.set_author(name=us.display_name, icon_url=us.avatar_url)
+                        embed.set_author(name=us.display_name, icon_url=us.display_avatar.url)
                         embed.color = discord.Color.green()
                         embed.title = "🎉 RulePush Completed"
                         embed.description = f"{us.mention} has successfully completed the rulepush puzzle and has been released."
@@ -271,7 +323,7 @@ class RulePush(commands.Cog):
 
                     if modlog_channel and modlog_channel != notify_channel:
                         embed = stock_embed(self.bot)
-                        embed.set_author(name=us.display_name, icon_url=us.avatar_url)
+                        embed.set_author(name=us.display_name, icon_url=us.display_avatar.url)
                         embed.color = discord.Color.green()
                         embed.title = "🎉 RulePush Completed"
                         embed.description = f"{us.mention} has successfully completed the rulepush puzzle and has been released."
@@ -279,7 +331,7 @@ class RulePush(commands.Cog):
 
     async def kick(self, ctx, member: discord.Member, *, reason= None):
         await member.kick(reason="Could not read the rules in time.")
-        self.sessions["kicks"][member.id] = datetime.utcnow().isoformat()
+        self.sessions["kicks"][member.id] = datetime.now(tz=timezone.utc).timestamp()
         self.savesessions()
         await ctx.send(f'Kicked {member.mention}')
 
@@ -296,7 +348,7 @@ class RulePush(commands.Cog):
                 kick_time_str = self.sessions["kicks"].get(member.id)
                 if kick_time_str:
                     kick_time = datetime.fromisoformat(kick_time_str)
-                    if datetime.utcnow() - kick_time < timedelta(hours=1):
+                    if datetime.now(tz=timezone.utc) - kick_time < timedelta(hours=1):
                         return
                     
                 await member.guild.ban(member, reason="Attempting to evade the rules by leaving the server.")
@@ -311,7 +363,7 @@ class RulePush(commands.Cog):
                 # Create and send embed messages
                 if notify_channel:
                     embed = stock_embed(self.bot)
-                    embed.set_author(name=member.display_name, icon_url=member.avatar_url)
+                    embed.set_author(name=member.display_name, icon_url=member.display_avatar.url)
                     embed.color = discord.Color.red()
                     embed.title = "🚫 RulePush Violation"
                     embed.description = f"{member.mention} has been banned for attempting to leave while rulepushed."
@@ -319,7 +371,7 @@ class RulePush(commands.Cog):
 
                 if modlog_channel and modlog_channel != notify_channel:
                     embed = stock_embed(self.bot)
-                    embed.set_author(name=member.display_name, icon_url=member.avatar_url)
+                    embed.set_author(name=member.display_name, icon_url=member.display_avatar.url)
                     embed.color = discord.Color.red()
                     embed.title = "🚫 RulePush Violation"
                     embed.description = f"{member.mention} has been banned for attempting to leave while rulepushed."
@@ -338,9 +390,9 @@ class RulePush(commands.Cog):
     async def on_member_join(self, member):
         if member.id in self.sessions["left"]:
             self.sessions["left"].remove(member.id)
-            self.sessions["current"][member.id] = {"start_time": datetime.utcnow().isoformat()}
+            self.sessions["current"][member.id] = {"start_time": datetime.now(tz=timezone.utc).timestamp()}
             self.save_sessions()
-            await self.start_rule_push(member)
+            await self.start_rule_push(self.bot, member)
 
             notify_channel = self.bot.pull_channel(member.guild, get_config(member.guild.id, "rulepush", "notificationchannel"))
             if not notify_channel:
@@ -349,7 +401,7 @@ class RulePush(commands.Cog):
 
             if notify_channel:
                 embed = stock_embed(self.bot)
-                embed.set_author(name=member.display_name, icon_url=member.avatar_url)
+                embed.set_author(name=member.display_name, icon_url=member.display_avatar.url)
                 embed.color = discord.Color.orange()
                 embed.title = "⚠️ RulePush Rejoin"
                 embed.description = f"{member.mention} has rejoined the server after being kicked while rulepushed."
@@ -357,21 +409,11 @@ class RulePush(commands.Cog):
 
             if modlog_channel and modlog_channel != notify_channel:
                 embed = stock_embed(self.bot)
-                embed.set_author(name=member.display_name, icon_url=member.avatar_url)
+                embed.set_author(name=member.display_name, icon_url=member.display_avatar.url)
                 embed.color = discord.Color.orange()
                 embed.title = "⚠️ RulePush Rejoin"
                 embed.description = f"{member.mention} has rejoined the server after being kicked while rulepushed."
                 await modlog_channel.send(embed=embed)
-
-    async def start_rule_push(self, member):
-        guild = member.guild
-        rulepush_role = self.bot.pull_role(guild, get_config(guild.id, "rulepush", "rulepushrole"))
-        if not rulepush_role:
-            return
-
-        await member.add_roles(rulepush_role)
-        self.sessions["current"][member.id] = {"start_time": datetime.utcnow().isoformat()}
-        self.save_sessions()
 
 async def setup(bot):
     await bot.add_cog(RulePush(bot))
