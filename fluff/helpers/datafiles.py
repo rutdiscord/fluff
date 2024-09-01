@@ -104,7 +104,7 @@ def get_tossfile(serverid, filename):
 def set_tossfile(serverid, filename, contents):
     with open(f"data/servers/{serverid}/toss/{filename}.json", "w") as f:
         f.write(contents)
-
+        
 
 # Default Fills
 

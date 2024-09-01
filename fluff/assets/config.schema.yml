@@ -128,6 +128,10 @@ rulepush:
         - string
         - "null"
       minimum: 100000000000000000
+    rulepushtopic:
+      type:
+        - string
+        - "null"
     rulepushchannels:
       type: 
         - array
@@ -198,4 +202,4 @@ rulepush:
     type: object
     properties:
       version:
-        const: 17
+        const: 18
