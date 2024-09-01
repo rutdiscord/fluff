@@ -1,4 +1,5 @@
 import discord
+import json
 from discord.ext.commands import Cog
 from discord.ext import commands
 from helpers.sv_config import get_config
@@ -105,7 +106,10 @@ class Tenure(Cog):
 
         if tenure_disabled_role not in user.roles:
             await user.add_roles(tenure_disabled_role, reason="Fluff Tenure (Prohibition)")
+            if tenure_role in user.roles:
+                await user.remove_roles(tenure_role, reason="Fluff Tenure (Prohibition)")
             tenure_disabled_users[str(user.id)] = reason
+            set_guildfile(ctx.guild.id, "tenure_disabled", json.dumps(tenure_disabled_users))
 
     @Cog.listener()
     async def on_message(self, msg):
