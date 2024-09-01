@@ -106,9 +106,12 @@ tenure:
   # Role ID for the 'regular' role
   role: 
 
+  # Role ID for the 'tenure disabled' role
+  role_disabled:
+
 drive:
   folder:
   # Set the ID of the Google Drive folder that the file should be uploaded to.
 
 metadata:
-  version: 17
+  version: 18

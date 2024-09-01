@@ -173,6 +173,12 @@ rulepush:
           - string
           - "null"
         minimum: 100000000000000000
+      role_disabled:
+        type:
+          - integer
+          - string
+          - "null"
+        minimum: 100000000000000000
   overrides:
     type:
       - array
