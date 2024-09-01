@@ -1,10 +1,6 @@
 import discord
 from discord.ext.commands import Cog
-from discord.ext import commands, tasks
-import json
-import re
-import datetime
-import asyncio
+from discord.ext import commands
 from unidecode import unidecode
 from helpers.checks import ismod
 from helpers.sv_config import get_config

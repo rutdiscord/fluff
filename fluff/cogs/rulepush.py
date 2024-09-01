@@ -1,17 +1,10 @@
 import discord
 import json
-import os
 import asyncio
-import random
-import zipfile
 from datetime import datetime, timezone, timedelta
 from discord.ext import commands
-from discord.ext.commands import Cog
-from io import BytesIO
 from helpers.checks import ismod
-from helpers.datafiles import add_userlog, toss_userlog, get_tossfile, set_tossfile
-from helpers.placeholders import random_msg
-from helpers.archive import log_channel, get_members
+from helpers.datafiles import get_tossfile, set_tossfile
 from helpers.embeds import (
     stock_embed,
     mod_embed,

@@ -2,7 +2,7 @@ import json
 import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
-from helpers.datafiles import get_userfile, fill_profile, set_userfile
+from helpers.datafiles import fill_profile, set_userfile
 from helpers.embeds import stock_embed, author_embed
 
 

@@ -1,6 +1,5 @@
 import time
 import discord
-import os
 import io
 import asyncio
 import matplotlib
@@ -8,20 +7,12 @@ import matplotlib.pyplot as plt
 import typing
 import random
 import platform
-import hashlib
-import zlib
-from datetime import datetime, timezone
 from discord.ext import commands
 from discord.ext.commands import Cog
 from helpers.checks import ismod
-from helpers.embeds import stock_embed, author_embed, sympage
-from helpers.datafiles import fill_profile
+from helpers.embeds import stock_embed, sympage
 from helpers.sv_config import get_config
-from zoneinfo import ZoneInfo, available_timezones
 import aiohttp
-import re as ren
-import html
-import json
 
 
 class Basic(Cog):

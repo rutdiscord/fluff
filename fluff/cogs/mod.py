@@ -1,17 +1,12 @@
 import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
-import datetime
 import asyncio
-import typing
-import random
 import emoji
-from helpers.checks import ismod, isadmin, ismanager
+from helpers.checks import ismod, isadmin
 from helpers.datafiles import add_userlog
 from helpers.placeholders import random_msg
 from helpers.sv_config import get_config
-from helpers.embeds import stock_embed, author_embed, mod_embed, quote_embed
-import io
 import re
 
 
