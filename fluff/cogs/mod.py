@@ -589,6 +589,7 @@ class Mod(Cog):
         self,
         ctx,
         channel: discord.abc.GuildChannel,
+        *,
         text: str,
     ):
         """This makes the bot repeat some text in a specific channel.
