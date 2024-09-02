@@ -144,7 +144,7 @@ class RulePush(commands.Cog):
         for us in users:
             try:
                 failed_roles, previous_roles = await self.start_rule_push(
-                    us, rulepush_channel
+                    us, ctx.author, rulepush_channel
                 )
                 await rulepush_channel.set_permissions(us, read_messages=True)
             except commands.MissingPermissions:
@@ -206,7 +206,7 @@ class RulePush(commands.Cog):
                 f"{rulepush_pings}\nYou have been pushed to read the rules due to suspicious activity indicating you have not read them\nYou must solve a puzzle before accessing the server again.\n{get_config(ctx.guild.id, 'rulepush', 'intro_message')}"
             )
 
-    async def start_rule_push(self, member, channel: discord.abc.GuildChannel):
+    async def start_rule_push(self, member: discord.User, staff: discord.User, channel: discord.abc.GuildChannel):
         guild = member.guild
         role = self.bot.pull_role(guild,
                                   get_config(guild.id, "rulepush", "rulepushrole")
@@ -233,13 +233,29 @@ class RulePush(commands.Cog):
         pushes[channel.name]["pushed"][str(member.id)] = [role.id for role in roles]
         set_tossfile(member.guild.id, "rulepushes", json.dumps(pushes))
 
+
         await member.add_roles(role, reason="User pushed to read rules")
+
+        fail_roles = []
+        if roles:
+            for rr in roles:
+                if not rr.is_assignable():
+                    fail_roles.append(rr)
+                    roles.remove(rr)
+            await member.remove_roles(
+                *roles,
+                reason=f"User tossed by {staff} ({staff.id})",
+                atomic=False,
+            )
+    
         try:
             self.user_timers[member.id] = self.bot.loop.call_later(43200, self.kick_user, member)
         except asyncio.CancelledError:
             return
         except asyncio.TimeoutError:
             return self.kick_user(member)
+        
+        return fail_roles, roles
         
     async def kick_user(self, member: discord.Member):
         pushes = get_tossfile(member.guild.id, "rulepushes")
@@ -282,7 +298,7 @@ class RulePush(commands.Cog):
             return
 
         member = message.author
-        if member.id in self.user_timers:
+        if member.id in self.user_timers and self.get_session(member):
             channel = self.user_timers[member.id]['channel']
             if message.channel == channel:
                 keywords = {"pineapple", "pancake", "coconut"}
@@ -391,7 +407,7 @@ class RulePush(commands.Cog):
         rulepushes = get_tossfile(member.guild.id, "rulepushes")
         if member.id in rulepushes["left"]:
             rolepush_rejoin = await self.new_session(member.guild)
-            await self.start_rule_push(self.bot, member, rolepush_rejoin)
+            await self.start_rule_push(self.bot, self.bot.user, member, rolepush_rejoin)
 
             notify_channel = self.bot.pull_channel(member.guild, get_config(member.guild.id, "rulepush", "notificationchannel"))
             if not notify_channel:
