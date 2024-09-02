@@ -5,6 +5,7 @@ from discord.ext import commands
 from helpers.sv_config import get_config
 from helpers.datafiles import get_guildfile, set_guildfile
 from helpers.checks import ismanager, isadmin
+from helpers.users import username_system
 from datetime import datetime, timedelta, UTC
 from config import logchannel
 class Tenure(Cog):
@@ -131,6 +132,7 @@ class Tenure(Cog):
             return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and has already received the {tenure_role.name} role.", mention_author=False)
         elif user.id in tenure_config["disabled_users"]:
             return await ctx.reply(f"{user.mention} has been prohibited from receiving the {tenure_role.name} role. Reason: {tenure_config['disabled_users'][user.id]['reason']}", mention_author=False)
+    
     @commands.check(isadmin)
     @tenure.command(aliases=["whitelist", "wl"])
     async def enable(self, ctx: commands.Context, user: discord.Member):
