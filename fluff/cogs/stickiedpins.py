@@ -78,12 +78,10 @@ class StickiedPins(commands.Cog):
     
     @commands.Cog.listener()
     async def on_message_edit(self, before: discord.Message, after: discord.Message):
-            guild = None
-
-            if isinstance(before.channel, discord.abc.GuildChannel):
-                guild = before.guild
-            else:
-                return
+            if not isinstance(before.channel, discord.TextChannel):
+                return  
+            
+            guild = before.guild
             
             guild_pins = get_guildfile(guild.id, "pins")
             if str(before.channel.id) in guild_pins:
