@@ -12,7 +12,6 @@ from helpers.checks import ismod
 from helpers.datafiles import toss_userlog, get_tossfile, set_tossfile
 from helpers.placeholders import random_msg
 from helpers.archive import log_channel
-from helpers.users import username_system
 from helpers.embeds import (
     stock_embed,
     mod_embed,
@@ -39,6 +38,15 @@ class ModToss(Cog):
                 self.bot.pull_category(g, get_config(g.id, "toss", "tosscategory")),
                 get_config(g.id, "toss", "tosschannels"),
             )
+        )
+
+    def username_system(self, user):
+        return (
+            "**"
+            + self.bot.pacify_name(user.global_name)
+            + f"** [{self.bot.pacify_name(str(user))}]"
+            if user.global_name
+            else f"**{self.bot.pacify_name(str(user))}**"
         )
 
     # Thank you to https://stackoverflow.com/a/29489919 for this function.
@@ -188,7 +196,7 @@ class ModToss(Cog):
                 else:
                     userlist = "\n".join(
                         [
-                            f"> {username_system(user)}"
+                            f"> {self.username_system(user)}"
                             for user in [
                                 await self.bot.fetch_user(str(u))
                                 for u in tosses[c]["tossed"].keys()
@@ -248,12 +256,12 @@ class ModToss(Cog):
         errors = ""
         for us in users:
             if us.id == ctx.author.id:
-                errors += f"\n- {username_system(us)}\n  You cannot toss yourself."
+                errors += f"\n- {self.username_system(us)}\n  You cannot toss yourself."
             elif us.id == self.bot.application_id:
-                errors += f"\n- {username_system(us)}\n  You cannot toss the bot."
+                errors += f"\n- {self.username_system(us)}\n  You cannot toss the bot."
             elif self.get_session(us) and toss_role in us.roles:
                 errors += (
-                    f"\n- {username_system(us)}\n  This user is already tossed."
+                    f"\n- {self.username_system(us)}\n  This user is already tossed."
                 )
             else:
                 continue
@@ -292,7 +300,7 @@ class ModToss(Cog):
                 )
                 await toss_channel.set_permissions(us, read_messages=True)
             except commands.MissingPermissions:
-                errors += f"\n- {username_system(us)}\n  Missing permissions to toss this user."
+                errors += f"\n- {self.username_system(us)}\n  Missing permissions to toss this user."
                 continue
 
             toss_userlog(
@@ -428,7 +436,7 @@ class ModToss(Cog):
                 str(us.id) not in tosses[ctx.channel.name]["tossed"]
                 and toss_role not in us.roles
             ):
-                output += "\n" + f"{username_system(us)} is not already tossed."
+                output += "\n" + f"{self.username_system(us)} is not already tossed."
             else:
                 continue
             users.remove(us)
@@ -464,7 +472,7 @@ class ModToss(Cog):
 
             await ctx.channel.set_permissions(us, overwrite=None)
 
-            output += "\n" + f"{username_system(us)} has been untossed."
+            output += "\n" + f"{self.username_system(us)} has been untossed."
             if notify_channel:
                 embed = stock_embed(self.bot)
                 author_embed(embed, us)
@@ -574,7 +582,7 @@ class ModToss(Cog):
             )
             reply = (
                 f"📕 I've archived that as: `{filename}.txt`\nThis mute session had the following users:\n- "
-                + "\n- ".join([f"{username_system(u)} ({u.id})" for u in users])
+                + "\n- ".join([f"{self.username_system(u)} ({u.id})" for u in users])
             )
             dotraw += f"\n{ctx.message.created_at.astimezone().strftime('%Y/%m/%d %H:%M')} {self.bot.user} [BOT]\n{reply}"
 
@@ -677,7 +685,7 @@ class ModToss(Cog):
 
         await toss_channel.set_permissions(member, read_messages=True)
         tossmsg = await toss_channel.send(
-            content=f"🔁 {username_system(member)} rejoined while tossed.\n{get_config(member.guild.id, 'toss', 'tossmsg_rejoin')}"
+            content=f"🔁 {self.username_system(member)} rejoined while tossed.\n{get_config(member.guild.id, 'toss', 'tossmsg_rejoin')}"
         )
 
         def check(m):
@@ -701,7 +709,7 @@ class ModToss(Cog):
 
         if notify_channel:
             tossmsg = await notify_channel.send(
-                content=f"🔁 {username_system(member)} ({member.id}) rejoined while tossed. Continuing in {toss_channel.mention}..."
+                content=f"🔁 {self.username_system(member)} ({member.id}) rejoined while tossed. Continuing in {toss_channel.mention}..."
             )
         toss_userlog(
             member.guild.id,
@@ -740,11 +748,11 @@ class ModToss(Cog):
         toss_channel = self.bot.pull_channel(member.guild, session)
         try:
             await member.guild.fetch_ban(member)
-            out = f"🔨 {username_system(member)} got banned while tossed."
+            out = f"🔨 {self.username_system(member)} got banned while tossed."
         except discord.NotFound:
-            out = f"🚪 {username_system(member)} left while tossed."
+            out = f"🚪 {self.username_system(member)} left while tossed."
         except discord.Forbidden:
-            out = f"❓ {username_system(member)} was removed from the server.\nI do not have Audit Log permissions to tell why."
+            out = f"❓ {self.username_system(member)} was removed from the server.\nI do not have Audit Log permissions to tell why."
         if notify_channel:
             await notify_channel.send(out)
         if toss_channel:
@@ -817,7 +825,7 @@ class ModToss(Cog):
        
         if self.get_session(msgauthor) and toss_role in msgauthor.roles:
                 error += (
-                    f"\n- {username_system(msgauthor)}\n  This user is already tossed."
+                    f"\n- {self.username_system(msgauthor)}\n  This user is already tossed."
                 )
 
         if all(
@@ -839,13 +847,13 @@ class ModToss(Cog):
                         msgauthor, msgauthor.guild.me, toss_channel
                     )
                 await toss_channel.set_permissions(msgauthor, read_messages=True)
-                await message.reply(f"{username_system(message.author)} has been automatically muted for blocking Fluff.")           
+                await message.reply(f"{self.username_system(message.author)} has been automatically muted for blocking Fluff.")           
                 await toss_channel.send(
                     f"{msgauthor.mention}, {get_config(message.guild.id, 'toss', 'tossmsg_noreply_blocked')}",
                     file=discord.File("assets/noreply.png")
                     )
             except commands.MissingPermissions:
-                error += f"\n- {username_system(msgauthor)}\n  Missing permissions to toss this user."
+                error += f"\n- {self.username_system(msgauthor)}\n  Missing permissions to toss this user."
         
         toss_userlog(
                 message.guild.id,
@@ -932,7 +940,7 @@ class ModToss(Cog):
        
         if self.get_session(msgauthor) and toss_role in msgauthor.roles:
                 error += (
-                    f"\n- {username_system(msgauthor)}\n  This user is already tossed."
+                    f"\n- {self.username_system(msgauthor)}\n  This user is already tossed."
                 )    
 
         if len(error) > 0:
@@ -961,13 +969,13 @@ class ModToss(Cog):
                         msgauthor, msgauthor.guild.me, toss_channel
                     )
                 await toss_channel.set_permissions(msgauthor, read_messages=True)
-                await message.reply(f"{username_system(message.author)} has been automatically muted for reaching the threshold for reply ping preference violation.")           
+                await message.reply(f"{self.username_system(message.author)} has been automatically muted for reaching the threshold for reply ping preference violation.")           
                 await toss_channel.send(
                     f"{msgauthor.mention}, {get_config(message.guild.id, 'toss', 'tossmsg_noreply')}",
                     file=discord.File("assets/noreply.png")
                     )
             except commands.MissingPermissions:
-                error += f"\n- {username_system(msgauthor)}\n  Missing permissions to toss this user."
+                error += f"\n- {self.username_system(msgauthor)}\n  Missing permissions to toss this user."
         
         toss_userlog(
                 message.guild.id,

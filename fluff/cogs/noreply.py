@@ -86,7 +86,7 @@ class Reply(Cog):
                 ):
                     temp_reminder_msg = await message_author.send(
                         content="**Please do not reply ping users who do not wish to be pinged.**\n"
-                        + "This incident will be excused, but further incidents will be counted as **violations**.",
+                        + "This incident will be excused, but further incidents will be counted as **violations**. (Reply to this message or wait sixty seconds to acknowledge)",
                         file=discord.File("assets/noreply.png"),
                         mention_author=False,
                     )
