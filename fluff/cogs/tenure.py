@@ -21,7 +21,6 @@ class Tenure(Cog):
             "role_disabled": self.bot.pull_role(guild, get_config(guild.id, "tenure", "role_disabled")),
             "role": self.bot.pull_role(guild, get_config(guild.id, "tenure", "role")),
             "threshold": get_config(guild.id, "tenure", "threshold"),
-            "disabled_users": get_guildfile(guild.id, "tenure_disabled"),
         }
     
     def enabled(self, guild: discord.Guild):
@@ -49,12 +48,11 @@ class Tenure(Cog):
         tenure_threshold = tenure_config["threshold"]
         tenure_role = tenure_config["role"]
         tenure_disabled_role = tenure_config["role_disabled"]
-        tenure_disabled_users = tenure_config["disabled_users"]
 
         tenure_dt = await self.check_joindelta(ctx.author)
         tenure_days = tenure_dt.days
 
-        if tenure_disabled_role in ctx.author.roles and ctx.author.id in tenure_disabled_users:
+        if tenure_disabled_role in ctx.author.roles:
             return await ctx.reply(f"You have been prohibited from receiving the {tenure_role.name} role. Please contact staff if this is in error.", mention_author=False)
 
         if tenure_days >= tenure_threshold:
@@ -103,17 +101,12 @@ class Tenure(Cog):
         tenure_config = self.get_tenureconfig(ctx.guild)
         tenure_role = tenure_config["role"]
         tenure_disabled_role = tenure_config["role_disabled"]
-        tenure_disabled_users = tenure_config["disabled_users"]
 
-        if str(user.id) in tenure_disabled_users and tenure_disabled_role in user.roles:
+        if tenure_disabled_role in user.roles:
             return await ctx.reply("This user is already prohibited from receiving the tenure role.", mention_author=False)
         else:
             await user.remove_roles(tenure_role, reason=f"Fluff Tenure (Prohibition enforcement: {reason})")
             await user.add_roles(tenure_disabled_role, reason=f"Fluff Tenure (Prohibition enforcement: {reason})")
-            tenure_disabled_users[str(user.id)] = {
-                "reason": reason
-            }
-            set_guildfile(ctx.guild.id, "tenure_disabled", json.dumps(tenure_disabled_users))
             return await ctx.reply(f"{user.mention} has been prohibited from receiving the tenure role. Reason: `{reason}`", mention_author=False)
         
     @commands.check(isadmin)
@@ -121,19 +114,22 @@ class Tenure(Cog):
     async def query(self, ctx: commands.Context, user: discord.Member):
         tenure_config = self.get_tenureconfig(ctx.guild)
         tenure_role = tenure_config["role"]
+        tenure_disabled_role = tenure_config["role_disabled"]
         tenure_threshold = tenure_config["threshold"]
         tenure_dt = await self.check_joindelta(user)
         tenure_days = tenure_dt.days
-        if tenure_role not in user.roles and str(user.id) not in tenure_config["disabled_users"]:
+
+        if tenure_role not in user.roles and tenure_disabled_role in user.roles:
+            return await ctx.reply(f"{user.mention} has been prohibited from receiving the {tenure_role.name} role.", mention_author=False)
+        elif tenure_role not in user.roles:
             if tenure_days >= tenure_threshold:
                 return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and is eligible for the {tenure_role.name} role. They just haven't received it yet!", mention_author=False)
             else:
                 return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and is not eligible for the {tenure_role.name} role. They need to wait {tenure_threshold - tenure_days} days.", mention_author=False)
         elif tenure_role in user.roles:
             return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and has already received the {tenure_role.name} role.", mention_author=False)
-        elif str(user.id) in tenure_config["disabled_users"]:
-            return await ctx.reply(f"{user.mention} has been prohibited from receiving the {tenure_role.name} role. Reason: `{tenure_config['disabled_users'][str(user.id)]['reason']}`", mention_author=False)
-    
+        
+
     @commands.check(isadmin)
     @tenure.command(aliases=["whitelist", "wl"])
     async def enable(self, ctx: commands.Context, user: discord.Member):
@@ -143,21 +139,17 @@ class Tenure(Cog):
         tenure_config = self.get_tenureconfig(ctx.guild)
         tenure_role = tenure_config["role"]
         tenure_disabled_role = tenure_config["role_disabled"]
-        tenure_disabled_users = tenure_config["disabled_users"]
         status_msg = await ctx.reply("Processing..", mention_author=False)
-
-        if str(user.id) in tenure_disabled_users and tenure_disabled_role in user.roles:
+    
+        if tenure_disabled_role in user.roles:
             await user.add_roles(tenure_role, reason="Fluff Tenure (Prohibition enforcement: Enablement)")
-            del tenure_disabled_users[str(user.id)]
-            set_guildfile(ctx.guild.id, "tenure_disabled", json.dumps(tenure_disabled_users))
             return await status_msg.edit(content=f"{user.mention} has been allowed to receive the {tenure_role.mention} role. They will have to run `pls tenure` to receive the role again.")
         else:
-            return await status_msg.edit(content=f"{user.mention} is not prohibited from receiving the {tenure_role.mention} role. No operations have been performed.")
+            return await status_msg.edit(content=f"{user.mention} is not prohibited from receiving the {tenure_role.mention} role. No operations have been performed.", )
 
     @Cog.listener()
     async def on_message(self, msg):
         await self.bot.wait_until_ready()
-
         if (
             msg.author.bot
             or msg.is_system()
@@ -179,11 +171,10 @@ class Tenure(Cog):
         #         set_guildfile(msg.guild.id, "tenure_disabled", json.dumps(tenureconfig["disabled_users"]))
         #     return await msg.author.remove_roles(tenureconfig["role"], reason="Fluff Tenure (Prohibition enforcement)")
 
-        if msg.author.id in tenureconfig["disabled_users"]:
-            if tenureconfig["role_disabled"] not in msg.author.roles:
-                return await msg.author.add_roles(tenureconfig["role_disabled"], reason="Fluff Tenure (Automatic enforcement)")
-        
-        if tenureconfig["role"] not in msg.author.roles and tenureconfig["threshold"] < tenure_days:
+
+        if tenureconfig["role_disabled"] in msg.author.roles:
+            return 
+        elif tenureconfig["role"] not in msg.author.roles and tenureconfig["threshold"] < tenure_days:
             return await msg.author.add_roles(tenureconfig["role"], reason="Fluff Tenure (Automatic assignment)")
         
 
