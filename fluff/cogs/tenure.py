@@ -109,6 +109,7 @@ class Tenure(Cog):
             return await ctx.reply("This user is already prohibited from receiving the tenure role.", mention_author=False)
         else:
             await user.remove_roles(tenure_role, reason=f"Fluff Tenure (Prohibition enforcement: {reason})")
+            await user.add_roles(tenure_disabled_role, reason=f"Fluff Tenure (Prohibition enforcement: {reason})")
             tenure_disabled_users[user.id] = {
                 "reason": reason
             }
@@ -150,7 +151,8 @@ class Tenure(Cog):
             del tenure_disabled_users[user.id]
             set_guildfile(ctx.guild.id, "tenure_disabled", json.dumps(tenure_disabled_users))
             return await status_msg.edit(content=f"{user.mention} has been allowed to receive the {tenure_role.mention} role. They will have to run `pls tenure` to receive the role again.")
-        
+        else:
+            return await status_msg.edit(content=f"{user.mention} is not prohibited from receiving the {tenure_role.mention} role. No operations have been performed.")
 
     @Cog.listener()
     async def on_message(self, msg):
