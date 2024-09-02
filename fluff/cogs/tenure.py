@@ -132,7 +132,7 @@ class Tenure(Cog):
         elif tenure_role in user.roles:
             return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and has already received the {tenure_role.name} role.", mention_author=False)
         elif str(user.id) in tenure_config["disabled_users"]:
-            return await ctx.reply(f"{user.mention} has been prohibited from receiving the {tenure_role.name} role. Reason: {tenure_config['disabled_users'][user.id]['reason']}", mention_author=False)
+            return await ctx.reply(f"{user.mention} has been prohibited from receiving the {tenure_role.name} role. Reason: {tenure_config['disabled_users'][str(user.id)]['reason']}", mention_author=False)
     
     @commands.check(isadmin)
     @tenure.command(aliases=["whitelist", "wl"])
