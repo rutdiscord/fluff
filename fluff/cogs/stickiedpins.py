@@ -77,7 +77,13 @@ class StickiedPins(commands.Cog):
     
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        if message.guild != None and message.type == discord.MessageType.pins_add:
+        
+        if all([
+            message.guild != None, 
+            message.type == discord.MessageType.pins_add, 
+            message.author != self.bot.user
+            ]):
+
             await self.update_pins(message.guild, message.channel)
             
            
