@@ -152,7 +152,7 @@ class Tenure(Cog):
             set_guildfile(ctx.guild.id, "tenure_disabled", json.dumps(tenure_disabled_users))
             return await status_msg.edit(content=f"{user.mention} has been allowed to receive the {tenure_role.mention} role. They will have to run `pls tenure` to receive the role again.")
         else:
-            return await status_msg.edit(content=f"{user.mention} is not prohibited from receiving the {tenure_role.mention} role. No operations have been performed. {user.id in tenure_disabled_users}")
+            return await status_msg.edit(content=f"{user.mention} is not prohibited from receiving the {tenure_role.mention} role. No operations have been performed. {str(user.id) in tenure_disabled_users}")
 
     @Cog.listener()
     async def on_message(self, msg):
