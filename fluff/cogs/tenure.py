@@ -23,13 +23,16 @@ class Tenure(Cog):
         }
     
     def enabled(self, guild: discord.Guild):
-        return all(
+        try:
+            return all(
         (
             self.bot.pull_role(guild, get_config(guild.id, "tenure", "role")),
             self.bot.pull_role(guild, get_config(guild.id, "tenure", "role_disabled")),
             get_config(guild.id, "tenure", "threshold"),
         )
         )
+        except KeyError:
+            return False
     
     @commands.guild_only()
     @commands.cooldown(1, 60, commands.BucketType.guild)
