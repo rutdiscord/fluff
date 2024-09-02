@@ -53,7 +53,7 @@ class Tenure(Cog):
         tenure_dt = await self.check_joindelta(ctx.author)
         tenure_days = tenure_dt.days
 
-        if tenure_disabled_role in ctx.author.roles and ctx.author.id in get_guildfile(ctx.guild.id, "tenure_disabled"):
+        if tenure_disabled_role in ctx.author.roles and ctx.author.id in tenure_disabled_users:
             return await ctx.reply(f"You have been prohibited from receiving the {tenure_role.name} role. Please contact staff if this is in error.", mention_author=False)
 
         if tenure_days >= tenure_threshold:
@@ -104,12 +104,51 @@ class Tenure(Cog):
         tenure_disabled_role = tenure_config["role_disabled"]
         tenure_disabled_users = tenure_config["disabled_users"]
 
-        if tenure_disabled_role not in user.roles:
-            await user.add_roles(tenure_disabled_role, reason="Fluff Tenure (Prohibition)")
-            if tenure_role in user.roles:
-                await user.remove_roles(tenure_role, reason="Fluff Tenure (Prohibition)")
-            tenure_disabled_users[str(user.id)] = reason
+        if user.id in tenure_disabled_users and tenure_disabled_role in user.roles:
+            return await ctx.reply("This user is already prohibited from receiving the tenure role.", mention_author=False)
+        else:
+            await user.remove_roles(tenure_role, reason=f"Fluff Tenure (Prohibition enforcement: {reason})")
+            tenure_disabled_users[user.id] = {
+                "reason": reason
+            }
             set_guildfile(ctx.guild.id, "tenure_disabled", json.dumps(tenure_disabled_users))
+            return await ctx.reply(f"{user.mention} has been prohibited from receiving the tenure role. Reason: `{reason}`", mention_author=False)
+        
+    @commands.check(isadmin)
+    @tenure.command(aliases=["check", "status"])
+    async def query(self, ctx: commands.Context, user: discord.Member):
+        tenure_config = self.get_tenureconfig(ctx.guild)
+        tenure_role = tenure_config["role"]
+        tenure_threshold = tenure_config["threshold"]
+        tenure_dt = await self.check_joindelta(user)
+        tenure_days = tenure_dt.days
+        if tenure_role not in user.roles and user.id not in tenure_config["disabled_users"]:
+            if tenure_days >= tenure_threshold:
+                return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and is eligible for the {tenure_role.name} role. They just haven't received it yet!", mention_author=False)
+            else:
+                return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and is not eligible for the {tenure_role.name} role. They need to wait {tenure_threshold - tenure_days} days.", mention_author=False)
+        elif tenure_role in user.roles:
+            return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and has already received the {tenure_role.name} role.", mention_author=False)
+        elif user.id in tenure_config["disabled_users"]:
+            return await ctx.reply(f"{user.mention} has been prohibited from receiving the {tenure_role.name} role. Reason: {tenure_config['disabled_users'][user.id]['reason']}", mention_author=False)
+    @commands.check(isadmin)
+    @tenure.command(aliases=["whitelist", "wl"])
+    async def enable(self, ctx: commands.Context, user: discord.Member):
+        if not self.enabled(ctx.guild):
+            return await ctx.reply(self.nocfgmsg, mention_author=False)
+        
+        tenure_config = self.get_tenureconfig(ctx.guild)
+        tenure_role = tenure_config["role"]
+        tenure_disabled_role = tenure_config["role_disabled"]
+        tenure_disabled_users = tenure_config["disabled_users"]
+        status_msg = await ctx.reply("Processing..", mention_author=False)
+
+        if user.id in tenure_disabled_users and tenure_disabled_role in user.roles:
+            await user.add_roles(tenure_role, reason="Fluff Tenure (Prohibition enforcement: Enablement)")
+            del tenure_disabled_users[user.id]
+            set_guildfile(ctx.guild.id, "tenure_disabled", json.dumps(tenure_disabled_users))
+            return await status_msg.edit(content=f"{user.mention} has been allowed to receive the {tenure_role.mention} role. They will have to run `pls tenure` to receive the role again.")
+        
 
     @Cog.listener()
     async def on_message(self, msg):
@@ -129,11 +168,16 @@ class Tenure(Cog):
         tenure_dt = await self.check_joindelta(msg.author)
         tenure_days = tenure_dt.days
 
-        if tenureconfig["role_disabled"] in msg.author.roles and tenureconfig["role"] in msg.author.roles:
-            if msg.author.id not in tenureconfig["disabled_users"]:
-                tenureconfig["disabled_users"][msg.author.id] = "Automatic prohibition enforcement"
-                set_guildfile(msg.guild.id, "tenure_disabled", json.dumps(tenureconfig["disabled_users"]))
-            return await msg.author.remove_roles(tenureconfig["role"], reason="Fluff Tenure (Prohibition enforcement)")
+        # Probably should not be automatically assigning the disable role like this.
+        # if tenureconfig["role_disabled"] in msg.author.roles and tenureconfig["role"] in msg.author.roles:
+        #     if msg.author.id not in tenureconfig["disabled_users"]:
+        #         tenureconfig["disabled_users"][msg.author.id] = "Automatic prohibition enforcement"
+        #         set_guildfile(msg.guild.id, "tenure_disabled", json.dumps(tenureconfig["disabled_users"]))
+        #     return await msg.author.remove_roles(tenureconfig["role"], reason="Fluff Tenure (Prohibition enforcement)")
+
+        if msg.author.id in tenureconfig["disabled_users"]:
+            if tenureconfig["role_disabled"] not in msg.author.roles:
+                return await msg.author.add_roles(tenureconfig["role_disabled"], reason="Fluff Tenure (Automatic enforcement)")
         
         if tenureconfig["role"] not in msg.author.roles and tenureconfig["threshold"] < tenure_days:
             return await msg.author.add_roles(tenureconfig["role"], reason="Fluff Tenure (Automatic assignment)")
