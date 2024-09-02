@@ -94,7 +94,7 @@ class Tenure(Cog):
                 
     @commands.check(isadmin)
     @tenure.command(aliases=["blacklist", "bl"])
-    async def disable(self, ctx: commands.Context, user: discord.Member, *, reason: str = "No reason provided"):
+    async def disable(self, ctx: commands.Context, user: discord.Member):
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
         
@@ -105,9 +105,9 @@ class Tenure(Cog):
         if tenure_disabled_role in user.roles:
             return await ctx.reply("This user is already prohibited from receiving the tenure role.", mention_author=False)
         else:
-            await user.remove_roles(tenure_role, reason=f"Fluff Tenure (Prohibition enforcement: {reason})")
-            await user.add_roles(tenure_disabled_role, reason=f"Fluff Tenure (Prohibition enforcement: {reason})")
-            return await ctx.reply(f"{user.mention} has been prohibited from receiving the tenure role. Reason: `{reason}`", mention_author=False)
+            await user.remove_roles(tenure_role, reason=f"Fluff Tenure (Prohibition enforcement)")
+            await user.add_roles(tenure_disabled_role, reason=f"Fluff Tenure (Prohibition enforcement)")
+            return await ctx.reply(f"{user.mention} has been prohibited from receiving the tenure role.", mention_author=False)
         
     @commands.check(isadmin)
     @tenure.command(aliases=["check", "status"])
