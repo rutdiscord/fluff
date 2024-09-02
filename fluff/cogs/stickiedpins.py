@@ -86,8 +86,8 @@ class StickiedPins(commands.Cog):
                 return
             
             guild_pins = get_guildfile(guild.id, "pins")
-            if str(after.channel.id) in guild_pins:
-                if after.pinned != before.pinned:
+            if str(before.channel.id) in guild_pins:
+                if after.pinned is not before.pinned:
                     await self.update_pins(guild, after.channel)
             else:
                 return
