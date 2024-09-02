@@ -105,12 +105,12 @@ class Tenure(Cog):
         tenure_disabled_role = tenure_config["role_disabled"]
         tenure_disabled_users = tenure_config["disabled_users"]
 
-        if user.id in tenure_disabled_users and tenure_disabled_role in user.roles:
+        if str(user.id) in tenure_disabled_users and tenure_disabled_role in user.roles:
             return await ctx.reply("This user is already prohibited from receiving the tenure role.", mention_author=False)
         else:
             await user.remove_roles(tenure_role, reason=f"Fluff Tenure (Prohibition enforcement: {reason})")
             await user.add_roles(tenure_disabled_role, reason=f"Fluff Tenure (Prohibition enforcement: {reason})")
-            tenure_disabled_users[user.id] = {
+            tenure_disabled_users[str(user.id)] = {
                 "reason": reason
             }
             set_guildfile(ctx.guild.id, "tenure_disabled", json.dumps(tenure_disabled_users))
@@ -124,14 +124,14 @@ class Tenure(Cog):
         tenure_threshold = tenure_config["threshold"]
         tenure_dt = await self.check_joindelta(user)
         tenure_days = tenure_dt.days
-        if tenure_role not in user.roles and user.id not in tenure_config["disabled_users"]:
+        if tenure_role not in user.roles and str(user.id) not in tenure_config["disabled_users"]:
             if tenure_days >= tenure_threshold:
                 return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and is eligible for the {tenure_role.name} role. They just haven't received it yet!", mention_author=False)
             else:
                 return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and is not eligible for the {tenure_role.name} role. They need to wait {tenure_threshold - tenure_days} days.", mention_author=False)
         elif tenure_role in user.roles:
             return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and has already received the {tenure_role.name} role.", mention_author=False)
-        elif user.id in tenure_config["disabled_users"]:
+        elif str(user.id) in tenure_config["disabled_users"]:
             return await ctx.reply(f"{user.mention} has been prohibited from receiving the {tenure_role.name} role. Reason: {tenure_config['disabled_users'][user.id]['reason']}", mention_author=False)
     
     @commands.check(isadmin)
@@ -146,13 +146,13 @@ class Tenure(Cog):
         tenure_disabled_users = tenure_config["disabled_users"]
         status_msg = await ctx.reply("Processing..", mention_author=False)
 
-        if user.id in tenure_disabled_users and tenure_disabled_role in user.roles:
+        if str(user.id) in tenure_disabled_users and tenure_disabled_role in user.roles:
             await user.add_roles(tenure_role, reason="Fluff Tenure (Prohibition enforcement: Enablement)")
-            del tenure_disabled_users[user.id]
+            del tenure_disabled_users[str(user.id)]
             set_guildfile(ctx.guild.id, "tenure_disabled", json.dumps(tenure_disabled_users))
             return await status_msg.edit(content=f"{user.mention} has been allowed to receive the {tenure_role.mention} role. They will have to run `pls tenure` to receive the role again.")
         else:
-            return await status_msg.edit(content=f"{user.mention} is not prohibited from receiving the {tenure_role.mention} role. No operations have been performed. {str(user.id) in tenure_disabled_users}")
+            return await status_msg.edit(content=f"{user.mention} is not prohibited from receiving the {tenure_role.mention} role. No operations have been performed.")
 
     @Cog.listener()
     async def on_message(self, msg):
