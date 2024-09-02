@@ -206,7 +206,7 @@ class RulePush(commands.Cog):
                 f"{rulepush_pings}\nYou have been pushed to read the rules due to suspicious activity indicating you have not read them\nYou must solve a puzzle before accessing the server again.\n{get_config(ctx.guild.id, 'rulepush', 'intro_message')}"
             )
 
-    async def start_rule_push(self, member, channel: discord.abc.MessageableChannel):
+    async def start_rule_push(self, member, channel: discord.abc.GuildChannel):
         guild = member.guild
         role = self.bot.pull_role(guild,
                                   get_config(guild.id, "rulepush", "rulepushrole")
