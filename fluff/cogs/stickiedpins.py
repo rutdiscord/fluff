@@ -19,9 +19,8 @@ class StickiedPins(commands.Cog):
                 if message.pinned:
                     await message.unpin()
                 await message.pin()
-
         else: 
-            raise LookupError('Channel not found in pins, not bothering')
+            return False
 
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
@@ -77,18 +76,10 @@ class StickiedPins(commands.Cog):
         return await self.update_pins(guild,channel)
     
     @commands.Cog.listener()
-    async def on_message_edit(self, before: discord.Message, after: discord.Message):
-            if not isinstance(before.channel, discord.TextChannel):
-                return  
+    async def on_message(self, message: discord.Message):
+        if message.guild != None and message.type == discord.MessageType.pins_add:
+            await self.update_pins(message.guild, message.channel)
             
-            guild = before.guild
-            
-            guild_pins = get_guildfile(guild.id, "pins")
-            if str(before.channel.id) in guild_pins:
-                if after.pinned is not before.pinned:
-                    await self.update_pins(guild, after.channel)
-            else:
-                return
-            
+           
 async def setup(bot):
    await bot.add_cog(StickiedPins(bot))
