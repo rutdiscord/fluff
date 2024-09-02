@@ -78,6 +78,7 @@ class StickiedPins(commands.Cog):
     
     @commands.Cog.listener()
     async def on_message_edit(self, before, after):
+        print(isinstance(before.guild, discord.Guild))
         if isinstance(before.guild, discord.Guild):
             guild = before.guild
             print(before.pinned, after.pinned)
