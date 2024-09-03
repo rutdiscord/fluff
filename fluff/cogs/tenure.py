@@ -3,7 +3,6 @@ import json
 from discord.ext.commands import Cog
 from discord.ext import commands
 from helpers.sv_config import get_config
-from helpers.datafiles import get_guildfile, set_guildfile
 from helpers.checks import ismanager, isadmin
 from datetime import datetime, timedelta, UTC
 from config import logchannel
