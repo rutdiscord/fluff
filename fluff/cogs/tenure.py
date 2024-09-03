@@ -35,7 +35,7 @@ class Tenure(Cog):
             return False
     
     @commands.guild_only()
-    @commands.cooldown(1, 60, commands.BucketType.guild)
+    @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.group(invoke_without_command=True)
     async def tenure(self, ctx, user: discord.Member = None):
         """This shows the user their tenure in the server. Or, for staff, queries the status of that user's tenure.
