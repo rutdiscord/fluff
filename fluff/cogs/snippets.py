@@ -72,7 +72,7 @@ class Snippets(Cog):
             if name in guild_snippets:
                 if ctx.message.reference != None and isinstance(ctx.message.reference.resolved, discord.Message):
                     referenced_message = ctx.message.reference.resolved
-                    await ctx.message.delete(delay=15)
+                    await ctx.message.delete(delay=1)
                     return await referenced_message.reply(guild_snippets[name]["content"], mention_author=True)
                 else:
                     return await ctx.reply(guild_snippets[name]["content"], mention_author=False)
@@ -81,7 +81,7 @@ class Snippets(Cog):
                     if name in guild_snippets[current_snippet]["aliases"]:
                         if ctx.message.reference != None and isinstance(ctx.message.reference.resolved, discord.Message):
                             referenced_message = ctx.message.reference.resolved
-                            await ctx.message.delete(delay=15)
+                            await ctx.message.delete(delay=1)
                             return await referenced_message.reply(guild_snippets[current_snippet]["content"], mention_author=True)
                         else:
                             return await ctx.reply(guild_snippets[current_snippet]["content"], mention_author=False)
