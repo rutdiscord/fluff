@@ -37,12 +37,12 @@ class Tenure(Cog):
     @commands.guild_only()
     @commands.cooldown(1, 60, commands.BucketType.guild)
     @commands.group(invoke_without_command=True)
-    async def tenure(self, ctx):
-        """This shows the user their tenure in the server.
+    async def tenure(self, ctx, user: discord.Member = None):
+        """This shows the user their tenure in the server. Or, for staff, queries the status of that user's tenure.
         
         Any guild channel that has Tenure configured.
 
-        No arguments."""
+        No arguments, unless querying a user, which is just the user you want to query."""
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
         
@@ -51,6 +51,20 @@ class Tenure(Cog):
         tenure_role = tenure_config["role"]
         tenure_disabled_role = tenure_config["role_disabled"]
 
+        if user and isadmin(ctx):
+            tenure_dt = await self.check_joindelta(user)
+            tenure_days = tenure_dt.days
+
+            if tenure_role not in user.roles and tenure_disabled_role in user.roles:
+                return await ctx.reply(f"{user.mention} has been prohibited from receiving the {tenure_role.name} role.", mention_author=False)
+            elif tenure_role not in user.roles:
+                if tenure_days >= tenure_threshold:
+                    return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and is eligible for the {tenure_role.name} role. They just haven't received it yet!", mention_author=False)
+                else:
+                    return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and is not eligible for the {tenure_role.name} role. They need to wait {tenure_threshold - tenure_days} days.", mention_author=False)
+            elif tenure_role in user.roles:
+                return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and has already received the {tenure_role.name} role.", mention_author=False)
+        
         tenure_dt = await self.check_joindelta(ctx.author)
         tenure_days = tenure_dt.days
 
@@ -110,27 +124,7 @@ class Tenure(Cog):
             await user.remove_roles(tenure_role, reason=f"Fluff Tenure (Prohibition enforcement)")
             await user.add_roles(tenure_disabled_role, reason=f"Fluff Tenure (Prohibition enforcement)")
             return await ctx.reply(f"{user.mention} has been prohibited from receiving the tenure role.", mention_author=False)
-        
-    @commands.check(isadmin)
-    @tenure.command(aliases=["check", "status"])
-    async def query(self, ctx: commands.Context, user: discord.Member):
-        tenure_config = self.get_tenureconfig(ctx.guild)
-        tenure_role = tenure_config["role"]
-        tenure_disabled_role = tenure_config["role_disabled"]
-        tenure_threshold = tenure_config["threshold"]
-        tenure_dt = await self.check_joindelta(user)
-        tenure_days = tenure_dt.days
 
-        if tenure_role not in user.roles and tenure_disabled_role in user.roles:
-            return await ctx.reply(f"{user.mention} has been prohibited from receiving the {tenure_role.name} role.", mention_author=False)
-        elif tenure_role not in user.roles:
-            if tenure_days >= tenure_threshold:
-                return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and is eligible for the {tenure_role.name} role. They just haven't received it yet!", mention_author=False)
-            else:
-                return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and is not eligible for the {tenure_role.name} role. They need to wait {tenure_threshold - tenure_days} days.", mention_author=False)
-        elif tenure_role in user.roles:
-            return await ctx.reply(f"{user.mention} has been here for {tenure_days} days, and has already received the {tenure_role.name} role.", mention_author=False)
-        
 
     @commands.check(isadmin)
     @tenure.command(aliases=["whitelist", "wl"])
