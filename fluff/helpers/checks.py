@@ -15,12 +15,14 @@ async def ismanager(ctx, layered=False):
 
     return await commands.is_owner().predicate(ctx)
 
+
 async def isowner(ctx, layered=False):
     if not layered:
         if await ismanager(ctx, True):
             return True
 
     return ctx.guild.owner.id == ctx.author.id
+
 
 async def isadmin(ctx, layered=False):
     if not layered:

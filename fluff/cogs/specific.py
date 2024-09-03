@@ -88,8 +88,6 @@ class specific(Cog):
             )
         await ctx.reply(embed=embed, mention_author=False)
 
-
-
     @Cog.listener()
     async def on_message(self, message):
         await self.bot.wait_until_ready()

@@ -7,6 +7,7 @@ from helpers.checks import isadmin
 from helpers.embeds import stock_embed
 from helpers.datafiles import get_guildfile, set_guildfile
 
+
 class Snippets(Cog):
     """
     Commands for easily explaining things.
@@ -34,83 +35,98 @@ class Snippets(Cog):
             embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
             if not guild_snippets:
                 embed.add_field(
-                    name = "No Snippets",
-                    value = "There are no snippets available in this server.",
+                    name="No Snippets",
+                    value="There are no snippets available in this server.",
                     inline=True,
                 )
             else:
                 for snippet in guild_snippets:
-                        embed.add_field(
-                            name = f"**{snippet}**",
-                            value = ("> " + discord.utils.remove_markdown(guild_snippets[snippet]["content"][:60]) + "_..._"
-                                        + f'\n**Aliases**: _{", ".join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"}_'
+                    embed.add_field(
+                        name=f"**{snippet}**",
+                        value=(
+                            "> "
+                            + discord.utils.remove_markdown(
+                                guild_snippets[snippet]["content"][:60]
                             )
-                            ,
-                            inline=True,
-                        )
+                            + "_..._"
+                            + f'\n**Aliases**: _{", ".join(guild_snippets[snippet]["aliases"]) if len(guild_snippets[snippet]["aliases"]) > 0 else "None"}_'
+                        ),
+                        inline=True,
+                    )
 
             try:
                 await ctx.reply(embed=embed, mention_author=False)
-            except discord.errors.HTTPException as exception: # Over 25 embed fields
+            except discord.errors.HTTPException as exception:  # Over 25 embed fields
                 if exception.code == 50035:
                     file_content = ""
                     for snippet in guild_snippets:
-                        file_content += (
-                            "**{snippet}** \n" +
-                            ("> " + guild_snippets[snippet]["content"][:100] + "...")
+                        file_content += "**{snippet}** \n" + (
+                            "> " + guild_snippets[snippet]["content"][:100] + "..."
                         )
 
                     with open(f"temp/snippets-{ctx.guild.id}.txt", "w") as file:
                         file.write(file_content)
 
-                    file_sent = await ctx.send(file=discord.File(f"temp/snippets-{ctx.guild.id}.txt"))
+                    file_sent = await ctx.send(
+                        file=discord.File(f"temp/snippets-{ctx.guild.id}.txt")
+                    )
                     if file_sent:
                         os.remove(f"temp/snippets-{ctx.guild.id}.txt")
-                    
+
         else:
             name = name.lower()
             if name in guild_snippets:
-                if ctx.message.reference != None and isinstance(ctx.message.reference.resolved, discord.Message):
+                if ctx.message.reference != None and isinstance(
+                    ctx.message.reference.resolved, discord.Message
+                ):
                     referenced_message = ctx.message.reference.resolved
                     await ctx.message.delete(delay=1)
-                    return await referenced_message.reply(guild_snippets[name]["content"], mention_author=True)
+                    return await referenced_message.reply(
+                        guild_snippets[name]["content"], mention_author=True
+                    )
                 else:
-                    return await ctx.reply(guild_snippets[name]["content"], mention_author=False)
+                    return await ctx.reply(
+                        guild_snippets[name]["content"], mention_author=False
+                    )
             if name not in guild_snippets:
                 for current_snippet in guild_snippets:
                     if name in guild_snippets[current_snippet]["aliases"]:
-                        if ctx.message.reference != None and isinstance(ctx.message.reference.resolved, discord.Message):
+                        if ctx.message.reference != None and isinstance(
+                            ctx.message.reference.resolved, discord.Message
+                        ):
                             referenced_message = ctx.message.reference.resolved
                             await ctx.message.delete(delay=1)
-                            return await referenced_message.reply(guild_snippets[current_snippet]["content"], mention_author=True)
+                            return await referenced_message.reply(
+                                guild_snippets[current_snippet]["content"],
+                                mention_author=True,
+                            )
                         else:
-                            return await ctx.reply(guild_snippets[current_snippet]["content"], mention_author=False)
-                
+                            return await ctx.reply(
+                                guild_snippets[current_snippet]["content"],
+                                mention_author=False,
+                            )
+
             return await ctx.reply(f"Snippet `{name}` not found.", mention_author=False)
-                
-        
+
     @snippets.command(aliases=["add"])
     @commands.guild_only()
     @commands.check(isadmin)
     async def create(self, ctx: commands.Context, new_snippet: str, *, content: str):
-            """Creates a new snippet with the given name and content.
-            
-            - `new_snippet` 
-            The name of the snippet to create.
-            - `content`
-            Content of the snippet."""
-            new_snippet = new_snippet.lower()
-            guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
-            dict_new_snippet = guild_snippets.get(new_snippet,{})
-            if dict_new_snippet == {}:
-                guild_snippets[new_snippet] = {
-                    "content": content,
-                    "aliases" : []
-                }
-                set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
-                return await ctx.reply(f"Snippet `{new_snippet}` added successfully.")
-            else:
-                return await ctx.reply(f"Snippet `{new_snippet}` already exists.")
+        """Creates a new snippet with the given name and content.
+
+        - `new_snippet`
+        The name of the snippet to create.
+        - `content`
+        Content of the snippet."""
+        new_snippet = new_snippet.lower()
+        guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
+        dict_new_snippet = guild_snippets.get(new_snippet, {})
+        if dict_new_snippet == {}:
+            guild_snippets[new_snippet] = {"content": content, "aliases": []}
+            set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
+            return await ctx.reply(f"Snippet `{new_snippet}` added successfully.")
+        else:
+            return await ctx.reply(f"Snippet `{new_snippet}` already exists.")
 
     @snippets.command(aliases=["alias"])
     @commands.guild_only()
@@ -120,11 +136,15 @@ class Snippets(Cog):
         snippet = snippet.lower()
         try:
             if new_alias in guild_snippets[snippet]["aliases"]:
-                return await ctx.reply(f"Alias `{new_alias}` already exists for snippet `{snippet}`.")
+                return await ctx.reply(
+                    f"Alias `{new_alias}` already exists for snippet `{snippet}`."
+                )
             else:
                 guild_snippets[snippet]["aliases"].append(new_alias)
                 set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
-                return await ctx.reply(f"Alias `{new_alias}` added successfully for snippet `{snippet}`.")
+                return await ctx.reply(
+                    f"Alias `{new_alias}` added successfully for snippet `{snippet}`."
+                )
         except KeyError:
             return await ctx.reply(f"Snippet `{snippet}` not found.")
 
@@ -140,12 +160,11 @@ class Snippets(Cog):
                 set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
                 return await ctx.reply(f"Alias `{unaliased}` removed successfully.")
         return await ctx.reply(f"Alias `{unaliased}` not found.")
-    
-    
+
     @snippets.command(aliases=["amend"])
     @commands.guild_only()
     @commands.check(isadmin)
-    async def edit(self, ctx: commands.Context, snippet: str, * , new_content: str):
+    async def edit(self, ctx: commands.Context, snippet: str, *, new_content: str):
         guild_snippets = get_guildfile(ctx.guild.id, "snippets_v2")
         snippet = snippet.lower()
         try:
@@ -154,7 +173,7 @@ class Snippets(Cog):
             return await ctx.reply(f"Snippet `{snippet}` edited successfully.")
         except KeyError:
             return await ctx.reply(f"Snippet `{snippet}` not found.")
-    
+
     @snippets.command(aliases=["remove"])
     @commands.guild_only()
     @commands.check(isadmin)
@@ -163,12 +182,12 @@ class Snippets(Cog):
         snippet = snippet.lower()
 
         if snippet in guild_snippets:
-                del guild_snippets[snippet]
-                set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
-                return await ctx.reply(f"Snippet `{snippet}` deleted successfully.")
+            del guild_snippets[snippet]
+            set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
+            return await ctx.reply(f"Snippet `{snippet}` deleted successfully.")
         else:
             return await ctx.reply(f"Snippet `{snippet}` not found.")
-        
+
 
 async def setup(bot):
     await bot.add_cog(Snippets(bot))

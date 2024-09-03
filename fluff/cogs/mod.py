@@ -104,17 +104,19 @@ class Mod(Cog):
             target = ctx.guild.get_member(target.id)
             if self.check_if_target_is_staff(target):
                 return await ctx.send("I cannot ban Staff members.")
-            
+
         # Check if already banned
         user = await self.bot.fetch_user(target.id)
         attempt_fetch_ban = None
-        
+
         try:
             attempt_fetch_ban = await ctx.guild.fetch_ban(user)
         except discord.NotFound:
             pass
         if isinstance(attempt_fetch_ban, discord.BanEntry):
-            return await ctx.reply(f"This user appears to be banned! `{attempt_fetch_ban.reason}`")
+            return await ctx.reply(
+                f"This user appears to be banned! `{attempt_fetch_ban.reason}`"
+            )
 
         if reason:
             add_userlog(ctx.guild.id, target.id, ctx.author, reason, "bans")
@@ -154,7 +156,9 @@ class Mod(Cog):
                 pass
 
         await ctx.guild.ban(
-            target, reason=f"[Ban performed by {ctx.author}] {reason}", delete_message_days=0
+            target,
+            reason=f"[Ban performed by {ctx.author}] {reason}",
+            delete_message_days=0,
         )
         await ctx.send(f"**{target.mention}** is now BANNED.\n{failmsg}")
 
@@ -303,7 +307,9 @@ class Mod(Cog):
             ctx, str(target)
         )
 
-        await ctx.guild.unban(target, reason=f"[Unban performed by {ctx.author}] {reason}")
+        await ctx.guild.unban(
+            target, reason=f"[Unban performed by {ctx.author}] {reason}"
+        )
         await ctx.send(f"{safe_name} is now UNBANNED.")
 
     @commands.bot_has_permissions(ban_members=True)
@@ -348,7 +354,9 @@ class Mod(Cog):
         )
 
         await ctx.guild.ban(
-            target, reason=f"[Ban performed by {ctx.author}] {reason}", delete_message_days=0
+            target,
+            reason=f"[Ban performed by {ctx.author}] {reason}",
+            delete_message_days=0,
         )
         await ctx.send(f"{safe_name} is now silently BANNED.")
 
@@ -374,7 +382,10 @@ class Mod(Cog):
                 mention_author=False,
             )
         deleted = len(await channel.purge(limit=limit))
-        await ctx.send(f"<a:bunnytrashjump:1256812177768185878> `{deleted}` messages purged.", delete_after=5)
+        await ctx.send(
+            f"<a:bunnytrashjump:1256812177768185878> `{deleted}` messages purged.",
+            delete_after=5,
+        )
 
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
@@ -396,7 +407,10 @@ class Mod(Cog):
             return any((m.author.bot, m.author.discriminator == "0000"))
 
         deleted = len(await channel.purge(limit=limit, check=is_bot))
-        await ctx.send(f"<a:bunnytrashjump:1256812177768185878> `{deleted}` bot messages purged.", delete_after=5)
+        await ctx.send(
+            f"<a:bunnytrashjump:1256812177768185878> `{deleted}` bot messages purged.",
+            delete_after=5,
+        )
 
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
@@ -426,7 +440,10 @@ class Mod(Cog):
             return target.id == m.author.id
 
         deleted = len(await channel.purge(limit=limit, check=is_mentioned))
-        await ctx.send(f"<a:bunnytrashjump:1256812177768185878> `{deleted}` messages from {target} purged.", delete_after=5)
+        await ctx.send(
+            f"<a:bunnytrashjump:1256812177768185878> `{deleted}` messages from {target} purged.",
+            delete_after=5,
+        )
 
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
@@ -457,7 +474,8 @@ class Mod(Cog):
 
         deleted = len(await channel.purge(limit=limit, check=contains))
         await ctx.send(
-            f"<a:bunnytrashjump:1256812177768185878> `{deleted}` messages containing `{string}` purged.", delete_after=5
+            f"<a:bunnytrashjump:1256812177768185878> `{deleted}` messages containing `{string}` purged.",
+            delete_after=5,
         )
 
     @commands.bot_has_permissions(manage_messages=True)
@@ -487,7 +505,10 @@ class Mod(Cog):
             )
 
         deleted = len(await channel.purge(limit=limit, check=has_emote))
-        await ctx.send(f"<a:bunnytrashjump:1256812177768185878> `{deleted}` emotes purged.", delete_after=5)
+        await ctx.send(
+            f"<a:bunnytrashjump:1256812177768185878> `{deleted}` emotes purged.",
+            delete_after=5,
+        )
 
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
@@ -510,7 +531,10 @@ class Mod(Cog):
             return any((m.embeds, m.attachments, m.stickers))
 
         deleted = len(await channel.purge(limit=limit, check=has_embed))
-        await ctx.send(f"<a:bunnytrashjump:1256812177768185878> `{deleted}` embeds purged.", delete_after=5)
+        await ctx.send(
+            f"<a:bunnytrashjump:1256812177768185878> `{deleted}` embeds purged.",
+            delete_after=5,
+        )
 
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
@@ -534,32 +558,46 @@ class Mod(Cog):
             if msg.reactions:
                 deleted += 1
                 await msg.clear_reactions()
-        await ctx.send(f"<a:bunnytrashjump:1256812177768185878> `{deleted}` reactions purged.", delete_after=5)
+        await ctx.send(
+            f"<a:bunnytrashjump:1256812177768185878> `{deleted}` reactions purged.",
+            delete_after=5,
+        )
 
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command(aliases=["slow"])
-    async def slowmode(self, ctx, channel: discord.abc.GuildChannel = None, seconds: int = 5):
+    async def slowmode(
+        self, ctx, channel: discord.abc.GuildChannel = None, seconds: int = 5
+    ):
         """This makes the bot set a channel's slowmode.
 
         Slowmode will be set in a `channel` to a specified amount of `seconds`. Running this command by itself will enable a 5 second slowmode for the invoker's current channel.
-        
+
         - `channel`
         The channel to manage slowmode for. Optional, will target to the current channel by default.
         - `seconds`
-        The time (in seconds) to set slowmode for. Optional, will be five seconds by default."""
+        The time (in seconds) to set slowmode for. Optional, will be five seconds by default.
+        """
         if not channel:
             channel = ctx.channel
 
         if channel.slowmode_delay == seconds:
-            return await ctx.reply(f"Slowmode is already `{seconds}` second(s) in {channel.mention}!", mention_author=False)
-        
+            return await ctx.reply(
+                f"Slowmode is already `{seconds}` second(s) in {channel.mention}!",
+                mention_author=False,
+            )
+
         new_channel_data = await channel.edit(slowmode_delay=seconds)
 
         if new_channel_data.slowmode_delay > 0:
-            return await ctx.reply(f"Slowmode set to `{seconds}` second(s) in {channel.mention}.", mention_author=False)
+            return await ctx.reply(
+                f"Slowmode set to `{seconds}` second(s) in {channel.mention}.",
+                mention_author=False,
+            )
         else:
-            return await ctx.reply(f"Slowmode disabled in {channel.mention}.", mention_author=False)
+            return await ctx.reply(
+                f"Slowmode disabled in {channel.mention}.", mention_author=False
+            )
 
     @commands.check(ismod)
     @commands.guild_only()
@@ -568,19 +606,25 @@ class Mod(Cog):
         """This makes the bot disable a channel's slowmode.
 
         Slowmode will be disabled in a `channel` if it is supplied, otherwise Fluff will disable slowmode for the invoker's current channel.
-        
+
         - `channel`
-        The channel to disable slowmode for. Optional, will target to the current channel by default."""
+        The channel to disable slowmode for. Optional, will target to the current channel by default.
+        """
         if not channel:
             channel = ctx.channel
-        
+
         if channel.slowmode_delay == 0:
-            return await ctx.reply(f"Slowmode is already disabled in {channel.mention}!", mention_author=False)
-        
+            return await ctx.reply(
+                f"Slowmode is already disabled in {channel.mention}!",
+                mention_author=False,
+            )
+
         if channel.slowmode_delay > 0:
             new_channel_data = await channel.edit(slowmode_delay=0)
             if new_channel_data.slowmode_delay == 0:
-                return await ctx.reply(f"Slowmode disabled in {channel.mention}.", mention_author=False)
+                return await ctx.reply(
+                    f"Slowmode disabled in {channel.mention}.", mention_author=False
+                )
 
     @commands.check(isadmin)
     @commands.guild_only()

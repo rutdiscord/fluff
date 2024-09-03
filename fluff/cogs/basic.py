@@ -20,10 +20,10 @@ class Basic(Cog):
         self.bot = bot
         matplotlib.use("agg")
 
-
-    '''
+    """
     TODO: stop this from being stupid
-    '''
+    """
+
     @commands.command()
     @commands.check(ismod)
     async def drive(self, ctx):
@@ -31,8 +31,6 @@ class Basic(Cog):
         await ctx.send(
             f"https://drive.google.com/drive/folders/{get_config(ctx.guild.id, 'drive', 'folder')}?usp=sharing"
         )
-    
-
 
     @commands.command()
     async def choose(self, ctx, *options):
@@ -67,7 +65,7 @@ class Basic(Cog):
             msg = await ctx.channel.send(content=ctx.author.mention)
             await msg.edit(content="⌛", delete_after=5)
         except discord.errors.NotFound:
-            return 
+            return
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.group(invoke_without_command=True)
@@ -111,9 +109,9 @@ class Basic(Cog):
 
         - `links`
         The links to reupload to catbox."""
-        '''
+        """
         TODO: Move away from Catbox due to user-facing slurs 
-        '''
+        """
         api_url = "https://catbox.moe/user/api.php"
         if not ctx.message.attachments and not links:
             return await ctx.reply(
@@ -132,12 +130,18 @@ class Basic(Cog):
             # Post form data
             async with self.bot.session.post(api_url, data=formdata) as response:
                 if response.status == 412:
-                # Catbox 412 response conflicts with server rules. Overriding this makes it both friendlier and an opportunity to direct users somewhere they can fix it
-                    return await ctx.reply(content=f'Your file is too large. If you\'re uploading a GIF, try optimizing with something like [Ezgif](https://ezgif.com).', mention_author=False)
+                    # Catbox 412 response conflicts with server rules. Overriding this makes it both friendlier and an opportunity to direct users somewhere they can fix it
+                    return await ctx.reply(
+                        content=f"Your file is too large. If you're uploading a GIF, try optimizing with something like [Ezgif](https://ezgif.com).",
+                        mention_author=False,
+                    )
                 else:
-                # If there's no issue, then assume it's safe to send the response back
+                    # If there's no issue, then assume it's safe to send the response back
                     whats_supposed_to_be_the_image_link = await response.text()
-                    return await ctx.reply(content=whats_supposed_to_be_the_image_link, mention_author=False)
+                    return await ctx.reply(
+                        content=whats_supposed_to_be_the_image_link,
+                        mention_author=False,
+                    )
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.command()
@@ -178,26 +182,30 @@ class Basic(Cog):
         The command to get help on. Optional."""
         if not command:
             help_embed = stock_embed(self.bot)
-            help_embed.set_author(name="Fluff", url="https://github.com/dfault-user/fluff", icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&")
+            help_embed.set_author(
+                name="Fluff",
+                url="https://github.com/dfault-user/fluff",
+                icon_url="https://cdn.discordapp.com/attachments/629713406651531284/1256428667345834014/3be16Ny.png?ex=668164a1&is=66801321&hm=d60b695a687388f6b7de1911b788676f12b56c630157e4a2c0249cc431faa5f6&",
+            )
 
             help_data = {
-            "Image Hosting": "Use `pls rehost`, `pls imgur`, or `pls catbox` with an attachment or link to host that attachment forever. Please respect the service.",
-            "Staff List": "`pls staff` will show all active staff.",
-            "Join Graph": "`pls joingraph` shows a graph of users who have joined.",
-            "Join Score": "`pls joinscore` shows when you joined in comparison to other users.",
-            "Rules and Snippets": "`pls rule` will display a list of rules, while `pls snippets` will display frequently recalled information that is good to have on hand.",
-            "Ping Preferences": "`pls replyconfig` will allow you to change your ping preferences, AKA whether you'd like to be pinged always, never, or after a delay.",
-            "Rolling the Dice": "`pls choose [options separated by spaces]` will choose something at random for you.",
-            "Timer": "`pls timer [duration in minutes, max 60]` I will start a timer for you and ping you when it's done. By default I will set it for 5 minutes.",
-            "User Avy": "`pls avy [user]` will tell me to post your avatar. Without any user specified, I will post your current avatar.",
-            "Server Avy": "`pls avy server` will tell me to post the avatar of the server.",
-            "About Me": "`pls about` shows my info!",
-            "Bunfact": "`pls bunfact` and `pls bunfact [fact name]` shows a fun bun fact, and sometimes an associated gif or image!"
+                "Image Hosting": "Use `pls rehost`, `pls imgur`, or `pls catbox` with an attachment or link to host that attachment forever. Please respect the service.",
+                "Staff List": "`pls staff` will show all active staff.",
+                "Join Graph": "`pls joingraph` shows a graph of users who have joined.",
+                "Join Score": "`pls joinscore` shows when you joined in comparison to other users.",
+                "Rules and Snippets": "`pls rule` will display a list of rules, while `pls snippets` will display frequently recalled information that is good to have on hand.",
+                "Ping Preferences": "`pls replyconfig` will allow you to change your ping preferences, AKA whether you'd like to be pinged always, never, or after a delay.",
+                "Rolling the Dice": "`pls choose [options separated by spaces]` will choose something at random for you.",
+                "Timer": "`pls timer [duration in minutes, max 60]` I will start a timer for you and ping you when it's done. By default I will set it for 5 minutes.",
+                "User Avy": "`pls avy [user]` will tell me to post your avatar. Without any user specified, I will post your current avatar.",
+                "Server Avy": "`pls avy server` will tell me to post the avatar of the server.",
+                "About Me": "`pls about` shows my info!",
+                "Bunfact": "`pls bunfact` and `pls bunfact [fact name]` shows a fun bun fact, and sometimes an associated gif or image!",
             }
 
             for name, value in help_data.items():
                 help_embed.add_field(name=name, value=value, inline=True)
-            return await ctx.reply(embed=help_embed,mention_author=False)
+            return await ctx.reply(embed=help_embed, mention_author=False)
         else:
             botcommand = self.bot.get_command(command)
             if not botcommand:
@@ -262,17 +270,17 @@ class Basic(Cog):
     @commands.command()
     @commands.check(ismod)
     async def staffhelp(self, ctx):
-       """This is Fluff's staff help command.
-       
-       Spits out two internally defined embeds with pagination to help staff out on the ropes.
-       
-       No arguments."""
-       embed1 = stock_embed(self.bot)
-       fields = [
+        """This is Fluff's staff help command.
+
+        Spits out two internally defined embeds with pagination to help staff out on the ropes.
+
+        No arguments."""
+        embed1 = stock_embed(self.bot)
+        fields = [
             {
                 "name": "Kicking",
                 "value": """Use `pls kick` to kick users. If you add a reason to the end, the user will be DMed the reason. (This is useful for users who didn't respond in muted!)""",
-                "inline": False
+                "inline": False,
             },
             {
                 "name": "Banning & Unbanning",
@@ -282,22 +290,22 @@ class Basic(Cog):
 `pls massban` can be used with user IDs to massban. It will not DM the users.
 `pls unban` unbans a user. The reason can't be sent to the user. 
 `pls sban` bans a user without DMing them the reason.""",
-                "inline": False
+                "inline": False,
             },
             {
                 "name": "Muting & Unmuting Users",
                 "value": """I can mute users! I don't use slash commands to provide a simple alternative to Smol/Tol for mobile moderation. When I mute users, I create multiple channels so nothing gets messy. I do this automatically. To mute users, you can use `pls toss`, `pls mute`, or `pls roleban`. To unmute users, you can use `pls untoss`, `pls unmute`, or `pls unroleban`.""",
-                "inline": True
+                "inline": True,
             },
             {
                 "name": "Session Commands",
                 "value": """Some commands are to be used inside of a toss session. Most imperatively is the `pls close` command, which closes the session that the command is invoked in. Sometimes though, a user may need to send an image or two during a toss session, which is why `pls unlockimages` is used to enable those permissions.""",
-                "inline": True
+                "inline": True,
             },
             {
                 "name": "Namefixing & Dehoisting",
                 "value": """If somebody has a name with unmentionable characters, you can easily fix it with `pls fixname` (or `fixname`, if you prefer). If somebody is purposefully hoisting themselves on the userlist, you can dehoist them with `pls dehoist`.""",
-                "inline": True
+                "inline": True,
             },
             {
                 "name": "Miscellaneous Moderation",
@@ -305,39 +313,43 @@ class Basic(Cog):
 `pls reply [message link] [text]` will make me repeat what you said, replying to somebody else.
 `pls react [message link] [emoji]` will make me react to someone's message with an emote. I can only use emotes I have access to!
 `pls typing [channel] [duration]` will make me look like I'm typing in a channel for however long you set.""",
-                "inline": False
+                "inline": False,
             },
             {
                 "name": "Google Drive",
                 "value": """Access the Undertale Discord's Google Drive with `pls drive`.""",
-                "inline": False
+                "inline": False,
             },
             {
                 "name": "Rules and Snippets",
                 "value": """If you need to call up a specific rule, you can use `pls rule [rulename]`. Some rules have specific information which needs to be recalled repetitively, which is done with `pls snippets [snippet]`. All rules and snippets can be summarized by calling `pls rule` or `pls snippets` on their own.""",
-                "inline": True
+                "inline": True,
             },
             {
                 "name": "Latency Checking",
                 "value": """If I'm slow, you can check my ping with `pls ping`.""",
-                "inline": True
-            }
+                "inline": True,
+            },
         ]
 
-       half = len(fields) // 2
-       first_half = fields[:half]
-       second_half = fields[half:]
+        half = len(fields) // 2
+        first_half = fields[:half]
+        second_half = fields[half:]
 
-       embed1 = stock_embed(self.bot)
-       embed2 = stock_embed(self.bot)
+        embed1 = stock_embed(self.bot)
+        embed2 = stock_embed(self.bot)
 
-       for field in first_half:
-           embed1.add_field(name=field["name"], value=field["value"], inline=field["inline"])
+        for field in first_half:
+            embed1.add_field(
+                name=field["name"], value=field["value"], inline=field["inline"]
+            )
 
-       for field in second_half:
-           embed2.add_field(name=field["name"], value=field["value"], inline=field["inline"])
+        for field in second_half:
+            embed2.add_field(
+                name=field["name"], value=field["value"], inline=field["inline"]
+            )
 
-       await sympage(self.bot, ctx, [embed1, embed2], ["1️⃣","2️⃣"])
+        await sympage(self.bot, ctx, [embed1, embed2], ["1️⃣", "2️⃣"])
 
     @commands.command(aliases=["p"])
     async def ping(self, ctx):
@@ -414,6 +426,7 @@ class Basic(Cog):
                     else f"{message}\n`{idx+1}` {user}"
                 )
         await ctx.reply(content=message, mention_author=False)
+
 
 async def setup(bot):
     await bot.add_cog(Basic(bot))

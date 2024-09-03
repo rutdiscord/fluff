@@ -90,7 +90,7 @@ class ModLocks(Cog):
                 "Only Staff may speak. "
                 '**Do not** bring the topic to other channels or risk action taken. This includes "What happened?" messages.'
             )
-        
+
         await ctx.reply(public_msg, mention_author=False)
         # Take a snapshot of current channel state before making any changes
         if ctx.guild.id not in self.snapshots:

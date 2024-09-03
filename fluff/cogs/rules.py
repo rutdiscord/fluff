@@ -8,15 +8,14 @@ from helpers.checks import isadmin
 from helpers.embeds import stock_embed
 from helpers.datafiles import get_guildfile, set_guildfile
 
+
 class Rules(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    
-
     @commands.Cog.listener()
     async def on_ready(self):
-        print(f'{self.__class__.__name__} cog has been loaded')
+        print(f"{self.__class__.__name__} cog has been loaded")
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
@@ -33,13 +32,15 @@ class Rules(Cog):
         summary_embed = stock_embed(self.bot)
         summary_embed.title = "Rules"
         summary_embed.color = discord.Color.red()
-        summary_embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
+        summary_embed.set_author(
+            name=ctx.author, icon_url=ctx.author.display_avatar.url
+        )
 
         if not name:
             if not guild_rules:
                 summary_embed.add_field(
-                    name = "No Rules",
-                    value = "There are no rules available in this server.",
+                    name="No Rules",
+                    value="There are no rules available in this server.",
                     inline=False,
                 )
             else:
@@ -53,35 +54,47 @@ class Rules(Cog):
         elif name in guild_rules:
             return await ctx.reply(content=f"{guild_rules[name]}", mention_author=False)
         else:
-            return await ctx.reply(content=f"Rule `{name}` not found.", mention_author=False)
-        
+            return await ctx.reply(
+                content=f"Rule `{name}` not found.", mention_author=False
+            )
+
     @commands.check(isadmin)
     @rule.command(aliases=["add"])
-    async def create(self, ctx: commands.Context, rule: str, *, content:str):
+    async def create(self, ctx: commands.Context, rule: str, *, content: str):
         guild_rules = get_guildfile(ctx.guild.id, "rules")
         if not guild_rules:
             guild_rules = {}
         if rule in guild_rules:
-            react_msg = await ctx.reply(f"Rule `{rule}` already exists. Do you wish to overwrite it instead?", mention_author=False)
+            react_msg = await ctx.reply(
+                f"Rule `{rule}` already exists. Do you wish to overwrite it instead?",
+                mention_author=False,
+            )
             await react_msg.add_reaction("✅")
 
             try:
                 reaction, user = await self.bot.wait_for(
                     "reaction_add",
                     timeout=60,
-                    check=lambda reaction, user: user == ctx.author and str(reaction.emoji) == "✅" and reaction.message.id == react_msg.id,
+                    check=lambda reaction, user: user == ctx.author
+                    and str(reaction.emoji) == "✅"
+                    and reaction.message.id == react_msg.id,
                 )
             except asyncio.TimeoutError:
-                return await react_msg.edit(content="No reaction received. Rule not overwritten.")
+                return await react_msg.edit(
+                    content="No reaction received. Rule not overwritten."
+                )
 
             guild_rules[rule] = content
             set_guildfile(ctx.guild.id, "rules", json.dumps(guild_rules))
-            await react_msg.edit(content="Rule overwritten.", allowed_mentions=discord.AllowedMentions.none())
+            await react_msg.edit(
+                content="Rule overwritten.",
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
         else:
             guild_rules[rule] = content
             set_guildfile(ctx.guild.id, "rules", json.dumps(guild_rules))
             return await ctx.reply(f"Rule `{rule}` created.", mention_author=False)
-        
+
     @rule.command(aliases=["remove"])
     @commands.guild_only()
     @commands.check(isadmin)
@@ -89,11 +102,12 @@ class Rules(Cog):
         guild_rules = get_guildfile(ctx.guild.id, "rules")
 
         if rule in guild_rules:
-                del guild_rules[rule]
-                set_guildfile(ctx.guild.id, "rules", json.dumps(guild_rules))
-                return await ctx.reply(f"Rule `{rule}` deleted successfully.")
+            del guild_rules[rule]
+            set_guildfile(ctx.guild.id, "rules", json.dumps(guild_rules))
+            return await ctx.reply(f"Rule `{rule}` deleted successfully.")
         else:
             return await ctx.reply(f"Rule `{rule}` not found.")
-    
+
+
 async def setup(bot):
     await bot.add_cog(Rules(bot))
