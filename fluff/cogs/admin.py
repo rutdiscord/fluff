@@ -649,6 +649,8 @@ class Admin(Cog):
                         content=f":white_check_mark: `{cog}` successfully reloaded.",
                         mention_author=False,
                     )
+
+                    self.lastreload = cog_name
                 except:
                     await ctx.message.reply(
                         content=f":x: Cog reloading failed, traceback: "
@@ -713,8 +715,8 @@ class Admin(Cog):
 
         - `ext`
         The cog to reload."""
-        if ext:
-            self.lastreload = ext
+        if self.lastreload:
+            ext = self.lastreload
 
         try:
             await self.bot.unload_extension(ext)
