@@ -220,7 +220,7 @@ class Basic(Cog):
             segments = botcommand.help.split("\n\n")
             if len(segments) != 3:
                 return await ctx.reply(
-                    "This command isn't configured properly yet.\nPlease look at the documentation, and yell at Ren to fix it.",
+                    "This command isn't properly documented  yet.\nPlease yell at DFU or Marr to fix it.",
                     mention_author=False,
                 )
             embed.description = f"**{segments[0]}**\n>>> {segments[1]}"
