@@ -331,6 +331,11 @@ class Basic(Cog):
                 "value": """If I'm slow, you can check my ping with `pls ping`.""",
                 "inline": True,
             },
+            {
+                "name": "Checking Permissions",
+                "value": """`pls permcheck` will check a user's permissions for a certain channel.""",
+                "inline": True,
+            }
         ]
 
         half = len(fields) // 2
