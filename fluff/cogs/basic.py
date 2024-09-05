@@ -322,6 +322,11 @@ class Basic(Cog):
                 "inline": False,
             },
             {
+                "name": "Tenure Querying",
+                "value": """If you need to query a user's Tenure status, you can use `pls tenure [user]`. This will return the user's tenure status, as well as when they last joined the server, in days.""",
+                "inline": False,
+            },
+            {
                 "name": "Rules and Snippets",
                 "value": """If you need to call up a specific rule, you can use `pls rule [rulename]`. Some rules have specific information which needs to be recalled repetitively, which is done with `pls snippets [snippet]`. All rules and snippets can be summarized by calling `pls rule` or `pls snippets` on their own.""",
                 "inline": True,
