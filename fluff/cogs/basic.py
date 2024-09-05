@@ -383,11 +383,12 @@ class Basic(Cog):
     @commands.command()
     @commands.check(ismanager)
     async def managerhelp(self, ctx):
-        """This is Fluff's staff help command.
+        """This is Fluff's manager help command.
 
         Spits out two internally defined embeds with pagination to help staff out on the ropes.
 
         No arguments."""
+        title = "These are commands that may only be used by the bot manager."
         embed1 = stock_embed(self.bot)
         fields = [
             {
@@ -510,7 +511,10 @@ the true/false portion tells me whether to reload cogs""",
         second_half = fields[half:]
 
         embed1 = stock_embed(self.bot)
+        embed1.title = title
+
         embed2 = stock_embed(self.bot)
+        embed2.title = title
 
         for field in first_half:
             embed1.add_field(
