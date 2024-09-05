@@ -452,7 +452,7 @@ class Basic(Cog):
             ]
             random_message = random.choice(reply_messages)
 
-            await ctx.reply(random_message, mention_author=False)
+            await ctx.send(random_message, mention_author=False)
 
             async for message in ctx.channel.history(limit=20):
                 if message.author == target:
