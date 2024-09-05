@@ -449,6 +449,12 @@ class Basic(Cog):
                 f"{target_mention} is dead now.",
                 f"{target_mention} will be back. They always come back.",
                 f"{target_mention} has been sent Somewhere Else.",
+                f"{target_mention} has been sent to gay baby jail.",
+                f"{target_mention} has been sent to Non-Denominational Vaguely Romantic Infant Gulag.",
+                f"{target_mention} is over there now.",
+                f"{target_mention} has been shaved bald.",
+                f"{target_mention} is in your house now.",
+                f"{target_mention} has had every bone in their body shattered.",
             ]
             random_message = random.choice(reply_messages)
 
