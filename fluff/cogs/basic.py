@@ -457,6 +457,7 @@ class Basic(Cog):
                 f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is in your house now.",
                 f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has had every bone in their body shattered.",
                 f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} went on vacation.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} was let cook.",
             ]
             random_message = random.choice(reply_messages)
 
