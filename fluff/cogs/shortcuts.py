@@ -1,5 +1,4 @@
-import json
-import discord
+import discord, json
 from discord.ext import commands
 from discord.ext.commands import Cog
 from helpers.datafiles import fill_profile, set_userfile

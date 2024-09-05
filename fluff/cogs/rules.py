@@ -13,10 +13,6 @@ class Rules(Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @commands.Cog.listener()
-    async def on_ready(self):
-        print(f"{self.__class__.__name__} cog has been loaded")
-
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.group(aliases=["r", "rules"], invoke_without_command=True)

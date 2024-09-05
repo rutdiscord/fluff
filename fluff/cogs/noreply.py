@@ -1,8 +1,6 @@
-import discord
+import discord, json, asyncio
 from discord.ext.commands import Cog
 from discord.ext import commands, tasks
-import json
-import asyncio
 from helpers.datafiles import get_guildfile, set_guildfile
 from helpers.sv_config import get_config
 from helpers.datafiles import fill_profile, set_userfile
@@ -19,8 +17,6 @@ class Reply(Cog):
         self.violations = {}
         self.timers = {}
         self.counttimer.start()
-        self.last_eval_result = None
-        self.previous_eval_code = None
 
     def cog_unload(self):
         self.counttimer.cancel()
