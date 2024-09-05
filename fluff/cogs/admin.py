@@ -706,16 +706,14 @@ class Admin(Cog):
 
     @commands.check(ismanager)
     @commands.command()
-    async def reload(self, ctx, ext="_"):
+    async def reload(self, ctx, ext=None):
         """This reloads a cog.
 
         You have to prefix it with `cogs.`. No no, don't ask!
 
         - `ext`
         The cog to reload."""
-        if ext == "_":
-            ext = self.lastreload
-        else:
+        if ext:
             self.lastreload = ext
 
         try:
