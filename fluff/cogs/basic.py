@@ -427,6 +427,39 @@ class Basic(Cog):
                 )
         await ctx.reply(content=message, mention_author=False)
 
+    @commands.cooldown(1, 5, type=commands.BucketType.default)
+    @commands.guild_only()
+    @commands.command()
+    async def mutedmute(self, ctx, target: typing.Union[discord.Member, int] = None):
+        if not target: 
+            return
+        else:
+            if isinstance(target, discord.Member):
+                target_mention = target.mention
+            else:
+                return
+            reply_messages = [
+                f"{target_mention} has been demoted to muted mute."
+                f"{target_mention} has been forever silenced."
+                f"{target_mention} has been erased from history."
+                f"{target_mention} has been sent to a farm upstate."
+                f"{target_mention} has been sentenced to 50 years in the dungeon."
+                f"{target_mention} has been muted muted muted muted muted mute."
+                f"{target_mention} is gone."
+                f"{target_mention} is dead now."
+                f"{target_mention} will be back. They always come back."
+                f"{target_mention} has been sent Somewhere Else."
+            ]
+            random_message = random.choice(reply_messages)
+
+            await ctx.reply(random_message, mention_author=False)
+
+            async for message in ctx.channel.history(limit=20):
+                if message.author == target:
+                    await message.add_reaction("<:rubberhammer:1281079056820998185>")
+                    break
+
+
 
 async def setup(bot):
     await bot.add_cog(Basic(bot))
