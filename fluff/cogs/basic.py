@@ -201,6 +201,7 @@ class Basic(Cog):
                 "Server Avy": "`pls avy server` will tell me to post the avatar of the server.",
                 "About Me": "`pls about` shows my info!",
                 "Bunfact": "`pls bunfact` and `pls bunfact [fact name]` shows a fun bun fact, and sometimes an associated gif or image!",
+                "Mutedmute": "`pls mutedmute [user]` will mute a user in a special way. You can use it even when you're not staff!",
             }
 
             for name, value in help_data.items():
@@ -436,6 +437,12 @@ class Basic(Cog):
     @commands.guild_only()
     @commands.command(aliases=["banne"])
     async def mutedmute(self, ctx, target: typing.Union[discord.Member, int] = None):
+        """This mutes a user in a special way.
+        
+        You can use it even if you aren't staff!
+        
+        - `target`
+        Who you want to 'mute'. This is a user mention."""
         if not target:
             return
         else:
@@ -444,16 +451,24 @@ class Basic(Cog):
             else:
                 return
             reply_messages = [
-                f"{target_mention} has been demoted to muted mute.",
-                f"{target_mention} has been forever silenced.",
-                f"{target_mention} has been erased from history.",
-                f"{target_mention} has been sent to a farm upstate.",
-                f"{target_mention} has been sentenced to 50 years in the dungeon.",
-                f"{target_mention} has been muted muted muted muted muted mute.",
-                f"{target_mention} is gone.",
-                f"{target_mention} is dead now.",
-                f"{target_mention} will be back. They always come back.",
-                f"{target_mention} has been sent Somewhere Else.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been demoted to muted mute.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been forever silenced.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been erased from history.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sent to a farm upstate.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sentenced to 50 years in the dungeon.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been muted muted muted muted muted mute.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is gone.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is dead now.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} will be back. They always come back.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sent Somewhere Else.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sent to gay baby jail.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sent to Non-Denominational Vaguely Romantic Infant Gulag.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is over there now.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been shaved bald.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is in your house now.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has had every bone in their body shattered.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} went on vacation.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} was let cook.",
             ]
             random_message = random.choice(reply_messages)
 
