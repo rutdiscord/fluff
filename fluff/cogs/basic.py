@@ -429,7 +429,7 @@ class Basic(Cog):
 
     @commands.cooldown(1, 5, type=commands.BucketType.default)
     @commands.guild_only()
-    @commands.command()
+    @commands.command(aliases=["banne"])
     async def mutedmute(self, ctx, target: typing.Union[discord.Member, int] = None):
         if not target:
             return
