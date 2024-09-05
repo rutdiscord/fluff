@@ -406,12 +406,6 @@ class Basic(Cog):
                 "inline": True,
             },
             {
-                "name": "pls setdata {attachment}",
-                "value": """replaces bot data files
-only to use with backups if the bot explodes or something""",
-                "inline": False,
-            },
-            {
                 "name": "pls getsdata [server ID]",
                 "value": """gets server data files""",
                 "inline": True,
@@ -445,6 +439,12 @@ only to use with backups if the bot explodes or something""",
                 "name": "pls guilds",
                 "value": """shows what guilds the bot is in""",
                 "inline": True,
+            },
+            {
+                "name": "pls setdata {attachment}",
+                "value": """replaces bot data files
+only to use with backups if the bot explodes or something""",
+                "inline": False,
             },
             {
                 "name": "pls threadlock [channel]",
