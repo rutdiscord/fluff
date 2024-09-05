@@ -329,17 +329,17 @@ class Basic(Cog):
             {
                 "name": "Rules and Snippets",
                 "value": """If you need to call up a specific rule, you can use `pls rule [rulename]`. Some rules have specific information which needs to be recalled repetitively, which is done with `pls snippets [snippet]`. All rules and snippets can be summarized by calling `pls rule` or `pls snippets` on their own.""",
-                "inline": True,
+                "inline": False,
             },
             {
                 "name": "Latency Checking",
                 "value": """If I'm slow, you can check my ping with `pls ping`.""",
-                "inline": True,
+                "inline": False,
             },
             {
                 "name": "Checking Permissions",
                 "value": """`pls permcheck` will check a user's permissions for a certain channel.""",
-                "inline": True,
+                "inline": False,
             }
         ]
 
