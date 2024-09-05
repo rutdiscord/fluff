@@ -201,6 +201,7 @@ class Basic(Cog):
                 "Server Avy": "`pls avy server` will tell me to post the avatar of the server.",
                 "About Me": "`pls about` shows my info!",
                 "Bunfact": "`pls bunfact` and `pls bunfact [fact name]` shows a fun bun fact, and sometimes an associated gif or image!",
+                "Mutedmute": "`pls mutedmute [user]` will mute a user in a special way. You can use it even when you're not staff!",
             }
 
             for name, value in help_data.items():
@@ -455,6 +456,7 @@ class Basic(Cog):
                 f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been shaved bald.",
                 f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is in your house now.",
                 f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has had every bone in their body shattered.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} went on vacation.",
             ]
             random_message = random.choice(reply_messages)
 
