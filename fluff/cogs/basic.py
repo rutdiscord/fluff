@@ -9,7 +9,7 @@ import random
 import platform
 from discord.ext import commands
 from discord.ext.commands import Cog
-from helpers.checks import ismod
+from helpers.checks import ismod, ismanager
 from helpers.embeds import stock_embed, sympage
 from helpers.sv_config import get_config
 import aiohttp
@@ -379,6 +379,149 @@ class Basic(Cog):
         message_text = f":ping_pong:\nRound-Time Trip (Receive-to-Response): `{rtt_ms:.1f}ms`\nGateway (Connection to Discord): `{gw_ms:.1f}ms`"
         self.bot.log.info(message_text)
         await tmp.edit(content=message_text)
+
+    @commands.command()
+    @commands.check(ismanager)
+    async def managerhelp(self, ctx):
+        """This is Fluff's staff help command.
+
+        Spits out two internally defined embeds with pagination to help staff out on the ropes.
+
+        No arguments."""
+        embed1 = stock_embed(self.bot)
+        fields = [
+            {
+                "name": "pls quit",
+                "value": """shuts down the bot""",
+                "inline": True,
+            },
+            {
+                "name": "pls errors",
+                "value": """checks error log""",
+                "inline": True,
+            },
+            {
+                "name": "pls getdata",
+                "value": """sends you current bot data files""",
+                "inline": True,
+            },
+            {
+                "name": "pls setdata {attachment}",
+                "value": """replaces bot data files
+only to use with backups if the bot explodes or something""",
+                "inline": True,
+            },
+            {
+                "name": "pls getsdata [server ID]",
+                "value": """gets server data files""",
+                "inline": True,
+            },
+            {
+                "name": "pls setsdata [server ID] {attachment}",
+                "value": """replaces server data files""",
+                "inline": True,
+            },
+            {
+                "name": "pls getudata [user ID]",
+                "value": """gets user data files""",
+                "inline": True,
+            },
+            {
+                "name": "pls setudata [user ID] {attachment}",
+                "value": """replaces user data files""",
+                "inline": True,
+            },
+            {
+                "name": "pls getlogs",
+                "value": """gets bots log file""",
+                "inline": True,
+            },
+            {
+                "name": "pls taillogs",
+                "value": """gets the last 10 lines of the log file""",
+                "inline": True,
+            },
+            {
+                "name": "pls guilds",
+                "value": """shows what guilds the bot is in""",
+                "inline": True,
+            },
+            {
+                "name": "pls threadlock [channel]",
+                "value": """locks all threads in one channel""",
+                "inline": True,
+            },
+            {
+                "name": "pls botban [user]",
+                "value": """bans a user from using me. naughty!""",
+                "inline": True,
+            },
+            {
+                "name": "pls unbotban [user]",
+                "value": """back on the nice list. lets a user use me again""",
+                "inline": True,
+            },
+            {
+                "name": "pls setavy",
+                "value": """sets my avy!""",
+                "inline": True,
+            },
+            {
+                "name": "pls setbanner",
+                "value": """sets my banner!""",
+                "inline": True,
+            },
+            {
+                "name": "pls eval {code}",
+                "value": """evaluates some code""",
+                "inline": True,
+            },
+            {
+                "name": "pls exec {code}",
+                "value": """executes some code""",
+                "inline": True,
+            },
+            {
+                "name": "pls pull [true/false]",
+                "value": """you can pull from git
+the true/false portion tells me whether to reload cogs""",
+                "inline": True,
+            },
+            {
+                "name": "pls load cogs.[cog name]",
+                "value": """loads a cog""",
+                "inline": True,
+            },
+            {
+                "name": "pls unload cogs.[cog name]",
+                "value": """unloads a cog""",
+                "inline": True,
+            },
+            {
+                "name": "pls reload cogs.[cog name]",
+                "value": """reloads a cog""",
+                "inline": True,
+            },
+        ]
+
+        half = len(fields) // 2
+        first_half = fields[:half]
+        second_half = fields[half:]
+
+        embed1 = stock_embed(self.bot)
+        embed2 = stock_embed(self.bot)
+
+        for field in first_half:
+            embed1.add_field(
+                name=field["name"], value=field["value"], inline=field["inline"]
+            )
+
+        for field in second_half:
+            embed2.add_field(
+                name=field["name"], value=field["value"], inline=field["inline"]
+            )
+
+        await sympage(self.bot, ctx, [embed1, embed2], ["1️⃣", "2️⃣"])    
 
     @commands.cooldown(1, 5, type=commands.BucketType.default)
     @commands.bot_has_permissions(attach_files=True)
