@@ -481,12 +481,7 @@ only to use with backups if the bot explodes or something""",
                 "value": """executes some code""",
                 "inline": True,
             },
-            {
-                "name": "pls pull [true/false]",
-                "value": """you can pull from git
-the true/false portion tells me whether to reload cogs""",
-                "inline": False,
-            },
+            
             {
                 "name": "pls load cogs.[cog name]",
                 "value": """loads a cog""",
@@ -501,6 +496,12 @@ the true/false portion tells me whether to reload cogs""",
                 "name": "pls reload cogs.[cog name]",
                 "value": """reloads a cog""",
                 "inline": True,
+            },
+            {
+                "name": "pls pull [true/false]",
+                "value": """you can pull from git
+the true/false portion tells me whether to reload cogs""",
+                "inline": False,
             },
         ]
 
