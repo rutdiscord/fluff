@@ -24,6 +24,4 @@ Fluff is currently not available for public use, but self-hosting instructions a
 - Enter `pipenv shell`, `cd fluff`, then `python __init__.py`.
 - Congratulations.
 
-I will not help you if you wish to use a `requirements.txt`. It is much easier to just use `pipenv`. 
-
 Also, neither of us know anything about Python and this bot is the equivelant of the [infinite monkey theorem](https://en.wikipedia.org/wiki/Infinite_monkey_theorem), so you might not want to ask us for help regardless.
