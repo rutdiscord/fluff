@@ -432,6 +432,12 @@ class Basic(Cog):
     @commands.guild_only()
     @commands.command(aliases=["banne"])
     async def mutedmute(self, ctx, target: typing.Union[discord.Member, int] = None):
+        """This mutes a user in a special way.
+        
+        You can use it even if you aren't staff!
+        
+        - `target`
+        Who you want to 'mute'. This is a user mention."""
         if not target:
             return
         else:
