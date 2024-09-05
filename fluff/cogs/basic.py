@@ -409,7 +409,7 @@ class Basic(Cog):
                 "name": "pls setdata {attachment}",
                 "value": """replaces bot data files
 only to use with backups if the bot explodes or something""",
-                "inline": True,
+                "inline": False,
             },
             {
                 "name": "pls getsdata [server ID]",
@@ -495,12 +495,12 @@ the true/false portion tells me whether to reload cogs""",
             {
                 "name": "pls unload cogs.[cog name]",
                 "value": """unloads a cog""",
-                "inline": True,
+                "inline": False,
             },
             {
                 "name": "pls reload cogs.[cog name]",
                 "value": """reloads a cog""",
-                "inline": True,
+                "inline": False,
             },
         ]
 
