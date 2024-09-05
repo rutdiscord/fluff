@@ -439,15 +439,15 @@ class Basic(Cog):
             else:
                 return
             reply_messages = [
-                f"{target_mention} has been demoted to muted mute."
-                f"{target_mention} has been forever silenced."
-                f"{target_mention} has been erased from history."
-                f"{target_mention} has been sent to a farm upstate."
-                f"{target_mention} has been sentenced to 50 years in the dungeon."
-                f"{target_mention} has been muted muted muted muted muted mute."
-                f"{target_mention} is gone."
-                f"{target_mention} is dead now."
-                f"{target_mention} will be back. They always come back."
+                f"{target_mention} has been demoted to muted mute.",
+                f"{target_mention} has been forever silenced.",
+                f"{target_mention} has been erased from history.",
+                f"{target_mention} has been sent to a farm upstate.",
+                f"{target_mention} has been sentenced to 50 years in the dungeon.",
+                f"{target_mention} has been muted muted muted muted muted mute.",
+                f"{target_mention} is gone.",
+                f"{target_mention} is dead now.",
+                f"{target_mention} will be back. They always come back.",
                 f"{target_mention} has been sent Somewhere Else."
             ]
             random_message = random.choice(reply_messages)
