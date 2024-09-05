@@ -431,7 +431,7 @@ class Basic(Cog):
     @commands.guild_only()
     @commands.command()
     async def mutedmute(self, ctx, target: typing.Union[discord.Member, int] = None):
-        if not target: 
+        if not target:
             return
         else:
             if isinstance(target, discord.Member):
@@ -448,7 +448,7 @@ class Basic(Cog):
                 f"{target_mention} is gone.",
                 f"{target_mention} is dead now.",
                 f"{target_mention} will be back. They always come back.",
-                f"{target_mention} has been sent Somewhere Else."
+                f"{target_mention} has been sent Somewhere Else.",
             ]
             random_message = random.choice(reply_messages)
 
@@ -458,7 +458,6 @@ class Basic(Cog):
                 if message.author == target:
                     await message.add_reaction("<:rubberhammer:1281079056820998185>")
                     break
-
 
 
 async def setup(bot):
