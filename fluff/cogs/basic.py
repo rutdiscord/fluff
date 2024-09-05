@@ -439,22 +439,22 @@ class Basic(Cog):
             else:
                 return
             reply_messages = [
-                f"{target_mention} has been demoted to muted mute.",
-                f"{target_mention} has been forever silenced.",
-                f"{target_mention} has been erased from history.",
-                f"{target_mention} has been sent to a farm upstate.",
-                f"{target_mention} has been sentenced to 50 years in the dungeon.",
-                f"{target_mention} has been muted muted muted muted muted mute.",
-                f"{target_mention} is gone.",
-                f"{target_mention} is dead now.",
-                f"{target_mention} will be back. They always come back.",
-                f"{target_mention} has been sent Somewhere Else.",
-                f"{target_mention} has been sent to gay baby jail.",
-                f"{target_mention} has been sent to Non-Denominational Vaguely Romantic Infant Gulag.",
-                f"{target_mention} is over there now.",
-                f"{target_mention} has been shaved bald.",
-                f"{target_mention} is in your house now.",
-                f"{target_mention} has had every bone in their body shattered.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been demoted to muted mute.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been forever silenced.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been erased from history.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sent to a farm upstate.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sentenced to 50 years in the dungeon.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been muted muted muted muted muted mute.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is gone.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is dead now.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} will be back. They always come back.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sent Somewhere Else.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sent to gay baby jail.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sent to Non-Denominational Vaguely Romantic Infant Gulag.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is over there now.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been shaved bald.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is in your house now.",
+                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has had every bone in their body shattered.",
             ]
             random_message = random.choice(reply_messages)
 
