@@ -518,6 +518,9 @@ class ModToss(Cog):
         """This closes a mute session.
 
         Please refer to the tossing section of the [documentation](https://3gou.0ccu.lt/as-a-moderator/the-tossing-system/).
+        In Fluff, this command also sends archival data to Google Drive.
+
+        - No arguments.
         """
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
