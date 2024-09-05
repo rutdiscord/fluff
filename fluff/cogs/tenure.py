@@ -100,7 +100,7 @@ class Tenure(Cog):
                 )
             else:
                 await ctx.reply(
-                    f"You joined around {tenure_days}  (to be more exact, `{tenure_dt} (hours:minutes:ss.mmmmmm, UTC)`) days ago, and you've already been assigned the {tenure_role.name} role!",
+                    f"You joined around {tenure_days} (to be more exact, `{tenure_dt} (hours:minutes:ss.mmmmmm, UTC)`) days ago, and you've already been assigned the {tenure_role.name} role!",
                     mention_author=False,
                 )
         else:
