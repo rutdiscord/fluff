@@ -204,7 +204,8 @@ class RulePushV2(Cog):
 
                     if session["session_data"]["roles"]:
                         for role in session["session_data"]["roles"]:
-                            await user.add_roles(guild.get_role(role))
+                            if role is not guild.default_role:
+                                await user.add_roles(guild.get_role(role))
 
                     await channel.delete()
                     del rulepush_sessions["pushed"][session["channel"]]
