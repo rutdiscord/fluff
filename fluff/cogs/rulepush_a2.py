@@ -108,7 +108,6 @@ class RulePushV2(Cog):
             case "create":
 
                 user_current_session = await self.session_manager("get", guild, user)
-                print(user_current_session)
 
                 if user_current_session:
                     return user_current_session
@@ -119,6 +118,10 @@ class RulePushV2(Cog):
 
                 rulepush_config_topic = get_config(
                     guild.id, "rulepush", "rulepushtopic"
+                )
+
+                rulepush_config_role = self.bot.pull_role(
+                    guild, get_config(guild.id, "rulepush", "rulepushrole")
                 )
 
                 staff_roles = [
@@ -183,6 +186,12 @@ class RulePushV2(Cog):
                                 user, read_messages=True
                             )
 
+                            if rulepush_config_role not in user.roles:
+                                await user.add_roles(rulepush_config_role)
+                                for role in user.roles:
+                                    if role != rulepush_config_role:
+                                        await user.remove_roles(role)
+
                             return rulepush_channel
 
             case "clean_destroy":
@@ -192,6 +201,15 @@ class RulePushV2(Cog):
 
                 session = await self.session_manager("get", guild, user)
                 if session is not None and session["channel"] == channel.name:
+
+                    if session["session_data"]["roles"]:
+                        await user.add_roles(
+                            *[
+                                self.bot.pull_role(guild, role_id)
+                                for role_id in session["session_data"]["roles"]
+                            ]
+                        )
+
                     await channel.delete()
                     del rulepush_sessions["pushed"][session["channel"]]
                     set_tossfile(guild.id, "rulepush", json.dumps(rulepush_sessions))
@@ -235,22 +253,12 @@ class RulePushV2(Cog):
 
         potential_session = await self.session_manager("get", ctx.guild, user)
 
-        rulepush_configured_role = self.bot.pull_role(
-            ctx.guild, get_config(ctx.guild.id, "rulepush", "rulepushrole")
-        )
-
         if (potential_session) is not None:
             return await ctx.reply(
                 f"User already has a session... *thump*", mention_author=False
             )
 
-        rulepush_channel = await self.session_manager("create", ctx.guild, user)
-
-        if rulepush_configured_role not in user.roles:
-            await user.remove_roles(
-                *[role for role in user.roles if role != rulepush_configured_role]
-            )
-            await user.add_roles(rulepush_configured_role)
+        await self.session_manager("create", ctx.guild, user)
 
     @Cog.listener()
     async def on_message(self, message: discord.Message):
