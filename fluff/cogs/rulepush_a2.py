@@ -67,6 +67,16 @@ class RulePushV2(Cog):
         if not self.enabled(guild):
             return
 
+        rulepush_config_category = self.bot.pull_category(
+            guild, get_config(guild.id, "rulepush", "rulepushcategory")
+        )
+
+        rulepush_config_topic = get_config(guild.id, "rulepush", "rulepushtopic")
+
+        rulepush_config_role = self.bot.pull_role(
+            guild, get_config(guild.id, "rulepush", "rulepushrole")
+        )
+
         rulepush_sessions = get_tossfile(guild.id, "rulepush")  # Pull tosses
         if rulepush_sessions == {}:
             rulepush_sessions = {
@@ -111,18 +121,6 @@ class RulePushV2(Cog):
 
                 if user_current_session:
                     return user_current_session
-
-                rulepush_config_category = self.bot.pull_category(
-                    guild, get_config(guild.id, "rulepush", "rulepushcategory")
-                )
-
-                rulepush_config_topic = get_config(
-                    guild.id, "rulepush", "rulepushtopic"
-                )
-
-                rulepush_config_role = self.bot.pull_role(
-                    guild, get_config(guild.id, "rulepush", "rulepushrole")
-                )
 
                 staff_roles = [
                     self.bot.pull_role(guild, get_config(guild.id, "staff", "modrole")),
@@ -186,13 +184,15 @@ class RulePushV2(Cog):
                                 user, read_messages=True
                             )
 
-                            if rulepush_config_role not in user.roles:
-                                for role in user.roles:
-                                    if role != rulepush_config_role:
-                                        if role.is_assignable():
-                                            await user.remove_roles(role)
-                                        else:
-                                            return
+                            for role in user.roles:
+                                if role != rulepush_config_role:
+                                    if role.is_assignable():
+                                        await user.remove_roles(
+                                            role,
+                                            reason="Generating rulepush session (Fluff)",
+                                        )
+                                    else:
+                                        return
 
                             await user.add_roles(rulepush_config_role)
 
@@ -205,7 +205,10 @@ class RulePushV2(Cog):
 
                 session = await self.session_manager("get", guild, user)
                 if session is not None and session["channel"] == channel.name:
-
+                    await user.remove_roles(
+                        rulepush_config_role,
+                        reason="Dismantling rulepush session (Fluff)",
+                    )
                     if session["session_data"]["roles"]:
                         for role in session["session_data"]["roles"]:
                             if guild.get_role(role) is not guild.default_role:
