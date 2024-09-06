@@ -34,7 +34,7 @@ class Basic(Cog):
         )
 
     @commands.command()
-    async def choose(self, ctx, *options):
+    async def choose(self, ctx: commands.Context, *options):
         """This will choose something at random for you.
 
         It's not weighted, it's completely random between
@@ -46,7 +46,7 @@ class Basic(Cog):
 
     @commands.bot_has_permissions(add_reactions=True)
     @commands.command(aliases=["timer"])
-    async def eggtimer(self, ctx, minutes: int = 5):
+    async def eggtimer(self, ctx: commands.Context, minutes: int = 5):
         """This starts a timer.
 
         It'll react to your message, then ping you
@@ -70,7 +70,7 @@ class Basic(Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.group(invoke_without_command=True)
-    async def avy(self, ctx, target: discord.User = None):
+    async def avy(self, ctx: commands.Context, target: discord.User = None):
         """This gets a user's avatar.
 
         If you don't specify anyone, it'll show your
@@ -87,7 +87,7 @@ class Basic(Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @avy.command(name="server")
-    async def _server(self, ctx, target: discord.Guild = None):
+    async def _server(self, ctx: commands.Context, target: discord.Guild = None):
         """This gets a server's avatar.
 
         You *could* get another server's avatar with
@@ -101,7 +101,7 @@ class Basic(Cog):
         return await ctx.send(content=target.icon.url)
 
     @commands.command(aliases=["catbox", "imgur"])
-    async def rehost(self, ctx, links=None):
+    async def rehost(self, ctx: commands.Context, links=None):
         """This uploads a file to catbox.moe.
 
         These files won't expire, ever. Please respect
@@ -341,7 +341,7 @@ class Basic(Cog):
                 "name": "Checking Permissions",
                 "value": """`pls permcheck` will check a user's permissions for a certain channel.""",
                 "inline": False,
-            }
+            },
         ]
 
         half = len(fields) // 2
@@ -483,7 +483,6 @@ only to use with backups if the bot explodes or something""",
                 "value": """executes some code""",
                 "inline": True,
             },
-            
             {
                 "name": "pls load cogs.[cog name]",
                 "value": """loads a cog""",
@@ -527,7 +526,7 @@ the true/false portion tells me whether to reload cogs""",
                 name=field["name"], value=field["value"], inline=field["inline"]
             )
 
-        await sympage(self.bot, ctx, [embed1, embed2], ["1️⃣", "2️⃣"])    
+        await sympage(self.bot, ctx, [embed1, embed2], ["1️⃣", "2️⃣"])
 
     @commands.cooldown(1, 5, type=commands.BucketType.default)
     @commands.bot_has_permissions(attach_files=True)
@@ -592,9 +591,9 @@ the true/false portion tells me whether to reload cogs""",
     @commands.command(aliases=["banne"])
     async def mutedmute(self, ctx, target: typing.Union[discord.Member, int] = None):
         """This mutes a user in a special way.
-        
+
         You can use it even if you aren't staff!
-        
+
         - `target`
         Who you want to 'mute'. This is a user mention."""
         if not target:
@@ -640,6 +639,7 @@ the true/false portion tells me whether to reload cogs""",
 
         No arguments."""
         await ctx.send(content=random_msg("rules_1"))
+
 
 async def setup(bot):
     await bot.add_cog(Basic(bot))
