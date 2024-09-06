@@ -613,7 +613,7 @@ class Admin(Cog):
 
     @commands.check(ismanager)
     @commands.command()
-    async def pull(self, ctx, auto=False):
+    async def pull(self, ctx, auto=True):
         """This performs a Git Pull.
 
         I really wouldn't use this unless you're fine
