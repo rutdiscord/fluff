@@ -60,6 +60,12 @@ class RulePushV2(Cog):
             return
 
         rulepush_sessions = get_tossfile(guild.id, "rulepush")  # Pull tosses
+        if rulepush_sessions == {}:
+            rulepush_sessions = {
+                "pushed": {},
+                "idle_kicked": {},
+                "left": [],
+            }  # If no sessions, create empty dict
 
         match action:
             case "get":
@@ -76,7 +82,7 @@ class RulePushV2(Cog):
 
                 for channel in rulepush_sessions["pushed"]:
                     if str(user.id) in rulepush_sessions["pushed"][channel]:
-                        session = rulepush_sessions[channel][
+                        session = rulepush_sessions["pushed"][channel][
                             str(user.id)
                         ]  # Found session
                         break
@@ -84,11 +90,12 @@ class RulePushV2(Cog):
                 return session
             case "create":
 
-                rulepush_config_role = self.bot.pull_role(
-                    guild.id, get_config(guild.id, "rulepush", "rulepushrole")
-                )
                 rulepush_config_category = self.bot.pull_category(
-                    guild.id, get_config(guild.id, "rulepush", "rulepushcategory")
+                    guild, get_config(guild.id, "rulepush", "rulepushcategory")
+                )
+
+                rulepush_config_topic = get_config(
+                    guild.id, "rulepush", "rulepushtopic"
                 )
 
                 staff_roles = [
@@ -113,7 +120,9 @@ class RulePushV2(Cog):
                                     ),
                                 }
                             }
-                            set_tossfile("rulepush", json.dumps(rulepush_sessions))
+                            set_tossfile(
+                                guild.id, "rulepush", json.dumps(rulepush_sessions)
+                            )
                             overwrites = {
                                 guild.default_role: discord.PermissionOverwrite(
                                     read_messages=False
@@ -135,14 +144,9 @@ class RulePushV2(Cog):
                             rulepush_channel = await guild.create_text_channel(
                                 channel,
                                 reason="Fluff Rulepush",
-                                category=self.bot.pull_category(
-                                    guild,
-                                    get_config(
-                                        guild.id, "rulepush", "rulepushcategory"
-                                    ),
-                                ),
+                                category=rulepush_config_category,
                                 overwrites=overwrites,
-                                topic=get_config(guild.id, "rulepush", "rulepushtopic"),
+                                topic=rulepush_config_topic,
                             )
 
                             return rulepush_channel
@@ -161,9 +165,9 @@ class RulePushV2(Cog):
     async def session_debug(self, ctx, action: str, user: discord.Member):
         match action:
             case "get":
-                await ctx.send(await self.session_manager("get", ctx.guild, user))
+                await ctx.send(f"```\n{await self.session_manager("get", ctx.guild, user)}```")
             case "create":
-                await ctx.send(await self.session_manager("create", ctx.guild, user))
+                await ctx.send(f"```{await self.session_manager("create", ctx.guild, user)}```")
 
     @Cog.listener()
     async def on_message(self, message: discord.Message):
