@@ -23,6 +23,7 @@ from helpers.placeholders import random_msg
 class Admin(Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.lastreload = None
         self.last_eval_result = None
         self.previous_eval_code = None
         self.last_exec_result = None
