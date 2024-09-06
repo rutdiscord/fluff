@@ -28,7 +28,7 @@ from helpers.datafiles import get_tossfile, set_tossfile
         },
 
         "left": []
-        
+
         },
     }
 """
@@ -187,13 +187,14 @@ class RulePushV2(Cog):
                             )
 
                             if rulepush_config_role not in user.roles:
-                                await user.add_roles(rulepush_config_role)
                                 for role in user.roles:
                                     if role != rulepush_config_role:
                                         if role.is_assignable():
                                             await user.remove_roles(role)
                                         else:
                                             return
+
+                            await user.add_roles(rulepush_config_role)
 
                             return rulepush_channel
 
