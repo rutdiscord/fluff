@@ -716,7 +716,7 @@ class Admin(Cog):
 
         - `ext`
         The cog to reload."""
-        if self.lastreload:
+        if self.lastreload == ext:
             ext = self.lastreload
 
         try:
