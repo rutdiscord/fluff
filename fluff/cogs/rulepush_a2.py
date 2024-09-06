@@ -165,9 +165,13 @@ class RulePushV2(Cog):
     async def session_debug(self, ctx, action: str, user: discord.Member):
         match action:
             case "get":
-                await ctx.send(f"```\n{await self.session_manager("get", ctx.guild, user)}```")
+                await ctx.send(
+                    f'```\n{await self.session_manager("get", ctx.guild, user)}```'
+                )
             case "create":
-                await ctx.send(f"```{await self.session_manager("create", ctx.guild, user)}```")
+                await ctx.send(
+                    f'```\n{await self.session_manager("create", ctx.guild, user)}```'
+                )
 
     @Cog.listener()
     async def on_message(self, message: discord.Message):
