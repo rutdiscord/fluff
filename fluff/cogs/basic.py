@@ -639,7 +639,7 @@ the true/false portion tells me whether to reload cogs""",
         """This posts the rules.
 
         No arguments."""
-        await ctx.message.send(content=random_msg("rules_1"))
+        await ctx.message.reply(content=random_msg("rules_1"), mention_author=False)
 
 async def setup(bot):
     await bot.add_cog(Basic(bot))
