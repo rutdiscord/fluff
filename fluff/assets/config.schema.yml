@@ -141,7 +141,7 @@ rulepush:
           - integer
           - string
         minimum: 100000000000000000
-    intro_message:
+    rulepushtopic:
       type: 
         - string
         - "null"
