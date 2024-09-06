@@ -154,3 +154,4 @@ embed_msg:
 # Used for rules randomization.
 rules_1: 
   - "bot stop crashing-inator"
+  - "lalala"
