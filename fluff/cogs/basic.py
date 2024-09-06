@@ -7,13 +7,13 @@ import matplotlib.pyplot as plt
 import typing
 import random
 import platform
-import yaml
 from discord.ext import commands
 from discord.ext.commands import Cog
 from helpers.checks import ismod, ismanager
 from helpers.embeds import stock_embed, sympage
 from helpers.sv_config import get_config
 import aiohttp
+from helpers.placeholders import random_msg
 
 
 class Basic(Cog):
@@ -639,8 +639,7 @@ the true/false portion tells me whether to reload cogs""",
         """This posts the rules.
 
         No arguments."""
-        rules_message = self.placeholders.get('rules_1', 'No rules have been set.')
-        await ctx.send(rules_message)
+        await ctx.message.send(content=random_msg("rules_1"))
 
 async def setup(bot):
     await bot.add_cog(Basic(bot))
