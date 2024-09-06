@@ -52,9 +52,17 @@ class RulePushV2(Cog):
         )
 
     async def session_manager(
-        self, action: str, guild: discord.Guild, user: discord.Member
-    ):
-        assert action in ["get", "create"]  # if action not supported throw assert
+        self,
+        action: str,
+        guild: discord.Guild,
+        user: discord.Member = None,
+        channel: discord.TextChannel = None,
+    ):  # this is mostly to provide a predictable path to frequently used functions
+
+        if action not in ["get", "create", "destroy", "all_sessions"]:
+            raise NotImplementedError(
+                "Action not implemented"
+            )  # if action not supported, bail
 
         if not self.enabled(guild):
             return
@@ -68,6 +76,11 @@ class RulePushV2(Cog):
             }  # If no sessions, create empty dict
 
         match action:
+            case "all_sessions":
+                if not rulepush_sessions:
+                    return None
+                else:
+                    return rulepush_sessions
             case "get":
                 if not rulepush_sessions:  # Prevention of Chaos
                     return None
@@ -82,9 +95,12 @@ class RulePushV2(Cog):
 
                 for channel in rulepush_sessions["pushed"]:
                     if str(user.id) in rulepush_sessions["pushed"][channel]:
-                        session = rulepush_sessions["pushed"][channel][
-                            str(user.id)
-                        ]  # Found session
+                        session = {
+                            "channel": channel,
+                            "session_data": rulepush_sessions["pushed"][channel][
+                                str(user.id)
+                            ],
+                        }  # Found session
                         break
 
                 return session
@@ -141,6 +157,7 @@ class RulePushV2(Cog):
                                 overwrites[staff_role] = discord.PermissionOverwrite(
                                     read_messages=True
                                 )
+
                             rulepush_channel = await guild.create_text_channel(
                                 channel,
                                 reason="Fluff Rulepush",
@@ -150,6 +167,21 @@ class RulePushV2(Cog):
                             )
 
                             return rulepush_channel
+            case "destroy":
+                session = self.session_manager("get", guild, user)
+                if session != False or session != None:
+                    session = rulepush_sessions["pushed"][
+                        self.session_manager("get", guild, user)
+                    ][str(user.id)]
+                    if session in rulepush_config_category.channels:
+                        await session.delete()
+                        del session
+                        set_tossfile(
+                            guild.id, "rulepush", json.dumps(rulepush_sessions)
+                        )
+                        return True
+                    else:
+                        return False
 
     @commands.bot_has_permissions(manage_roles=True)
     @commands.guild_only()
@@ -158,20 +190,36 @@ class RulePushV2(Cog):
     async def rulepush(self, ctx, user: discord.Member):
         pass
 
-    @commands.bot_has_guild_permissions(manage_roles=True)
-    @commands.guild_only()
-    @commands.check(ismanager)
-    @commands.command()
-    async def session_debug(self, ctx, action: str, user: discord.Member):
-        match action:
-            case "get":
-                await ctx.send(
-                    f'```\n{await self.session_manager("get", ctx.guild, user)}```'
-                )
-            case "create":
-                await ctx.send(
-                    f'```\n{await self.session_manager("create", ctx.guild, user)}```'
-                )
+    @commands.bot_has_permissions(manage_roles=True, manage_channels=True)
+    @commands.group(invoke_without_command=True)
+    async def session_debug(self, ctx: commands.Context):
+        sessions = await self.session_manager("all_sessions", ctx.guild)
+        await ctx.reply(f"```\n{sessions}```", mention_author=False)
+
+    @session_debug.command()
+    async def get(self, ctx: commands.Context, user: discord.Member):
+        session = await self.session_manager("get", ctx.guild, user)
+        await ctx.reply(f"```\n{session}```", mention_author=False)
+
+    @session_debug.command()
+    async def create(self, ctx: commands.Context, user: discord.Member):
+        session = await self.session_manager("create", ctx.guild, user)
+        await ctx.reply(f"```\n{session}```", mention_author=False)
+
+    @session_debug.command()
+    async def destroy(
+        self,
+        ctx: commands.Context,
+        user: discord.Member,
+        chan=None,
+    ):
+        if isinstance(chan, discord.TextChannel):
+            session = await self.session_manager("destroy", ctx.guild, user, chan)
+            await ctx.reply(f"```\n{session}```", mention_author=False)
+        else:
+            session = await self.session_manager(
+                "destroy", ctx.guild, user, ctx.channel
+            )
 
     @Cog.listener()
     async def on_message(self, message: discord.Message):
