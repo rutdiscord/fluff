@@ -148,3 +148,49 @@ hello_hello:
 embed_msg:
   - "If you can't see this, check your message link settings."
   - "Here's your embed. Check your settings if you can't see it."
+
+# === RULES ===
+
+# Used for rules randomization.
+rules_1:
+- """**__Welcome to the Undertale DISCORD SERVER!__**
+
+This is a server for **English-speaking** Undertale lovers to hang out. Please refrain from conversing extensively with languages other than English in this server, as we cannot properly moderate non-English languages. Thank you for understanding.
+
+**__RULES__**
+**Rule 1. Follow Discord ToS and US law.**
+> Discord operates in the US and as such the platform is bound by US laws.
+> - NSFW and suggestive content and is not allowed anywhere on the server.
+> Discord's Terms of Service can be found here: https://discordapp.com/terms
+> Discord's Community Guidelines (which you must also follow on all servers) can be found here: https://discord.com/guidelines
+> - Endorsement of piracy is not allowed.
+
+**Rule 2. Before posting in any channel, read the channel description and follow that channel's rules.**
+> Some channels have dedicated topics and specific rules. Please keep posts to the relevant channels.
+> #newhome and #home are all-purpose channels, but we value flow of conversation and do not permit disrupting (derailing) ongoing topics - you can either use an alternate channel, wait until the conversation has finished to introduce your own topic, or join the ongoing conversation if there is an ongoing topic.
+> - We also discourage “dead chat” and variations of this comment as they are disruptive and nonconstructive - automod will remove these messages automatically. Please do not attempt to bypass this, or any other messages that are automodded or you will receive a warning. 
+
+**Rule 3. Treat your fellow server members with respect and dignity.**
+> This Undertale Discord is a space for all to enjoy. Toxic and discriminatory behavior in any form will not be tolerated.
+> - In this server, our userbase is made up of many LGBTQ+, neurodivergent, and BIPOC individuals, and we support these movements and people wholeheartedly. If you feel you will be unable to show the due respect to these groups as your peers, this server is not for you and you will be immediately removed.
+> - Additionally, we strictly forbid the nonbinary erasure of Frisk, Kris, or Chara - please keep gender-related 'headcanons' out of this server, and debates of their genders will net a ban on grounds of nonbinary erasure, which is a form of discrimination. 
+> - We also do not allow discussion of underage or incestuous ships, nor AU's that have sexual or problematic content.
+
+**Rule 4. Alternate accounts and other means of ban evasion are forbidden.**
+> You can only have one account here at a time. The first instance in which we find two of your accounts here will result in a kick. Further attempts or more accounts will result in a ban without appeal. 
+>  - If you are going to transfer to a new account and you have warnings on your current profile, please notify staff so we can transfer them - otherwise, it may be seen as warn evasion.
+
+**Rule 5. Cooperate with staff.**
+> Our staff members are trusted members of our community.
+> If a staff member tells you to stop doing something, please assume it is for a good reason and follow suit.
+> - If you disagree with the request given, you can either use our f!report system to bring the issue to all of staff's attention or we can discuss it further privately in ⁠muted.
+> - Please let the staff do their jobs and use the @Staff ping in the event of trouble - "Minimodding" is highly discouraged and may result in formal warnings with repeated offenses.
+
+\**Rule 6. Disruptive chat behavior is not permitted**
+\> Roleplay, unwanted advertising (shilling) in-server or in DMs, harassment and making statements for the sole purpose of upsetting others, bot abuse, enticing (or participating in) raids, lyricposting, joke spoilers, everyone/here pings and other spam are all disallowed, as they are disruptive. Again, we believe in flow of conversation and we ask you not to interrupt ongoing conversations (derail) - doing so repeatedly may result in formal action.
+\> - **Typing quirks are not permitted.** They are almost impossible for screen readers to parse and very difficult for users and staff to read. 
+\> - Our mod tools require that your nickname be at least partially typeable using a standard QWERTY keyboard. If your nickname is not typeable, it should resemble the typeable characters of your username, so that we are able to correctly type that to ping you.
+\> - Please note that if you choose to have a nickname that is partially or fully untypeable, it will be impossible for screen readers to process and may be difficult for others around you to read, and it may be an accessibility issue up to staff's discretion to change at any time.
+
+Thanks for reading! Now check out \#additional-info for more information about the server.
+"""
