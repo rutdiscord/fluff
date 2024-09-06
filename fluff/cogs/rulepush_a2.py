@@ -145,9 +145,7 @@ class RulePushV2(Cog):
                             rulepush_sessions["pushed"][channel] = {
                                 f"{user.id}": {
                                     "roles": [role.id for role in user.roles],
-                                    "timestamp": int(
-                                        datetime.datetime.now().timestamp()
-                                    ),
+                                    "timestamp": int(datetime.now().timestamp()),
                                 }
                             }
                             set_tossfile(
@@ -157,7 +155,6 @@ class RulePushV2(Cog):
                                 guild.default_role: discord.PermissionOverwrite(
                                     read_messages=False
                                 ),
-                                user: discord.PermissionOverwrite(read_messages=True),
                                 guild.me: discord.PermissionOverwrite(
                                     read_messages=True
                                 ),
@@ -179,6 +176,10 @@ class RulePushV2(Cog):
                                 category=rulepush_config_category,
                                 overwrites=overwrites,
                                 topic=rulepush_config_topic,
+                            )
+
+                            await rulepush_channel.set_permissions(
+                                user, read_messages=True
                             )
 
                             return rulepush_channel
