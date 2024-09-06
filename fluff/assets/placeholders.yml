@@ -152,4 +152,5 @@ embed_msg:
 # === RULES ===
 
 # Used for rules randomization.
-rules_1: "bot stop crashing-inator"
+rules_1: 
+  - "bot stop crashing-inator"
