@@ -1,6 +1,6 @@
 import discord
 import json
-from datetime import datetime
+import datetime
 
 from discord.ext import commands
 from discord.ext.commands import Cog
@@ -144,7 +144,9 @@ class RulePushV2(Cog):
                             rulepush_sessions["pushed"][channel] = {
                                 f"{user.id}": {
                                     "roles": [role.id for role in user.roles],
-                                    "timestamp": int(datetime.now().timestamp()),
+                                    "timestamp": int(
+                                        datetime.datetime.now().timestamp()
+                                    ),
                                 }
                             }
                             set_tossfile(
