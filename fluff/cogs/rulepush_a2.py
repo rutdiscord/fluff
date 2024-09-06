@@ -59,7 +59,7 @@ class RulePushV2(Cog):
         channel: discord.TextChannel = None,
     ):  # this is mostly to provide a predictable path to frequently used functions
 
-        if action not in ["get", "create", "destroy", "all_sessions"]:
+        if action not in ["get", "create", "clean_destroy", "all_sessions"]:
             raise NotImplementedError(
                 "Action not implemented"
             )  # if action not supported, bail
@@ -78,7 +78,7 @@ class RulePushV2(Cog):
         match action:
             case "all_sessions":
                 if not rulepush_sessions:
-                    return None
+                    return
                 else:
                     return rulepush_sessions
             case "get":
@@ -96,6 +96,7 @@ class RulePushV2(Cog):
                 for channel in rulepush_sessions["pushed"]:
                     if str(user.id) in rulepush_sessions["pushed"][channel]:
                         session = {
+                            "user_id": str(user.id),
                             "channel": channel,
                             "session_data": rulepush_sessions["pushed"][channel][
                                 str(user.id)
@@ -105,6 +106,12 @@ class RulePushV2(Cog):
 
                 return session
             case "create":
+
+                user_current_session = await self.session_manager("get", guild, user)
+                print(user_current_session)
+
+                if user_current_session:
+                    return user_current_session
 
                 rulepush_config_category = self.bot.pull_category(
                     guild, get_config(guild.id, "rulepush", "rulepushcategory")
@@ -127,6 +134,12 @@ class RulePushV2(Cog):
 
                 for channel in get_config(guild.id, "rulepush", "rulepushchannels"):
                     if channel not in [iterc.name for iterc in guild.channels]:
+                        try:
+                            if str(user.id) in rulepush_sessions["pushed"][channel]:
+                                return False
+                        except KeyError:
+                            pass
+
                         if channel not in rulepush_sessions:
                             rulepush_sessions["pushed"][channel] = {
                                 f"{user.id}": {
@@ -167,21 +180,20 @@ class RulePushV2(Cog):
                             )
 
                             return rulepush_channel
-            case "destroy":
-                session = self.session_manager("get", guild, user)
-                if session != False or session != None:
-                    session = rulepush_sessions["pushed"][
-                        self.session_manager("get", guild, user)
-                    ][str(user.id)]
-                    if session in rulepush_config_category.channels:
-                        await session.delete()
-                        del session
-                        set_tossfile(
-                            guild.id, "rulepush", json.dumps(rulepush_sessions)
-                        )
-                        return True
-                    else:
-                        return False
+
+            case "clean_destroy":
+                rulepush_config_category = self.bot.pull_category(
+                    guild, get_config(guild.id, "rulepush", "rulepushcategory")
+                )
+
+                session = await self.session_manager("get", guild, user)
+                if session is not None and session["channel"] == channel.name:
+                    await channel.delete()
+                    del rulepush_sessions["pushed"][session["channel"]]
+                    set_tossfile(guild.id, "rulepush", json.dumps(rulepush_sessions))
+                    return True
+                else:
+                    return False
 
     @commands.bot_has_permissions(manage_roles=True)
     @commands.guild_only()
@@ -210,16 +222,11 @@ class RulePushV2(Cog):
     async def destroy(
         self,
         ctx: commands.Context,
-        user: discord.Member,
-        chan=None,
+        us: discord.Member,
+        chan: discord.TextChannel,
     ):
-        if isinstance(chan, discord.TextChannel):
-            session = await self.session_manager("destroy", ctx.guild, user, chan)
-            await ctx.reply(f"```\n{session}```", mention_author=False)
-        else:
-            session = await self.session_manager(
-                "destroy", ctx.guild, user, ctx.channel
-            )
+        session = await self.session_manager("clean_destroy", ctx.guild, us, chan)
+        await ctx.reply(f"```\n{session}```", mention_author=False)
 
     @Cog.listener()
     async def on_message(self, message: discord.Message):
