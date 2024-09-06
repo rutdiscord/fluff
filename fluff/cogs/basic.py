@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import typing
 import random
 import platform
+import yaml
 from discord.ext import commands
 from discord.ext.commands import Cog
 from helpers.checks import ismod, ismanager
@@ -632,6 +633,14 @@ the true/false portion tells me whether to reload cogs""",
                     await message.add_reaction("<:rubberhammer:1281079056820998185>")
                     break
 
+    @commands.guild_only()
+    @commands.command()
+    async def postrules(self, ctx):
+        """This posts the rules.
+
+        No arguments."""
+        rules_message = self.placeholders.get('rules_1', 'No rules have been set.')
+        await ctx.send(rules_message)
 
 async def setup(bot):
     await bot.add_cog(Basic(bot))
