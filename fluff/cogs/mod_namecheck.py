@@ -27,7 +27,7 @@ class ModNamecheck(Cog):
         - `target`
         The target to clean unicode from."""
         oldname = target.display_name
-        newname = unidecode(target.display_name)
+        newname = unidecode(target.display_name)[:31]
         if not newname:
             newname = "Unreadable Name"
         await target.edit(nick=newname, reason="Namecheck")
