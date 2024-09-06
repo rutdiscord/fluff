@@ -39,6 +39,7 @@ class RulePushV2(Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.eph_timers = {}
 
     def enabled(self, g):
         return all(
