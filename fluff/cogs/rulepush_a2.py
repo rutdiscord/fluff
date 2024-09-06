@@ -199,21 +199,6 @@ class RulePushV2(Cog):
                 else:
                     return False
 
-    @commands.bot_has_permissions(manage_roles=True)
-    @commands.guild_only()
-    @commands.check(ismod)
-    @commands.command()
-    async def rulepush(self, ctx, user: discord.Member):
-        if not self.enabled(ctx.guild):
-            return
-
-        potential_session = await self.session_manager("get", ctx.guild, user)
-
-        if (potential_session) is not None:
-            return await ctx.reply(f"User already has a session", mention_author=False)
-
-        rulepush_channel = await self.session_manager("create", ctx.guild, user)
-
     @commands.bot_has_permissions(manage_roles=True, manage_channels=True)
     @commands.group(invoke_without_command=True)
     async def session_debug(self, ctx: commands.Context):
@@ -239,6 +224,33 @@ class RulePushV2(Cog):
     ):
         session = await self.session_manager("clean_destroy", ctx.guild, us, chan)
         await ctx.reply(f"```\n{session}```", mention_author=False)
+
+    @commands.bot_has_permissions(manage_roles=True)
+    @commands.guild_only()
+    @commands.check(ismod)
+    @commands.command()
+    async def rulepush(self, ctx, user: discord.Member):
+        if not self.enabled(ctx.guild):
+            return
+
+        potential_session = await self.session_manager("get", ctx.guild, user)
+
+        rulepush_configured_role = self.bot.pull_role(
+            ctx.guild, get_config(ctx.guild.id, "rulepush", "rulepushrole")
+        )
+
+        if (potential_session) is not None:
+            return await ctx.reply(
+                f"User already has a session... *thump*", mention_author=False
+            )
+
+        rulepush_channel = await self.session_manager("create", ctx.guild, user)
+
+        if rulepush_configured_role not in user.roles:
+            await user.remove_roles(
+                *[role for role in user.roles if role != rulepush_configured_role]
+            )
+            await user.add_roles(rulepush_configured_role)
 
     @Cog.listener()
     async def on_message(self, message: discord.Message):
