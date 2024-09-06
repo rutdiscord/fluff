@@ -201,7 +201,18 @@ class RulePushV2(Cog):
     @commands.check(ismod)
     @commands.command()
     async def rulepush(self, ctx, user: discord.Member):
-        pass
+        if not self.enabled(ctx.guild):
+            return
+
+        potential_session = await self.session_manager("get", ctx.guild, user)
+
+        if (potential_session) is not None:
+            return await ctx.reply(f"User already has a session", mention_author=False)
+
+        rulepush_channel = await self.session_manager("create", ctx.guild, user)
+
+        if rulepush_channel:
+            rulepush_channel.set_permissions(user, read_messages=True)
 
     @commands.bot_has_permissions(manage_roles=True, manage_channels=True)
     @commands.group(invoke_without_command=True)
