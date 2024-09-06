@@ -146,7 +146,7 @@ class RulePushV2(Cog):
                         if channel not in rulepush_sessions:
                             rulepush_sessions["pushed"][channel] = {
                                 f"{user.id}": {
-                                    "roles": [role.id for role in user.roles],
+                                    "roles": [*user.roles],
                                     "timestamp": int(
                                         datetime.datetime.now().timestamp()
                                     ),
@@ -186,12 +186,6 @@ class RulePushV2(Cog):
                                 user, read_messages=True
                             )
 
-                            if rulepush_config_role not in user.roles:
-                                await user.add_roles(rulepush_config_role)
-                                for role in user.roles:
-                                    if role != rulepush_config_role:
-                                        await user.remove_roles(role)
-
                             return rulepush_channel
 
             case "clean_destroy":
@@ -203,12 +197,7 @@ class RulePushV2(Cog):
                 if session is not None and session["channel"] == channel.name:
 
                     if session["session_data"]["roles"]:
-                        await user.add_roles(
-                            *[
-                                self.bot.pull_role(guild, role_id)
-                                for role_id in session["session_data"]["roles"]
-                            ]
-                        )
+                        await user.add_roles(*[session["session_data"]["roles"]])
 
                     await channel.delete()
                     del rulepush_sessions["pushed"][session["channel"]]
