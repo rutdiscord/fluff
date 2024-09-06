@@ -1,7 +1,6 @@
 import discord
 import json
-import datetime
-import logging
+from datetime import datetime
 
 from discord.ext import commands
 from discord.ext.commands import Cog
