@@ -210,9 +210,7 @@ class RulePushV2(Cog):
             return await ctx.reply(f"User already has a session", mention_author=False)
 
         rulepush_channel = await self.session_manager("create", ctx.guild, user)
-
-        if rulepush_channel:
-            rulepush_channel.set_permissions(user, read_messages=True)
+        rulepush_channel.set_permissions(user, read_messages=True)
 
     @commands.bot_has_permissions(manage_roles=True, manage_channels=True)
     @commands.group(invoke_without_command=True)
