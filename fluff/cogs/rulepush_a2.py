@@ -197,7 +197,14 @@ class RulePushV2(Cog):
                 if session is not None and session["channel"] == channel.name:
 
                     if session["session_data"]["roles"]:
-                        await user.add_roles(*[session["session_data"]["roles"]])
+                        await user.add_roles(
+                            *[
+                                [
+                                    guild.get_role(r)
+                                    for r in session["session_data"]["roles"]
+                                ]
+                            ]
+                        )
 
                     await channel.delete()
                     del rulepush_sessions["pushed"][session["channel"]]
