@@ -210,6 +210,7 @@ class RulePushV2(Cog):
                         rulepush_config_role,
                         reason="Dismantling rulepush session (Fluff)",
                     )
+
                     if session["session_data"]["roles"]:
                         for role in session["session_data"]["roles"]:
                             if guild.get_role(role) is not guild.default_role:
