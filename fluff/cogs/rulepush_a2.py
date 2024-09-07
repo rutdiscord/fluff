@@ -1,6 +1,7 @@
 import discord
 import json
 import datetime
+import typing
 
 from discord.ext import commands
 from discord.ext.commands import Cog
@@ -184,6 +185,8 @@ class RulePushV2(Cog):
                                 user, read_messages=True
                             )
 
+                            await user.add_roles(rulepush_config_role)
+
                             for role in user.roles:
                                 if role != rulepush_config_role:
                                     if role.is_assignable():
@@ -193,8 +196,6 @@ class RulePushV2(Cog):
                                         )
                                     else:
                                         return
-
-                            await user.add_roles(rulepush_config_role)
 
                             return rulepush_channel
 
@@ -222,6 +223,9 @@ class RulePushV2(Cog):
                     return True
                 else:
                     return False
+
+    async def setup_session(session: discord.channel.TextChannel, user: discord.Member):
+        pass
 
     @commands.bot_has_permissions(manage_roles=True, manage_channels=True)
     @commands.group(invoke_without_command=True)
@@ -264,7 +268,7 @@ class RulePushV2(Cog):
                 f"User already has a session... *thump*", mention_author=False
             )
 
-        await self.session_manager("create", ctx.guild, user)
+        new_session = await self.session_manager("create", ctx.guild, user)
 
     @Cog.listener()
     async def on_message(self, message: discord.Message):
