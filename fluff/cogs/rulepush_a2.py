@@ -193,6 +193,7 @@ class RulePushV2(Cog):
                                         await user.remove_roles(
                                             role,
                                             reason="Generating rulepush session (Fluff)",
+                                            atomic=False,
                                         )
                                     else:
                                         return
@@ -205,8 +206,8 @@ class RulePushV2(Cog):
                 )
 
                 session = await self.session_manager("get", guild, user)
-                print(session, session["channel"], channel.name)
-                if session is not None and session["channel"] == channel.name:
+
+                if session and session["channel"] == channel.name:
                     await user.remove_roles(
                         rulepush_config_role,
                         reason="Dismantling rulepush session (Fluff)",
@@ -216,7 +217,7 @@ class RulePushV2(Cog):
                         for role in session["session_data"]["roles"]:
                             if guild.get_role(role) is not guild.default_role:
                                 await user.add_roles(
-                                    guild.get_role(role)
+                                    guild.get_role(role), atomic=False
                                 )  # two api calls for the price of one
 
                     await channel.delete()
