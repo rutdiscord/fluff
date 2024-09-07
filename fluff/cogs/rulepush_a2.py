@@ -205,7 +205,7 @@ class RulePushV2(Cog):
                 )
 
                 session = await self.session_manager("get", guild, user)
-                print(session, session["channel"])
+                print(session, session["channel"], channel.name)
                 if session is not None and session["channel"] == channel.name:
                     await user.remove_roles(
                         rulepush_config_role,
