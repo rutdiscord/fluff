@@ -30,7 +30,7 @@ class NoSticker(Cog):
 
         tenure_role = self.get_tenurerole(msg.guild)
         if tenure_role not in msg.author.roles and msg.stickers:
-            return await msg.delete()
+            return await msg.delete(delay=1)
 
 
 async def setup(bot: discord.Client):
