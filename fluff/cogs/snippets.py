@@ -59,12 +59,14 @@ class Snippets(Cog):
                 if exception.code == 50035:
                     file_content = ""
                     for snippet in guild_snippets:
-                        file_content += "**{snippet}** \n" + (
-                            "> " + guild_snippets[snippet]["content"][:100] + "..."
+                        file_content += f"\nSnippet: {snippet}\n" + (
+                            "> "
+                            + guild_snippets[snippet]["content"]
+                            + "\n"  # No longer Ugly..
                         )
                     await ctx.send(
                         file=discord.File(
-                            io.StringIO(file_content), #type:ignore
+                            io.StringIO(file_content),  # type:ignore
                             filename=f"snippets-{ctx.guild.id}.txt",
                         )
                     )
