@@ -4,6 +4,7 @@ from discord.ext.commands import Cog
 from helpers.checks import isadmin
 from helpers.embeds import stock_embed
 from helpers.datafiles import get_guildfile, set_guildfile
+import io
 
 
 class Snippets(Cog):
@@ -61,15 +62,12 @@ class Snippets(Cog):
                         file_content += "**{snippet}** \n" + (
                             "> " + guild_snippets[snippet]["content"][:100] + "..."
                         )
-
-                    with open(f"temp/snippets-{ctx.guild.id}.txt", "w") as file:
-                        file.write(file_content)
-
-                    file_sent = await ctx.send(
-                        file=discord.File(f"temp/snippets-{ctx.guild.id}.txt")
+                    await ctx.send(
+                        file=discord.File(
+                            io.StringIO(file_content), #type:ignore
+                            filename=f"snippets-{ctx.guild.id}.txt",
+                        )
                     )
-                    if file_sent:
-                        os.remove(f"temp/snippets-{ctx.guild.id}.txt")
 
         else:
             name = name.lower()
