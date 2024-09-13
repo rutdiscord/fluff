@@ -62,7 +62,7 @@ class Snippets(Cog):
                         file_content += "**{snippet}** \n" + (
                             "> " + guild_snippets[snippet]["content"][:100] + "..."
                         )
-                    file_sent = await ctx.send(
+                    await ctx.send(
                         file=discord.File(
                             io.StringIO(file_content), #type:ignore
                             filename=f"snippets-{ctx.guild.id}.txt",
