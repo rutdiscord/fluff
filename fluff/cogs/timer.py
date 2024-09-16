@@ -130,23 +130,23 @@ class Timer(Cog):
                 f"Cron-hourly has errored: ```{traceback.format_exc()}```"
             )
 
-    # @tasks.loop(hours=24)
-    # async def daily(self):
-    #     await self.bot.wait_until_ready()
-    #     log_channel = self.bot.get_channel(self.bot.config.logchannel)
-    #     try:
-    #         shutil.make_archive("data_backup", "zip", "data")
-    #         for m in self.bot.config.managers:
-    #             await self.bot.get_user(m).send(
-    #                 content="Daily backups:",
-    #                 file=discord.File("data_backup.zip"),
-    #             )
-    #         os.remove("data_backup.zip")
-    #     except:
-    #         # Don't kill cronjobs if something goes wrong.
-    #         await log_channel.send(
-    #             f"Cron-daily has errored: ```{traceback.format_exc()}```"
-    #         )
+    @tasks.loop(hours=24)
+    async def daily(self):
+        await self.bot.wait_until_ready()
+        log_channel = self.bot.get_channel(self.bot.config.logchannel)
+        try:
+            shutil.make_archive("data_backup", "zip", "data")
+            for m in self.bot.config.managers:
+                await self.bot.get_user(m).send(
+                    content="Daily backups:",
+                    file=discord.File("data_backup.zip"),
+                )
+            os.remove("data_backup.zip")
+        except:
+            # Don't kill cronjobs if something goes wrong.
+            await log_channel.send(
+                f"Cron-daily has errored: ```{traceback.format_exc()}```"
+            )
 
 
 async def setup(bot):
