@@ -1,6 +1,6 @@
 # MIT License
 
-Copyright (c) 2018 [Arda "Ave" Ozka](https://github.com/vrnavi)  
+Copyright (c) 2018 [Arda "Ave" Ozka](https://github.com/aveao)  
 Copyright (c) 2024 [Brandan C. Delafuente](https://github.com/dfault-user), [Marr](https://github.com/thereal-marr), [Meagus](https://github.com/meagus4)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
