@@ -30,7 +30,12 @@ class NoSticker(Cog):
 
         tenure_role = self.get_tenurerole(msg.guild)
         if tenure_role not in msg.author.roles and msg.stickers:
-            return await msg.delete()
+            poke_msg = await msg.channel.send(
+                f"{msg.author.mention} Stickers are not allowed to be used by new users."
+            )
+            await msg.delete()
+            await self.bot.await_message(msg.channel, msg.author)
+            return await poke_msg.delete()
 
 
 async def setup(bot: discord.Client):
