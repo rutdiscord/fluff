@@ -31,7 +31,7 @@ class NoSticker(Cog):
         tenure_role = self.get_tenurerole(msg.guild)
         if tenure_role not in msg.author.roles and msg.stickers:
             poke_msg = await msg.channel.send(
-                f"{msg.author.mention} Stickers are not allowed to be used by new members."
+                f"{msg.author.mention} New members are not allowed to use stickers."
             )
             await msg.delete()
             await self.bot.await_message(msg.channel, msg.author)
