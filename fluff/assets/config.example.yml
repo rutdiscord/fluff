@@ -14,6 +14,7 @@
 
 logging:
   modlog:
+  reactlog: # Used for Reaction Logging
 
 staff:
   # The role ID for your admin role.
