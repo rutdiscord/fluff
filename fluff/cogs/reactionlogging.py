@@ -59,7 +59,6 @@ class ReactionLogging(Cog):
             log_embed.set_image(
                 url=f"https://cdn.discordapp.com/emojis/{reaction.emoji.id}.png?size=1024"
             )
-        # {f'(https://cdn.discordapp.com/emojis/{reaction.emoji.id}.png?size=1024)' if isinstance(reaction.emoji, discord.PartialEmoji) or isinstance(reaction.emoji, discord.Emoji) else ""}
 
         return await log_channel.send(embed=log_embed)
 
