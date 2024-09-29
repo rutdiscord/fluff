@@ -37,7 +37,9 @@ class ReactionLogging(Cog):
         if not self.enabled(user.guild):
             return
 
-        log_channel = get_config(user.guild.id, "logging", "modlog")
+        log_channel = self.bot.get_channel(
+            get_config(user.guild.id, "logging", "modlog")
+        )
 
         log_embed = stock_embed(self.bot)
         log_embed.title = f"{self.username_system(user)}"
