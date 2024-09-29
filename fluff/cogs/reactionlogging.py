@@ -10,14 +10,14 @@ class ReactionLogging(Cog):
         self.bot = bot
 
     def enabled(self, guild: discord.Guild):
-
-        possible_log_channel = get_config(guild.id, "logging", "reactlog")
+        
+        possible_log_channel = self.bot.pull_channel(guild, get_config(guild.id, "logging", "reactlog"))
 
         return all(
             [
-                self.bot.get_channel(possible_log_channel) != None,
+                possible_log_channel != None,
                 isinstance(
-                    self.bot.get_channel(possible_log_channel),
+                    possible_log_channel,
                     discord.abc.Messageable,
                 ),
             ]
@@ -57,7 +57,14 @@ class ReactionLogging(Cog):
             )
 
             log_embed.set_image(
-                url=f"https://cdn.discordapp.com/emojis/{reaction.emoji.id}.png?size=1024"
+                url=f"https://cdn.discordapp.com/emojis/{reaction.emoji.id}.{"png" if reaction.emoji.animated != True else "gif"}?size=1024"
+            )
+
+        elif isinstance(reaction.emoji, str):
+            log_embed.description = (
+                f"**Emoji:** {reaction.emoji}"
+                + "\n"
+                + f"**Message**: {reaction.message.jump_url}"
             )
 
         return await log_channel.send(embed=log_embed)
