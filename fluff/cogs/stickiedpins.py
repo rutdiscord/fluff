@@ -1,10 +1,8 @@
 import json
 import discord
-from discord.ext import commands, tasks
-from helpers.placeholders import random_msg
+from discord.ext import commands
 from helpers.datafiles import get_guildfile, set_guildfile
 from helpers.checks import ismod, ismanager
-from helpers.embeds import stock_embed, sympage
 
 
 class StickiedPins(commands.Cog):

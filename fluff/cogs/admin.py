@@ -16,7 +16,7 @@ from contextlib import redirect_stdout
 from helpers.embeds import stock_embed
 from helpers.checks import ismanager
 from helpers.sv_config import get_config
-from helpers.datafiles import get_botfile, set_botfile, get_guildfile
+from helpers.datafiles import get_botfile, set_botfile
 from helpers.placeholders import random_msg
 
 
