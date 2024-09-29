@@ -10,9 +10,11 @@ class ReactionLogging(Cog):
         self.bot = bot
 
     def enabled(self, guild: discord.Guild):
+        try:
+            possible_log_channel = self.bot.pull_channel(guild, get_config(guild.id, "logging", "reactlog"))
+        except KeyError:
+            return False # Don't Even Bother!
         
-        possible_log_channel = self.bot.pull_channel(guild, get_config(guild.id, "logging", "reactlog"))
-
         return all(
             [
                 possible_log_channel != None,
