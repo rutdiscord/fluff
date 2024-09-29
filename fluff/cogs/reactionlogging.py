@@ -11,7 +11,7 @@ class ReactionLogging(Cog):
 
     def enabled(self, guild: discord.Guild):
 
-        possible_log_channel = get_config(guild.id, "logging", "modlog")
+        possible_log_channel = get_config(guild.id, "logging", "reactlog")
 
         return all(
             [
@@ -38,7 +38,7 @@ class ReactionLogging(Cog):
             return
 
         log_channel = self.bot.get_channel(
-            get_config(user.guild.id, "logging", "modlog")
+            get_config(user.guild.id, "logging", "reactlog")
         )
 
         log_embed = stock_embed(self.bot)
