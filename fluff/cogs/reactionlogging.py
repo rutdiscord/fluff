@@ -38,6 +38,9 @@ class ReactionLogging(Cog):
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.Member):
         if not self.enabled(user.guild):
             return
+        
+        if user == self.bot.user:
+            return
 
         log_channel = self.bot.get_channel(
             get_config(user.guild.id, "logging", "reactlog")
