@@ -2,6 +2,7 @@ import discord
 from discord.ext.commands import Cog
 from discord.ext import commands
 from helpers.embeds import stock_embed
+from helpers.sv_config import get_config
 
 
 class ReactionLogging(Cog):
@@ -10,11 +11,13 @@ class ReactionLogging(Cog):
 
     def enabled(self, guild: discord.Guild):
 
+        possible_log_channel = get_config(guild.id, "logging", "modlog")
+
         return all(
             [
-                self.bot.get_channel(self.bot.config.logchannel) != None,
+                self.bot.get_channel(possible_log_channel) != None,
                 isinstance(
-                    self.bot.get_channel(self.bot.config.logchannel),
+                    self.bot.get_channel(possible_log_channel),
                     discord.abc.Messageable,
                 ),
             ]
@@ -34,7 +37,7 @@ class ReactionLogging(Cog):
         if not self.enabled(user.guild):
             return
 
-        log_channel = self.bot.get_channel(self.bot.config.logchannel)
+        log_channel = get_config(user.guild.id, "logging", "modlog")
 
         log_embed = stock_embed(self.bot)
         log_embed.title = f"{self.username_system(user)}"
