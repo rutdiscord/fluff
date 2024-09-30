@@ -80,11 +80,17 @@ class Snippets(Cog):
                     referenced_message = ctx.message.reference.resolved
                     await ctx.message.delete(delay=1)
                     return await referenced_message.reply(
-                        guild_snippets[name]["content"], mention_author=True
+                        guild_snippets[name]["content"],
+                        mention_author=True,
+                        allowed_mentions=discord.AllowedMentions(
+                            everyone=False, roles=False, replied_user=True
+                        ),
                     )
                 else:
                     return await ctx.reply(
-                        guild_snippets[name]["content"], mention_author=False
+                        guild_snippets[name]["content"],
+                        mention_author=False,
+                        allowed_mentions=discord.AllowedMentions.none(),
                     )
             if name not in guild_snippets:
                 for current_snippet in guild_snippets:
@@ -102,9 +108,14 @@ class Snippets(Cog):
                             return await ctx.reply(
                                 guild_snippets[current_snippet]["content"],
                                 mention_author=False,
+                                allowed_mentions=discord.AllowedMentions.none(),
                             )
 
-            return await ctx.reply(f"Snippet `{name}` not found.", mention_author=False)
+            return await ctx.reply(
+                f"Snippet `{name}` not found.",
+                mention_author=False,
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
 
     @snippets.command(aliases=["add"])
     @commands.guild_only()
@@ -122,9 +133,15 @@ class Snippets(Cog):
         if dict_new_snippet == {}:
             guild_snippets[new_snippet] = {"content": content, "aliases": []}
             set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
-            return await ctx.reply(f"Snippet `{new_snippet}` added successfully.")
+            return await ctx.reply(
+                f"Snippet `{new_snippet}` added successfully.",
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
         else:
-            return await ctx.reply(f"Snippet `{new_snippet}` already exists.")
+            return await ctx.reply(
+                f"Snippet `{new_snippet}` already exists.",
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
 
     @snippets.command(aliases=["alias"])
     @commands.guild_only()
@@ -141,10 +158,14 @@ class Snippets(Cog):
                 guild_snippets[snippet]["aliases"].append(new_alias)
                 set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
                 return await ctx.reply(
-                    f"Alias `{new_alias}` added successfully for snippet `{snippet}`."
+                    f"Alias `{new_alias}` added successfully for snippet `{snippet}`.",
+                    allowed_mentions=discord.AllowedMentions.none(),
                 )
         except KeyError:
-            return await ctx.reply(f"Snippet `{snippet}` not found.")
+            return await ctx.reply(
+                f"Snippet `{snippet}` not found.",
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
 
     @snippets.command(aliases=["unalias"])
     @commands.guild_only()
@@ -156,8 +177,14 @@ class Snippets(Cog):
             if unaliased in guild_snippets[snippet]["aliases"]:
                 guild_snippets[snippet]["aliases"].remove(unaliased)
                 set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
-                return await ctx.reply(f"Alias `{unaliased}` removed successfully.")
-        return await ctx.reply(f"Alias `{unaliased}` not found.")
+                return await ctx.reply(
+                    f"Alias `{unaliased}` removed successfully.",
+                    allowed_mentions=discord.AllowedMentions.none(),
+                )
+        return await ctx.reply(
+            f"Alias `{unaliased}` not found.",
+            allowed_mentions=discord.AllowedMentions.none(),
+        )
 
     @snippets.command(aliases=["amend"])
     @commands.guild_only()
@@ -168,9 +195,15 @@ class Snippets(Cog):
         try:
             guild_snippets[snippet]["content"] = new_content
             set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
-            return await ctx.reply(f"Snippet `{snippet}` edited successfully.")
+            return await ctx.reply(
+                f"Snippet `{snippet}` edited successfully.",
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
         except KeyError:
-            return await ctx.reply(f"Snippet `{snippet}` not found.")
+            return await ctx.reply(
+                f"Snippet `{snippet}` not found.",
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
 
     @snippets.command(aliases=["remove"])
     @commands.guild_only()
@@ -182,9 +215,15 @@ class Snippets(Cog):
         if snippet in guild_snippets:
             del guild_snippets[snippet]
             set_guildfile(ctx.guild.id, "snippets_v2", json.dumps(guild_snippets))
-            return await ctx.reply(f"Snippet `{snippet}` deleted successfully.")
+            return await ctx.reply(
+                f"Snippet `{snippet}` deleted successfully.",
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
         else:
-            return await ctx.reply(f"Snippet `{snippet}` not found.")
+            return await ctx.reply(
+                f"Snippet `{snippet}` not found.",
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
 
 
 async def setup(bot):
