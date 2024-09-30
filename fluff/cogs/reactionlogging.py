@@ -39,7 +39,7 @@ class ReactionLogging(Cog):
         if not self.enabled(user.guild):
             return
         
-        if user == self.bot.user:
+        if user == self.bot.user or user.bot:
             return
 
         log_channel = self.bot.get_channel(
