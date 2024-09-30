@@ -48,10 +48,16 @@ class Rules(Cog):
                     )
                 return await ctx.reply(embed=summary_embed, mention_author=False)
         elif name in guild_rules:
-            return await ctx.reply(content=f"{guild_rules[name]}", mention_author=False)
+            return await ctx.reply(
+                content=f"{guild_rules[name]}",
+                mention_author=False,
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
         else:
             return await ctx.reply(
-                content=f"Rule `{name}` not found.", mention_author=False
+                content=f"Rule `{name}` not found.",
+                mention_author=False,
+                allowed_mentions=discord.AllowedMentions.none(),
             )
 
     @commands.check(isadmin)
@@ -64,6 +70,7 @@ class Rules(Cog):
             react_msg = await ctx.reply(
                 f"Rule `{rule}` already exists. Do you wish to overwrite it instead?",
                 mention_author=False,
+                allowed_mentions=discord.AllowedMentions.none(),
             )
             await react_msg.add_reaction("✅")
 
@@ -89,7 +96,11 @@ class Rules(Cog):
         else:
             guild_rules[rule] = content
             set_guildfile(ctx.guild.id, "rules", json.dumps(guild_rules))
-            return await ctx.reply(f"Rule `{rule}` created.", mention_author=False)
+            return await ctx.reply(
+                f"Rule `{rule}` created.",
+                mention_author=False,
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
 
     @rule.command(aliases=["remove"])
     @commands.guild_only()
@@ -100,9 +111,15 @@ class Rules(Cog):
         if rule in guild_rules:
             del guild_rules[rule]
             set_guildfile(ctx.guild.id, "rules", json.dumps(guild_rules))
-            return await ctx.reply(f"Rule `{rule}` deleted successfully.")
+            return await ctx.reply(
+                f"Rule `{rule}` deleted successfully.",
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
         else:
-            return await ctx.reply(f"Rule `{rule}` not found.")
+            return await ctx.reply(
+                f"Rule `{rule}` not found.",
+                allowed_mentions=discord.AllowedMentions.none(),
+            )
 
 
 async def setup(bot):
