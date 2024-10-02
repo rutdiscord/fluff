@@ -83,7 +83,11 @@ class Basic(Cog):
                 target = ctx.guild.get_member(target.id)
         else:
             target = ctx.author
-        await ctx.send(content=target.banner.url)
+        user = await self.bot.fetch_user(target.id)
+        if user.banner:
+            await ctx.send(content=target.banner.url)
+        else:
+            await ctx.send(content="This user has no banner.")
 
     @commands.bot_has_permissions(embed_links=True)
     @banner.command(name="server")
@@ -98,6 +102,8 @@ class Basic(Cog):
         The server you want to see the banner of. Optional."""
         if target is None:
             target = ctx.guild
+        else:
+            return await ctx.send(content="This server has no banner.")
         return await ctx.send(content=target.banner.url)
 
     @commands.bot_has_permissions(embed_links=True)
