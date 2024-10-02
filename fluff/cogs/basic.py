@@ -102,10 +102,11 @@ class Basic(Cog):
         The server you want to see the banner of. Optional."""
         if target is None:
             target = ctx.guild
+        if target.banner:
+            return await ctx.send(content=target.banner.url)
         else:
             return await ctx.send(content="This server has no banner.")
-        return await ctx.send(content=target.banner.url)
-
+        
     @commands.bot_has_permissions(embed_links=True)
     @commands.group(invoke_without_command=True)
     async def avy(self, ctx: commands.Context, target: discord.User = None):
