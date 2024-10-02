@@ -51,6 +51,4 @@ async def upload(ctx, filename, file_path, dotzip):
         upload = f_zip.Upload()
 
         if upload:
-            os.remove(full_path)
-            os.remove(dotzip)
-            return True
+            return os.remove(full_path)

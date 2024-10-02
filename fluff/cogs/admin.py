@@ -23,7 +23,6 @@ from helpers.placeholders import random_msg
 class Admin(Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.lastreload = None
         self.last_eval_result = None
         self.previous_eval_code = None
         self.last_exec_result = None
@@ -613,7 +612,7 @@ class Admin(Cog):
 
     @commands.check(ismanager)
     @commands.command()
-    async def pull(self, ctx, auto=False):
+    async def pull(self, ctx, auto=True):
         """This performs a Git Pull.
 
         I really wouldn't use this unless you're fine
@@ -650,8 +649,6 @@ class Admin(Cog):
                         content=f":white_check_mark: `{cog}` successfully reloaded.",
                         mention_author=False,
                     )
-
-                    self.lastreload = cog_name
                 except:
                     await ctx.message.reply(
                         content=f":x: Cog reloading failed, traceback: "
@@ -716,8 +713,8 @@ class Admin(Cog):
 
         - `ext`
         The cog to reload."""
-        if self.lastreload:
-            ext = self.lastreload
+        if ext:
+            self.lastreload = ext
 
         try:
             await self.bot.unload_extension(ext)

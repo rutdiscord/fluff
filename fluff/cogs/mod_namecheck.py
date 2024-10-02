@@ -41,17 +41,22 @@ Please review rule 6! Your nickname must be at least partially typable using a s
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command()
-    async def dehoist(self, ctx, target: discord.Member):
-        """This dehoists a user from the member list.
+    async def dehoist(self, ctx, targets: commands.Greedy[discord.Member]):
+        """This dehoists users from the member list.
 
         It uses a specific unicode character to do so.
 
         - `target`
         The target to dehoist."""
-        oldname = target.display_name
-        await target.edit(nick="᲼" + target.display_name, reason="Namecheck")
+        affected_users = []
+        for target in targets:
+            old_display_name = target.display_name
+            await target.edit(nick="᲼" + target.display_name, reason="Namecheck")
+            affected_users.append(old_display_name)
+
         return await ctx.reply(
-            content=f"Successfully dehoisted **{oldname}**.", mention_author=False
+            content=f"Successfully dehoisted **{', '.join(affected_users)}**.",
+            mention_author=False,
         )
 
     @Cog.listener()

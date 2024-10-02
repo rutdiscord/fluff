@@ -134,3 +134,4 @@ Thumbs.db
 .venv/Scripts/python.exe
 .venv/Scripts/pythonw.exe
 .venv/Scripts/virtualenv.exe
+fluff/cogs/unfinished

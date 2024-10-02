@@ -248,7 +248,7 @@ class Reply(Cog):
                 role_name = "No Ping"
 
             set_userfile(ctx.author.id, "profile", json.dumps(profile))
-            if role_name != None:
+            if role_name != None and ctx.guild:
                 role = self.bot.pull_role(ctx.guild, role_name)
                 if role:
                     await ctx.author.add_roles(role)

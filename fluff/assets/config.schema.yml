@@ -10,13 +10,7 @@ properties:
           - string
           - "null"
         minimum: 100000000000000000
-      serverlog:
-        type:
-          - integer
-          - string
-          - "null"
-        minimum: 100000000000000000
-      userlog:
+      reactlog:
         type:
           - integer
           - string
@@ -208,4 +202,4 @@ rulepush:
     type: object
     properties:
       version:
-        const: 18
+        const: 19

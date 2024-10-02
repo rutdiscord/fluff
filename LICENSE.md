@@ -1,6 +1,7 @@
-MIT License
+# MIT License
 
-Copyright (c) 2018 Arda "Ave" Ozkal
+Copyright (c) 2018 [Arda "Ave" Ozka](https://github.com/aveao)  
+Copyright (c) 2024 [Brandan C. Delafuente](https://github.com/dfault-user), [Marr](https://github.com/thereal-marr), [Meagus](https://github.com/meagus4)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
