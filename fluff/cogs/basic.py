@@ -67,6 +67,38 @@ class Basic(Cog):
             await msg.edit(content="⌛", delete_after=5)
         except discord.errors.NotFound:
             return
+        
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.group(invoke_without_command=True)
+    async def banner(self, ctx: commands.Context, target: discord.User = None):
+        """This gets a user's banner.
+        
+        If you don't specify anyone, it'll show your
+        pretty banner that you have on right now.
+        
+        - `target`
+        Who you wish to show the banner of. Optional."""
+        if target is not None:
+            if ctx.guild and ctx.guild.get_member(target.id):
+                target = ctx.guild.get_member(target.id)
+        else:
+            target = ctx.author
+        await ctx.send(content=target.banner.url)
+
+    @commands.bot_has_permissions(embed_links=True)
+    @banner.command(name="server")
+    async def _server(self, ctx: commands.Context, target: discord.Guild = None):
+        """This gets a server's banner.
+        
+        You *could* get another server's banner with
+        this if you know its ID, and the bot is on it.
+        Otherwise it shows the current server's banner.
+        
+        - `target`
+        The server you want to see the banner of. Optional."""
+        if target is None:
+            target = ctx.guild
+        return await ctx.send(content=target.banner.url)
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.group(invoke_without_command=True)
