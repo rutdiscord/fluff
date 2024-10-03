@@ -67,15 +67,15 @@ class Basic(Cog):
             await msg.edit(content="⌛", delete_after=5)
         except discord.errors.NotFound:
             return
-        
+
     @commands.bot_has_permissions(embed_links=True)
     @commands.group(invoke_without_command=True)
     async def banner(self, ctx: commands.Context, target: discord.User = None):
         """This gets a user's banner.
-        
+
         If you don't specify anyone, it'll show your
         pretty banner that you have on right now.
-        
+
         - `target`
         Who you wish to show the banner of. Optional."""
         if target is not None:
@@ -83,30 +83,29 @@ class Basic(Cog):
                 target = ctx.guild.get_member(target.id)
         else:
             target = ctx.author
-        user = await self.bot.fetch_user(target.id)
-        if user.banner:
-            await ctx.send(content=target.banner.url)
-        else:
-            await ctx.send(content="This user has no banner.")
+        await ctx.send(content=target.banner.url)
 
     @commands.bot_has_permissions(embed_links=True)
     @banner.command(name="server")
-    async def _server(self, ctx: commands.Context, target: discord.Guild = None):
+    async def bserver(self, ctx: commands.Context, target: discord.Guild = None):
         """This gets a server's banner.
-        
+
         You *could* get another server's banner with
         this if you know its ID, and the bot is on it.
         Otherwise it shows the current server's banner.
-        
+
         - `target`
         The server you want to see the banner of. Optional."""
         if target is None:
             target = ctx.guild
-        if target.banner:
-            return await ctx.send(content=target.banner.url)
-        else:
-            return await ctx.send(content="This server has no banner.")
-        
+
+        if target.banner == None:
+            return await ctx.reply(
+                "This server has no banner! \*thump\*", mention_author=False
+            )
+
+        return await ctx.send(content=target.banner.url)
+
     @commands.bot_has_permissions(embed_links=True)
     @commands.group(invoke_without_command=True)
     async def avy(self, ctx: commands.Context, target: discord.User = None):
@@ -122,11 +121,11 @@ class Basic(Cog):
                 target = ctx.guild.get_member(target.id)
         else:
             target = ctx.author
-        await ctx.send(content=target.display_avatar.url)
+        return await ctx.reply(content=target.display_avatar.url, mention_author=False)
 
     @commands.bot_has_permissions(embed_links=True)
     @avy.command(name="server")
-    async def _server(self, ctx: commands.Context, target: discord.Guild = None):
+    async def aserver(self, ctx: commands.Context, target: discord.Guild = None):
         """This gets a server's avatar.
 
         You *could* get another server's avatar with
@@ -137,6 +136,12 @@ class Basic(Cog):
         The server you want to see the avy of. Optional."""
         if target is None:
             target = ctx.guild
+
+            if target.icon == None:
+                return await ctx.reply(
+                    "This server has no icon! \*thump\*", mention_author=False
+                )
+
         return await ctx.send(content=target.icon.url)
 
     @commands.command(aliases=["catbox", "imgur"])
