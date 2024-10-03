@@ -86,7 +86,7 @@ class Basic(Cog):
 
         if target.banner == None:
             return await ctx.reply(
-                "This server has no banner! \*thump\*", mention_author=False
+                "This user has no banner! \*thump\*", mention_author=False
             )
 
         return await ctx.send(content=target.banner.url)
