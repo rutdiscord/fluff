@@ -70,7 +70,7 @@ class Basic(Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.group(invoke_without_command=True)
-    async def banner(self, ctx: commands.Context, target: discord.User = None):
+    async def banner(self, ctx: commands.Context, target: discord.User | None):
         """This gets a user's banner.
 
         If you don't specify anyone, it'll show your
@@ -93,7 +93,7 @@ class Basic(Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @banner.command(name="server")
-    async def bserver(self, ctx: commands.Context, target: discord.Guild = None):
+    async def bserver(self, ctx: commands.Context, target: discord.Guild | None):
         """This gets a server's banner.
 
         You *could* get another server's banner with
