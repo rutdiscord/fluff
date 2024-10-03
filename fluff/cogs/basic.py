@@ -83,7 +83,13 @@ class Basic(Cog):
                 target = ctx.guild.get_member(target.id)
         else:
             target = ctx.author
-        await ctx.send(content=target.banner.url)
+
+        if target.banner == None:
+            return await ctx.reply(
+                "This server has no banner! \*thump\*", mention_author=False
+            )
+
+        return await ctx.send(content=target.banner.url)
 
     @commands.bot_has_permissions(embed_links=True)
     @banner.command(name="server")
