@@ -68,28 +68,29 @@ class Basic(Cog):
         except discord.errors.NotFound:
             return
 
-    @commands.bot_has_permissions(embed_links=True)
-    @commands.group(invoke_without_command=True)
-    async def banner(self, ctx: commands.Context, target: discord.User | None):
-        """This gets a user's banner.
+    # Temporarily dead code as I cry in response to Discord's Horrid API
+    # @commands.bot_has_permissions(embed_links=True)
+    # @commands.group(invoke_without_command=True)
+    # async def banner(self, ctx: commands.Context, target: discord.User | None):
+    #     """This gets a user's banner.
 
-        If you don't specify anyone, it'll show your
-        pretty banner that you have on right now.
+    #     If you don't specify anyone, it'll show your
+    #     pretty banner that you have on right now.
 
-        - `target`
-        Who you wish to show the banner of. Optional."""
-        if target is not None:
-            if ctx.guild and ctx.guild.get_member(target.id):
-                target = ctx.guild.get_member(target.id)
-        else:
-            target = ctx.author
+    #     - `target`
+    #     Who you wish to show the banner of. Optional."""
+    #     if target is not None:
+    #         if ctx.guild and ctx.guild.get_member(target.id):
+    #             target = ctx.guild.get_member(target.id)
+    #     else:
+    #         target = ctx.author
 
-        if target.banner == None:
-            return await ctx.reply(
-                "This user has no banner! \*thump\*", mention_author=False
-            )
+    #     if target.banner == None:
+    #         return await ctx.reply(
+    #             "This user has no banner! \*thump\*", mention_author=False
+    #         )
 
-        return await ctx.send(content=target.banner.url)
+    #     return await ctx.send(content=target.banner.url)
 
     @commands.bot_has_permissions(embed_links=True)
     @banner.command(name="server")
