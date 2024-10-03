@@ -24,7 +24,10 @@ def make_config(sid):
 def get_config(sid, part, key):
     config = fill_config(sid)
 
-    return config[part][key]
+    if part not in config:
+        return None
+
+    return config[part][key] if key in config[part] else None
 
 
 def fill_config(sid):
