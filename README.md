@@ -15,7 +15,7 @@ This bot takes on the persona of a bunny and is based off one of Marr's real bun
 
 # Usage
 
-Fluff is currently not available for public use, but self-hosting instructions are available below. However, be mindful there are some things that hard-code to the Undertale Discord server. All command documentation currently heeds to [Sangou's original documentation](https://3gou.0ccu.lt/).
+Fluff is currently not available for public use, but self-hosting instructions are available below. However, be mindful there are some things that hard-code to the Undertale Discord server.
 
 - Download the bot from this repository. Stick to the release versions unless you have encountered a bug.
 - Install [pipenv](https://pipenv.pypa.io/en/latest/).
