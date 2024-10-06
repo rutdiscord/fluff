@@ -118,7 +118,7 @@ class Basic(Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @commands.group(invoke_without_command=True)
-    async def avy(self, ctx: commands.Context, target: discord.User = None):
+    async def avy(self, ctx: commands.Context, target: discord.User | None):
         """This gets a user's avatar.
 
         If you don't specify anyone, it'll show your
@@ -135,7 +135,7 @@ class Basic(Cog):
 
     @commands.bot_has_permissions(embed_links=True)
     @avy.command(name="server")
-    async def aserver(self, ctx: commands.Context, target: discord.Guild = None):
+    async def aserver(self, ctx: commands.Context, target: discord.Guild | None):
         """This gets a server's avatar.
 
         You *could* get another server's avatar with
@@ -614,7 +614,7 @@ the true/false portion tells me whether to reload cogs""",
 
     @commands.guild_only()
     @commands.command(aliases=["joinscore"])
-    async def joinorder(self, ctx, target: typing.Union[discord.Member, int] = None):
+    async def joinorder(self, ctx, target: typing.Union[discord.Member, int] | None):
         """This shows the joinscore of a user.
 
         See how close you are to being first!
@@ -643,7 +643,7 @@ the true/false portion tells me whether to reload cogs""",
     @commands.cooldown(1, 5, type=commands.BucketType.default)
     @commands.guild_only()
     @commands.command(aliases=["banne"])
-    async def mutedmute(self, ctx, target: typing.Union[discord.Member, int] = None):
+    async def mutedmute(self, ctx, target: typing.Union[discord.Member, int] | None):
         """This mutes a user in a special way.
 
         You can use it even if you aren't staff!

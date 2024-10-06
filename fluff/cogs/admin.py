@@ -204,7 +204,7 @@ class Admin(Cog):
     @commands.bot_has_permissions(attach_files=True)
     @commands.check(ismanager)
     @commands.command(aliases=["getserverdata"])
-    async def getsdata(self, ctx, server: discord.Guild = None):
+    async def getsdata(self, ctx, server: discord.Guild | None):
         """This returns the server files.
 
         Useful for debugging things.
@@ -253,7 +253,7 @@ class Admin(Cog):
     @commands.bot_has_permissions(attach_files=True)
     @commands.check(ismanager)
     @commands.command(aliases=["getuserdata"])
-    async def getudata(self, ctx, user: discord.User = None):
+    async def getudata(self, ctx, user: discord.User | None):
         """This returns the user files.
 
         Useful for debugging things.

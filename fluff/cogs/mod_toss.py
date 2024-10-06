@@ -387,7 +387,7 @@ class ModToss(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command(aliases=["unroleban", "unmute"])
-    async def untoss(self, ctx, users: commands.Greedy[discord.Member] = None):
+    async def untoss(self, ctx, users: commands.Greedy[discord.Member] | None):
         """This untosses a user.
 
         Please refer to the tossing section of the [documentation](https://3gou.0ccu.lt/as-a-moderator/the-tossing-system/).

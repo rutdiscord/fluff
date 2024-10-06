@@ -141,7 +141,7 @@ class ModLocks(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command()
-    async def unlock(self, ctx, channel: discord.TextChannel = None):
+    async def unlock(self, ctx, channel: discord.TextChannel | None):
         """This allows people to type in a channel again.
 
         This reloads the pre-lockdown state.

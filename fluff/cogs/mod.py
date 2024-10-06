@@ -364,7 +364,7 @@ class Mod(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @commands.group(invoke_without_command=True, aliases=["clear"])
-    async def purge(self, ctx, limit=50, channel: discord.abc.GuildChannel = None):
+    async def purge(self, ctx, limit=50, channel: discord.abc.GuildChannel | None):
         """This clears a given number of messages.
 
         Please see the sister subcommands as well, in the [documentation](https://3gou.0ccu.lt/as-a-moderator/basic-functionality/#purging).
@@ -391,7 +391,7 @@ class Mod(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @purge.command()
-    async def bots(self, ctx, limit=50, channel: discord.abc.GuildChannel = None):
+    async def bots(self, ctx, limit=50, channel: discord.abc.GuildChannel | None):
         """This clears a given number of bot messages.
 
         Defaults to 50 messages in the current channel. Max of one million.
@@ -482,7 +482,7 @@ class Mod(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @purge.command(aliases=["emoji"])
-    async def emotes(self, ctx, limit=50, channel: discord.abc.GuildChannel = None):
+    async def emotes(self, ctx, limit=50, channel: discord.abc.GuildChannel | None):
         """This clears a given number of emotes.
 
         Defaults to 50 messages in the current channel. Max of one million.
@@ -514,7 +514,7 @@ class Mod(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @purge.command()
-    async def embeds(self, ctx, limit=50, channel: discord.abc.GuildChannel = None):
+    async def embeds(self, ctx, limit=50, channel: discord.abc.GuildChannel | None):
         """This clears a given number of messages with embeds.
 
         This includes stickers, by the way, but not emoji.
@@ -540,7 +540,7 @@ class Mod(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @purge.command(aliases=["reactions"])
-    async def reacts(self, ctx, limit=50, channel: discord.abc.GuildChannel = None):
+    async def reacts(self, ctx, limit=50, channel: discord.abc.GuildChannel | None):
         """This clears a given number of reactions.
 
         This does NOT delete their messages! Just the reactions!
@@ -602,7 +602,7 @@ class Mod(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command(aliases=["unslow"])
-    async def unslowmode(self, ctx, channel: discord.abc.GuildChannel = None):
+    async def unslowmode(self, ctx, channel: discord.abc.GuildChannel | None):
         """This makes the bot disable a channel's slowmode.
 
         Slowmode will be disabled in a `channel` if it is supplied, otherwise Fluff will disable slowmode for the invoker's current channel.

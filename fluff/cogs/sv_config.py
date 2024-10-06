@@ -39,7 +39,7 @@ class sv_config(Cog):
 
     @commands.check(ismanager)
     @configs.command()
-    async def reset(self, ctx, guild: discord.Guild = None):
+    async def reset(self, ctx, guild: discord.Guild | None):
         """This resets the configuration for a guild.
 
         Dev only command. Server admins should use the `stock` command.
