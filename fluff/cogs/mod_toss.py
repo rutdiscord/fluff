@@ -364,6 +364,8 @@ class ModToss(Cog):
                 f"{toss_pings}\nYou were tossed by {self.bot.pacify_name(ctx.author.display_name)}.\n{get_config(ctx.guild.id, 'toss', 'tossmsg')}"
             )
 
+            pokemsg = await toss_channel.send(ctx.author.mention)
+
             def check(m):
                 return m.author in users and m.channel == toss_channel
 
@@ -373,7 +375,6 @@ class ModToss(Cog):
                 )
             except asyncio.TimeoutError:
                 del self.poketimers[str(toss_channel.id)]
-                pokemsg = await toss_channel.send(ctx.author.mention)
                 await pokemsg.edit(content="⏰", delete_after=5)
             else:
                 try:
