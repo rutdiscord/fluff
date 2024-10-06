@@ -91,14 +91,8 @@ class Reply(Cog):
                         new_msg.channel, discord.DMChannel
                     )
 
-                try:
-                    wait = await self.bot.wait_for(
-                        "message", timeout=60, check=wait_check
-                    )
-                    if wait:
-                        await temp_reminder_msg.delete()
-                except asyncio.TimeoutError:
-                    await temp_reminder_msg.delete()
+                await self.bot.wait_for("message", timeout=60, check=wait_check)
+                await temp_reminder_msg.delete()
 
             acknowledgements[str(message.author.id)] = True
             return set_guildfile(
