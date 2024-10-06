@@ -374,7 +374,6 @@ class ModToss(Cog):
                     "message", timeout=300, check=check
                 )
             except asyncio.TimeoutError:
-                del self.poketimers[str(toss_channel.id)]
                 await pokemsg.edit(content="⏰", delete_after=5)
             else:
                 try:
