@@ -368,7 +368,7 @@ class ModToss(Cog):
                 return m.author in users and m.channel == toss_channel
 
             try:
-                self.poketimers[str(toss_channel.id)] = self.bot.wait_for(
+                self.poketimers[str(toss_channel.id)] = await self.bot.wait_for(
                     "message", timeout=300, check=check
                 )
             except asyncio.TimeoutError:
