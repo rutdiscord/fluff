@@ -364,7 +364,9 @@ class Mod(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @commands.group(invoke_without_command=True, aliases=["clear"])
-    async def purge(self, ctx, limit=50, channel: discord.abc.GuildChannel | None):
+    async def purge(
+        self, ctx, limit: int | None, channel: discord.abc.GuildChannel | None
+    ):
         """This clears a given number of messages.
 
         Please see the sister subcommands as well, in the [documentation](https://3gou.0ccu.lt/as-a-moderator/basic-functionality/#purging).
@@ -374,6 +376,9 @@ class Mod(Cog):
         The limit of messages to delete. Optional.
         - `channel`
         The channel to purge from. Optional."""
+        if not limit:
+            limit = 50
+
         if not channel:
             channel = ctx.channel
         if limit >= 1000000:
@@ -391,7 +396,7 @@ class Mod(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @purge.command()
-    async def bots(self, ctx, limit=50, channel: discord.abc.GuildChannel | None):
+    async def bots(self, ctx, limit: int, channel: discord.abc.GuildChannel | None):
         """This clears a given number of bot messages.
 
         Defaults to 50 messages in the current channel. Max of one million.
@@ -400,6 +405,8 @@ class Mod(Cog):
         The limit of messages to delete. Optional.
         - `channel`
         The channel to purge from. Optional."""
+        if not limit:
+            limit = 50
         if not channel:
             channel = ctx.channel
 
@@ -482,7 +489,7 @@ class Mod(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @purge.command(aliases=["emoji"])
-    async def emotes(self, ctx, limit=50, channel: discord.abc.GuildChannel | None):
+    async def emotes(self, ctx, limit: int, channel: discord.abc.GuildChannel | None):
         """This clears a given number of emotes.
 
         Defaults to 50 messages in the current channel. Max of one million.
@@ -494,6 +501,8 @@ class Mod(Cog):
         if not channel:
             channel = ctx.channel
 
+        if not limit:
+            limit = 50
         emote_re = re.compile(r":[A-Za-z0-9_]+:", re.IGNORECASE)
 
         def has_emote(m):
@@ -514,7 +523,7 @@ class Mod(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @purge.command()
-    async def embeds(self, ctx, limit=50, channel: discord.abc.GuildChannel | None):
+    async def embeds(self, ctx, limit: int, channel: discord.abc.GuildChannel | None):
         """This clears a given number of messages with embeds.
 
         This includes stickers, by the way, but not emoji.
@@ -526,6 +535,9 @@ class Mod(Cog):
         The channel to purge from. Optional."""
         if not channel:
             channel = ctx.channel
+
+        if not limit:
+            limit = 50
 
         def has_embed(m):
             return any((m.embeds, m.attachments, m.stickers))
@@ -540,7 +552,7 @@ class Mod(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @purge.command(aliases=["reactions"])
-    async def reacts(self, ctx, limit=50, channel: discord.abc.GuildChannel | None):
+    async def reacts(self, ctx, limit: int, channel: discord.abc.GuildChannel | None):
         """This clears a given number of reactions.
 
         This does NOT delete their messages! Just the reactions!
