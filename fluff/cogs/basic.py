@@ -85,12 +85,14 @@ class Basic(Cog):
 
         if target is None:
             return await ctx.reply(
-                "This user is not visible to me! *thump\*", mention_author=False
+                "This user is not visible to me! *thump\\*", mention_author=False
             )
 
         if target.banner == None:
             return await ctx.reply(
-                "This user has no banner! *thump\*", mention_author=False
+                """This user has no banner! *thump\\*
+-# They either do not have a banner set, or the Discord API does not let me see their banner for some reason...""",
+                mention_author=False,
             )
 
         return await ctx.send(content=target.banner.url)
@@ -111,7 +113,7 @@ class Basic(Cog):
 
         if target.banner == None:
             return await ctx.reply(
-                "This server has no banner! \*thump\*", mention_author=False
+                "This server has no banner! *thump\\*", mention_author=False
             )
 
         return await ctx.send(content=target.banner.url)
@@ -149,7 +151,7 @@ class Basic(Cog):
 
             if target.icon == None:
                 return await ctx.reply(
-                    "This server has no icon! \*thump\*", mention_author=False
+                    "This server has no icon! \\*thump\\*", mention_author=False
                 )
 
         return await ctx.send(content=target.icon.url)
