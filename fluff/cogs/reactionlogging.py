@@ -36,11 +36,12 @@ class ReactionLogging(Cog):
 
     @commands.Cog.listener()
     async def on_reaction_add(self, reaction: discord.Reaction, user: discord.Member):
+        if not user.guild or user == self.bot.user or user.bot:
+            return
+
         if not self.enabled(user.guild):
             return
-        
-        if user == self.bot.user or user.bot:
-            return
+    
 
         log_channel = self.bot.get_channel(
             get_config(user.guild.id, "logging", "reactlog")
