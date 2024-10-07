@@ -60,7 +60,7 @@ err_role:
 err_perms:
   - "My hop's been restricted due to missing permissions... I need these."
   - "I really tried, but something's in the way! It told me I needed these permissions..."
-  - "Help! I can't see, my fur's in my eyes, I need a brushing... oh and I need these permissions."
+  - "Help! I can't see, my fur's in my eyes, I need a brushing... oh, and I need these permissions."
 
 # An error message for when a command is on cooldown.
 err_cooldown:
