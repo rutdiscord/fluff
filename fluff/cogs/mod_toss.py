@@ -370,17 +370,18 @@ class ModToss(Cog):
                 return m.author in users and m.channel == toss_channel
 
             try:
-                self.poketimers[str(toss_channel.id)] = await self.bot.wait_for(
-                    "message", timeout=300, check=check
-                )
+                msg = await self.bot.wait_for("message", timeout=300, check=check)
             except asyncio.TimeoutError:
-                await pokemsg.edit(content="⏰", delete_after=5)
-            else:
                 try:
                     pokemsg = await toss_channel.send(ctx.author.mention)
-                    await pokemsg.edit(content="🫳⏰", delete_after=5)
-                except discord.errors.NotFound:
+                    await pokemsg.edit(content="⏰", delete_after=5)
+                except discord.NotFound:
                     return
+            except discord.NotFound:
+                return
+            else:
+                pokemsg = await toss_channel.send(ctx.author.mention)
+                await pokemsg.edit(content="🫳⏰", delete_after=5)
 
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.bot_has_permissions(manage_roles=True, manage_channels=True)
