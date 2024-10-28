@@ -71,25 +71,6 @@ class Timer(Cog):
                     target_guild = self.bot.get_guild(job_details["guild"])
                     delete_job(timestamp, jobtype, job_name)
                     await target_guild.unban(target_user, reason="Timed ban expired.")
-                elif jobtype == "remind":
-                    text = job_details["text"]
-                    original_timestamp = job_details["added"]
-                    target = await self.bot.fetch_user(int(job_name))
-                    if target:
-                        embed = discord.Embed(
-                            title="⏰ Reminder",
-                            description=f"You asked to be reminded <t:{original_timestamp}:R> on <t:{original_timestamp}:f>.",
-                            timestamp=datetime.now(),
-                        )
-                        embed.set_footer(
-                            text=self.bot.user.name, icon_url=self.bot.user.avatar.url
-                        )
-                        embed.add_field(
-                            name="📝 Contents",
-                            value=f"{text}",
-                            inline=False,
-                        )
-                        await target.send(embed=embed)
                     delete_job(timestamp, jobtype, job_name)
             except:
                 # Don't kill cronjobs if something goes wrong.
