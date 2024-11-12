@@ -377,8 +377,8 @@ class Reply(Cog):
                     return self.bot.dispatch(
                         "autotoss_blocked", message, message.author
                     )
-                if self.mode_enabled and refmessage.author.id == 212719295124209664:
-                    await message.reply(content="Stop pinging Marr. Marr has the 'No Ping' role. DO NOT PING MARR.", mention_author=True)
+            if self.mode_enabled and refmessage.author.id == 212719295124209664:
+                await message.reply(content="Stop pinging Marr. Marr has the 'No Ping' role. DO NOT PING MARR.", mention_author=True)
             await wrap_violation(message)
             return
 
