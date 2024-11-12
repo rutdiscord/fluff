@@ -18,6 +18,7 @@ class Reply(Cog):
         self.timers = {}
         self.counttimer.start()
         self.specific_user_id = 212719295124209664
+        self.mode_enabled = False 
 
     def cog_unload(self):
         self.counttimer.cancel()
