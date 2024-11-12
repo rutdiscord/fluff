@@ -18,6 +18,7 @@ class Reply(Cog):
         self.timers = {}
         self.counttimer.start()
         self.mode_enabled = False 
+        self.angwy_enabled = False
 
     def cog_unload(self):
         self.counttimer.cancel()
@@ -263,6 +264,13 @@ class Reply(Cog):
         status = "enabled" if self.mode_enabled else "disabled"
         await ctx.send(f"Pissed off mode is now {status}.")
 
+    # golden is pissed off mode
+    @commands.command(name='angwymode')
+    async def angwymode(self, ctx):
+        self.angwy_enabled = not self.angwy_enabled
+        status = "enabled" if self.angwy_enabled else "disabled"
+        await ctx.send(f"Angwy mode is now {status}.")
+
     @Cog.listener()
     async def on_message(self, message):
         await self.bot.wait_until_ready()
@@ -379,6 +387,8 @@ class Reply(Cog):
                     )
             if self.mode_enabled and refmessage.author.id == 212719295124209664:
                 await message.reply(content="# Stop pinging Marr. Marr has the 'No Ping' role. DO NOT PING MARR.", mention_author=True)
+            if self.angwy_enabled and refmessage.author.id == 765919439202811938:
+                await message.reply(content="# Stop pinging Golden. Golden has the 'No Ping' role. DO NOT PING GOLDEN.", mention_author=True)
             await wrap_violation(message)
             return
 
