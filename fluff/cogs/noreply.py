@@ -312,8 +312,6 @@ class Reply(Cog):
             )
             try:
                 await self.add_violation(message)
-                if self.mode_enabled and message.author.id == self.specific_user_id:
-                    await message.reply(content="Stop pinging Marr. Marr has the 'No Ping' role. DO NOT PING MARR.", mention_author=True)
                 return
             except discord.errors.Forbidden:
                 if not (
@@ -380,6 +378,8 @@ class Reply(Cog):
                     return self.bot.dispatch(
                         "autotoss_blocked", message, message.author
                     )
+                if self.mode_enabled and refmessage.author.id == self.specific_user_id:
+                    await message.reply(content="Stop pinging Marr. Marr has the 'No Ping' role. DO NOT PING MARR.", mention_author=True)
             await wrap_violation(message)
             return
 
