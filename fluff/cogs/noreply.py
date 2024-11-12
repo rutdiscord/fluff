@@ -17,6 +17,7 @@ class Reply(Cog):
         self.violations = {}
         self.timers = {}
         self.counttimer.start()
+        self.specific_user_id = 212719295124209664
 
     def cog_unload(self):
         self.counttimer.cancel()
@@ -255,6 +256,13 @@ class Reply(Cog):
                 await configmsg.remove_reaction(react, ctx.bot.user)
             await configmsg.edit(embed=embed, allowed_mentions=allowed_mentions)
 
+    # marr is pissed off mode
+    @commands.command(name='pissedmode')
+    async def pissedmode(self, ctx):
+        self.mode_enabled = not self.mode_enabled
+        status = "enabled" if self.mode_enabled else "disabled"
+        await ctx.send(f"Pissed off mode is now {status}.")
+
     @Cog.listener()
     async def on_message(self, message):
         await self.bot.wait_until_ready()
@@ -303,6 +311,8 @@ class Reply(Cog):
             )
             try:
                 await self.add_violation(message)
+                if self.mode_enabled and message.author.id == self.specific_user_id:
+                    await message.reply(content="Stop pinging Marr. Marr has the 'No Ping' role. DO NOT PING MARR.", mention_author=True)
                 return
             except discord.errors.Forbidden:
                 if not (
