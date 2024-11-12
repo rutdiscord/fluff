@@ -260,6 +260,9 @@ class Reply(Cog):
     # marr is pissed off mode
     @commands.command(name='pissedmode')
     async def pissedmode(self, ctx):
+        if ctx.author.id != 212719295124209664:
+            await ctx.send ("You cannot use this command. Only Marr can use this command.")
+            return 
         self.mode_enabled = not self.mode_enabled
         status = "enabled" if self.mode_enabled else "disabled"
         await ctx.send(f"Pissed off mode is now {status}.")
@@ -267,6 +270,9 @@ class Reply(Cog):
     # golden is pissed off mode
     @commands.command(name='angwymode')
     async def angwymode(self, ctx):
+        if ctx.author.id != 765919439202811938:
+            await ctx.send ("You cannot use this command. Only Golden can use this command.")
+            return
         self.angwy_enabled = not self.angwy_enabled
         status = "enabled" if self.angwy_enabled else "disabled"
         await ctx.send(f"Angwy mode is now {status}.")
