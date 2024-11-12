@@ -17,7 +17,6 @@ class Reply(Cog):
         self.violations = {}
         self.timers = {}
         self.counttimer.start()
-        self.specific_user_id = 212719295124209664
         self.mode_enabled = False 
 
     def cog_unload(self):
@@ -378,7 +377,7 @@ class Reply(Cog):
                     return self.bot.dispatch(
                         "autotoss_blocked", message, message.author
                     )
-                if self.mode_enabled and refmessage.author.id == self.specific_user_id:
+                if self.mode_enabled and refmessage.author.id == 212719295124209664:
                     await message.reply(content="Stop pinging Marr. Marr has the 'No Ping' role. DO NOT PING MARR.", mention_author=True)
             await wrap_violation(message)
             return
