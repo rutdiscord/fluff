@@ -17,6 +17,8 @@ class Reply(Cog):
         self.violations = {}
         self.timers = {}
         self.counttimer.start()
+        self.mode_enabled = False 
+        self.angwy_enabled = False
 
     def cog_unload(self):
         self.counttimer.cancel()
@@ -255,6 +257,26 @@ class Reply(Cog):
                 await configmsg.remove_reaction(react, ctx.bot.user)
             await configmsg.edit(embed=embed, allowed_mentions=allowed_mentions)
 
+    # marr is pissed off mode
+    @commands.command(name='pissedmode')
+    async def pissedmode(self, ctx):
+        if ctx.author.id != 212719295124209664:
+            await ctx.send ("You cannot use this command. Only Marr can use this command.")
+            return 
+        self.mode_enabled = not self.mode_enabled
+        status = "enabled" if self.mode_enabled else "disabled"
+        await ctx.send(f"Pissed off mode is now {status}.")
+
+    # golden is pissed off mode
+    @commands.command(name='angwymode')
+    async def angwymode(self, ctx):
+        if ctx.author.id != 765919439202811938:
+            await ctx.send ("You cannot use this command. Only Golden can use this command.")
+            return
+        self.angwy_enabled = not self.angwy_enabled
+        status = "enabled" if self.angwy_enabled else "disabled"
+        await ctx.send(f"Angwy mode is now {status}.")
+
     @Cog.listener()
     async def on_message(self, message):
         await self.bot.wait_until_ready()
@@ -369,6 +391,10 @@ class Reply(Cog):
                     return self.bot.dispatch(
                         "autotoss_blocked", message, message.author
                     )
+            if self.mode_enabled and refmessage.author.id == 212719295124209664:
+                await message.reply(content="# Stop pinging Marr. Marr has the 'No Ping' role. DO NOT PING MARR.", mention_author=True)
+            if self.angwy_enabled and refmessage.author.id == 765919439202811938:
+                await message.reply(content="# Stop pinging Golden. Golden has the 'No Ping' role. DO NOT PING GOLDEN.", mention_author=True)
             await wrap_violation(message)
             return
 
