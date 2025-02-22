@@ -3,7 +3,7 @@ token = "token-goes-here"
 # How you'll invoke the bot.
 prefixes = ["pls ", "san "]
 # The IDs of the user(s) managing the bot.
-managers = [120698901236809728]
+managers = []
 # The ID of the channel the bot will log things to.
 # This will be removed soonTM.
 logchannel = 1006820351134683186
@@ -16,7 +16,7 @@ short_desc = "Fluff, a slightly-less-multi-purpose bunny."
 long_desc = (
     "Fluff\n"
     + "A slightly-less-multi-purpose bunny. \n\n"
-    + "Built and coded by [renavi](https://0ccu.lt), forked from [robocop-ng](https://github.com/reswitched/robocop-ng)."
+    + "Built and coded by renavi, Marr, Meagus and DFU."
 )
 
 # [cogs.shortcuts/prefixes] Maximum prefixes allowed.
