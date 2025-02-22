@@ -101,44 +101,7 @@ properties:
         type:
           - string
           - "null"
-rulepush:
-  type: object
-  properties:
-    rulepushrole:
-      type: 
-        - integer
-        - string
-        - "null"
-      minimum: 100000000000000000
-    rulepushcategory:
-      type: 
-        - integer
-        - string
-        - "null"
-      minimum: 100000000000000000
-    notificationchannel:
-      type: 
-        - integer
-        - string
-        - "null"
-      minimum: 100000000000000000
-    rulepushtopic:
-      type:
-        - string
-        - "null"
-    rulepushchannels:
-      type: 
-        - array
-        - "null"
-      items:
-        type: 
-          - integer
-          - string
-        minimum: 100000000000000000
-    rulepushtopic:
-      type: 
-        - string
-        - "null"
+
   reaction:
     type: object
     properties:
@@ -202,4 +165,4 @@ rulepush:
     type: object
     properties:
       version:
-        const: 19
+        const: 20
