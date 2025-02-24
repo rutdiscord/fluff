@@ -674,12 +674,12 @@ the true/false portion tells me whether to reload cogs""",
         ]
         random_message = random.choice(reply_messages)
 
-        await ctx.send(random_message, mention_author=False)
-
         async for message in ctx.channel.history(limit=20):
             if message.author == target:
                 await message.add_reaction("<:rubberhammer:1281079056820998185>")
                 break
+
+        await ctx.send(random_message, mention_author=False)
 
     @commands.guild_only()
     @commands.command()
