@@ -645,48 +645,41 @@ the true/false portion tells me whether to reload cogs""",
     @commands.cooldown(1, 5, type=commands.BucketType.default)
     @commands.guild_only()
     @commands.command(aliases=["banne"])
-    async def mutedmute(self, ctx, target: typing.Union[discord.Member, int] | None):
+    async def mutedmute(self, ctx, target: discord.Member):
         """This mutes a user in a special way.
 
         You can use it even if you aren't staff!
 
         - `target`
         Who you want to 'mute'. This is a user mention."""
-        if not target:
-            return
-        else:
-            if isinstance(target, discord.Member):
-                target_mention = target.mention
-            else:
-                return
-            reply_messages = [
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been demoted to muted mute.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been forever silenced.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been erased from history.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sent to a farm upstate.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sentenced to 50 years in the dungeon.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been muted muted muted muted muted mute.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is gone.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is dead now.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} will be back. They always come back.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sent Somewhere Else.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sent to gay baby jail.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sent to Non-Denominational Vaguely Romantic Infant Gulag.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is over there now.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been shaved bald.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is in your house now.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has had every bone in their body shattered.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} went on vacation.",
-                f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} was let cook.",
-            ]
-            random_message = random.choice(reply_messages)
+        reply_messages = [
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been demoted to muted mute.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been forever silenced.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been erased from history.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sent to a farm upstate.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sentenced to 50 years in the dungeon.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been muted muted muted muted muted mute.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is gone.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is dead now.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} will be back. They always come back.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sent Somewhere Else.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sent to gay baby jail.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been sent to Non-Denominational Vaguely Romantic Infant Gulag.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is over there now.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has been shaved bald.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} is in your house now.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} has had every bone in their body shattered.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} went on vacation.",
+            f"{self.bot.pacify_name(ctx.message.mentions[0].display_name)} was let cook.",
+        ]
+        random_message = random.choice(reply_messages)
 
-            await ctx.send(random_message, mention_author=False)
+        await ctx.send(random_message, mention_author=False)
 
-            async for message in ctx.channel.history(limit=20):
-                if message.author == target:
-                    await message.add_reaction("<:rubberhammer:1281079056820998185>")
-                    break
+        async for message in ctx.channel.history(limit=20):
+            if message.author == target:
+                await message.add_reaction("<:rubberhammer:1281079056820998185>")
+                break
 
     @commands.guild_only()
     @commands.command()
