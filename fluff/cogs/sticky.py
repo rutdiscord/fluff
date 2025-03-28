@@ -32,23 +32,6 @@ class StickyMessage(commands.Cog):
             return
 
         async def repost_task():
-            # Post the sticky message immediately when the task starts
-            if channel.id in self.sticky_messages:
-                last_message_id = self.sticky_messages[channel.id]["last_message_id"]
-
-                # Delete the previous sticky message if it exists
-                if last_message_id:
-                    try:
-                        last_message = await channel.fetch_message(last_message_id)
-                        await last_message.delete()
-                    except discord.NotFound:
-                        pass  # Message was already deleted
-
-                # Send the new sticky message
-                new_message = await channel.send(self.sticky_messages[channel.id]["message"])
-                self.sticky_messages[channel.id]["last_message_id"] = new_message.id
-                self.save_sticky_data()  # Save updated last_message_id
-
             while channel.id in self.sticky_messages:
                 # Wait for the interval
                 await asyncio.sleep(self.sticky_messages[channel.id]["interval"] * 60)
@@ -176,8 +159,13 @@ class StickyMessage(commands.Cog):
                 self.repost_tasks[message.channel.id].cancel()
                 del self.repost_tasks[message.channel.id]
 
-            # Restart the sticky task
-            self.startsticky(message.channel)
+            # Restart the sticky task with a delay
+            async def delayed_restart():
+                await asyncio.sleep(self.sticky_messages[message.channel.id]["interval"] * 60)
+                self.startsticky(message.channel)
+
+            # Schedule the delayed restart
+            self.repost_tasks[message.channel.id] = self.bot.loop.create_task(delayed_restart())
 
 async def setup(bot):
     cog = StickyMessage(bot)
@@ -187,6 +175,21 @@ async def setup(bot):
     for channel_id in cog.sticky_messages.keys():
         channel = bot.get_channel(int(channel_id))
         if channel:
+            # Immediately post the sticky message
+            last_message_id = cog.sticky_messages[channel_id].get("last_message_id")
+            if last_message_id:
+                try:
+                    last_message = await channel.fetch_message(last_message_id)
+                    await last_message.delete()
+                except discord.NotFound:
+                    pass  # Message was already deleted
+
+            # Send the sticky message immediately
+            new_message = await channel.send(cog.sticky_messages[channel_id]["message"])
+            cog.sticky_messages[channel_id]["last_message_id"] = new_message.id
+            cog.save_sticky_data()
+
+            # Start the sticky task
             cog.startsticky(channel)
 
     await bot.add_cog(cog)
