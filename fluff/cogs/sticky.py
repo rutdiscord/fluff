@@ -27,7 +27,7 @@ class StickyMessage(commands.Cog):
             "interval": interval,
             "last_message_id": None
         }
-        self.start_reposting(channel)
+        self.startsticky(channel)
         await ctx.send(f"Sticky message set in {channel.mention} with an interval of {interval} minutes.")
 
     @commands.command()
@@ -42,11 +42,11 @@ class StickyMessage(commands.Cog):
             await ctx.send("There is no sticky message in this channel.")
             return
 
-        self.stop_reposting(channel)
+        self.stopsticky(channel)
         del self.sticky_messages[channel.id]
         await ctx.send(f"Sticky message removed from {channel.mention}.")
 
-    def start_reposting(self, channel):
+    def startsticky(self, channel):
         """Start the reposting task for a sticky message."""
         if channel.id in self.repost_tasks:
             return
@@ -87,7 +87,7 @@ class StickyMessage(commands.Cog):
         self.repost_tasks[channel.id] = self.bot.loop.create_task(repost_task())
         asyncio.create_task(channel.send("Sticky message reposting has started."))
 
-    def stop_reposting(self, channel):
+    def stopsticky(self, channel):
         """Stop the reposting task for a sticky message."""
         if channel.id in self.repost_tasks:
             self.repost_tasks[channel.id].cancel()
@@ -99,8 +99,8 @@ class StickyMessage(commands.Cog):
         """Reset the repost timer if a new message is sent in a sticky channel."""
         if message.channel.id in self.sticky_messages and not message.author.bot:
             # Reset the timer by canceling and restarting the task
-            self.stop_reposting(message.channel)
-            self.start_reposting(message.channel)
+            self.stopsticky(message.channel)
+            self.startsticky(message.channel)
 
 async def setup(bot):
     await bot.add_cog(StickyMessage(bot))
