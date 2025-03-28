@@ -67,14 +67,12 @@ class StickyMessage(commands.Cog):
                 self.save_sticky_data()  # Save updated last_message_id
 
         self.repost_tasks[channel.id] = self.bot.loop.create_task(repost_task())
-        asyncio.create_task(channel.send("Sticky message reposting has started."))
 
     def stopsticky(self, channel):
         """Stop the reposting task for a sticky message."""
         if channel.id in self.repost_tasks:
             self.repost_tasks[channel.id].cancel()
             del self.repost_tasks[channel.id]
-            asyncio.create_task(channel.send("Sticky message reposting has been stopped."))
 
     @commands.command()
     @commands.has_permissions(manage_messages=True)
