@@ -159,13 +159,8 @@ class StickyMessage(commands.Cog):
                 self.repost_tasks[message.channel.id].cancel()
                 del self.repost_tasks[message.channel.id]
 
-            # Restart the sticky task with a delay
-            async def delayed_restart():
-                await asyncio.sleep(self.sticky_messages[message.channel.id]["interval"] * 60)
-                self.startsticky(message.channel)
-
-            # Schedule the delayed restart
-            self.repost_tasks[message.channel.id] = self.bot.loop.create_task(delayed_restart())
+            # Immediately restart the sticky task
+            self.startsticky(message.channel)
 
 async def setup(bot):
     cog = StickyMessage(bot)
