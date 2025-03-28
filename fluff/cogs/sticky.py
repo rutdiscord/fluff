@@ -33,27 +33,35 @@ class StickyMessage(commands.Cog):
 
         async def repost_task():
             while channel.id in self.sticky_messages:
+                # Wait for the interval
                 await asyncio.sleep(self.sticky_messages[channel.id]["interval"] * 60)
 
+                # Check if the sticky message is still active
                 if channel.id not in self.sticky_messages:
                     break
 
+                # Fetch the latest message in the channel
                 try:
                     latest_message = (await channel.history(limit=1).flatten())[0]
                 except IndexError:
                     latest_message = None
 
+                # Get the last sticky message ID
                 last_message_id = self.sticky_messages[channel.id]["last_message_id"]
+
+                # If the latest message is the bot's sticky, skip reposting
                 if latest_message and latest_message.id == last_message_id:
                     continue
 
+                # Delete the previous sticky message if it exists
                 if last_message_id:
                     try:
                         last_message = await channel.fetch_message(last_message_id)
                         await last_message.delete()
                     except discord.NotFound:
-                        pass
+                        pass  # Message was already deleted
 
+                # Send the new sticky message
                 new_message = await channel.send(self.sticky_messages[channel.id]["message"])
                 self.sticky_messages[channel.id]["last_message_id"] = new_message.id
                 self.save_sticky_data()  # Save updated last_message_id
@@ -114,6 +122,34 @@ class StickyMessage(commands.Cog):
         self.save_sticky_data()  # Save the cleared state to JSON
 
         await ctx.send("All sticky messages have been stopped and cleared.")
+
+    @commands.command()
+    @commands.has_permissions(manage_messages=True)
+    async def liststickies(self, ctx):
+        """
+        List all active sticky messages.
+        This will display all channels with active sticky messages and their details.
+        """
+        if not self.sticky_messages:
+            await ctx.send("There are no active sticky messages.")
+            return
+
+        description = []
+        for channel_id, data in self.sticky_messages.items():
+            channel = self.bot.get_channel(int(channel_id))
+            if channel:
+                description.append(
+                    f"**Channel:** {channel.mention}\n"
+                    f"**Message:** {data['message']}\n"
+                    f"**Interval:** {data['interval']} minutes\n"
+                )
+
+        embed = discord.Embed(
+            title="Active Sticky Messages",
+            description="\n\n".join(description),
+            color=discord.Color.blue(),
+        )
+        await ctx.send(embed=embed)
 
     @commands.Cog.listener()
     async def on_message(self, message):
