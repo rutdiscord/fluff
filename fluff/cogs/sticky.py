@@ -49,7 +49,7 @@ class StickyMessage(commands.Cog):
                 # Get the last sticky message ID
                 last_message_id = self.sticky_messages[channel.id]["last_message_id"]
 
-                # If the latest message is the bot's sticky, skip reposting
+                # If the latest message is the bot's sticky, skip waiting for the interval
                 if latest_message and latest_message.id == last_message_id:
                     continue
 
@@ -60,18 +60,26 @@ class StickyMessage(commands.Cog):
                 if channel.id not in self.sticky_messages:
                     break
 
-                # Delete the previous sticky message if it exists
-                if last_message_id:
-                    try:
-                        last_message = await channel.fetch_message(last_message_id)
-                        await last_message.delete()
-                    except discord.NotFound:
-                        pass  # Message was already deleted
+                # Fetch the latest message again to ensure it's not the bot's sticky
+                try:
+                    latest_message = (await channel.history(limit=1).flatten())[0]
+                except IndexError:
+                    latest_message = None
 
-                # Send the new sticky message
-                new_message = await channel.send(self.sticky_messages[channel.id]["message"])
-                self.sticky_messages[channel.id]["last_message_id"] = new_message.id
-                self.save_sticky_data()  # Save updated last_message_id
+                # If the latest message is still not the bot's sticky, repost the sticky
+                if not latest_message or latest_message.id != last_message_id:
+                    # Delete the previous sticky message if it exists
+                    if last_message_id:
+                        try:
+                            last_message = await channel.fetch_message(last_message_id)
+                            await last_message.delete()
+                        except discord.NotFound:
+                            pass  # Message was already deleted
+
+                    # Send the new sticky message
+                    new_message = await channel.send(self.sticky_messages[channel.id]["message"])
+                    self.sticky_messages[channel.id]["last_message_id"] = new_message.id
+                    self.save_sticky_data()  # Save updated last_message_id
 
         # Start the reposting task
         self.repost_tasks[channel.id] = self.bot.loop.create_task(repost_task())
