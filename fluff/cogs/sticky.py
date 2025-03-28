@@ -105,10 +105,9 @@ class StickyMessage(commands.Cog):
         This will stop all running sticky tasks and clear the sticky message data.
         """
         # Stop all running sticky tasks
-        for channel_id in list(self.repost_tasks.keys()):
-            channel = self.bot.get_channel(int(channel_id))
-            if channel:
-                self.stopsticky(channel)
+        for channel_id, task in list(self.repost_tasks.items()):
+            task.cancel()  # Cancel the task
+            del self.repost_tasks[channel_id]  # Remove it from the task dictionary
 
         # Clear sticky message data
         self.sticky_messages.clear()
