@@ -29,12 +29,12 @@ class StickyMessage(commands.Cog):
     def startsticky(self, channel):
         """Start the reposting task for a sticky message."""
         if channel.id in self.repost_tasks:
-            return
+            return  # Prevent multiple tasks for the same channel
 
         async def repost_task():
             while channel.id in self.sticky_messages:
-                # Wait for the interval
-                await asyncio.sleep(self.sticky_messages[channel.id]["interval"] * 60)
+                # Wait 60 seconds before checking the latest message
+                await asyncio.sleep(60)
 
                 # Check if the sticky message is still active
                 if channel.id not in self.sticky_messages:
@@ -52,6 +52,13 @@ class StickyMessage(commands.Cog):
                 # If the latest message is the bot's sticky, skip reposting
                 if latest_message and latest_message.id == last_message_id:
                     continue
+
+                # Wait for the interval specified in the setsticky command
+                await asyncio.sleep(self.sticky_messages[channel.id]["interval"] * 60)
+
+                # Check again if the sticky message is still active
+                if channel.id not in self.sticky_messages:
+                    break
 
                 # Delete the previous sticky message if it exists
                 if last_message_id:
@@ -159,7 +166,7 @@ class StickyMessage(commands.Cog):
                 self.repost_tasks[message.channel.id].cancel()
                 del self.repost_tasks[message.channel.id]
 
-            # Immediately restart the sticky task
+            # Restart the sticky task
             self.startsticky(message.channel)
 
 async def setup(bot):
