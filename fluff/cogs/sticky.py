@@ -53,12 +53,25 @@ class StickyMessage(commands.Cog):
 
         async def repost_task():
             while channel.id in self.sticky_messages:
+                # Wait for the interval (plus a 60-second delay after the last message)
                 await asyncio.sleep(self.sticky_messages[channel.id]["interval"] * 60)
+
+                # Check if the sticky message is still active
                 if channel.id not in self.sticky_messages:
                     break
 
-                # Delete the last sticky message if it exists
+                # Fetch the latest message in the channel
+                try:
+                    latest_message = (await channel.history(limit=1).flatten())[0]
+                except IndexError:
+                    latest_message = None
+
+                # If the latest message is the bot's sticky, do nothing
                 last_message_id = self.sticky_messages[channel.id]["last_message_id"]
+                if latest_message and latest_message.id == last_message_id:
+                    continue
+
+                # Delete the previous sticky message if it exists
                 if last_message_id:
                     try:
                         last_message = await channel.fetch_message(last_message_id)
@@ -70,19 +83,24 @@ class StickyMessage(commands.Cog):
                 new_message = await channel.send(self.sticky_messages[channel.id]["message"])
                 self.sticky_messages[channel.id]["last_message_id"] = new_message.id
 
+        # Notify when the reposting task starts
         self.repost_tasks[channel.id] = self.bot.loop.create_task(repost_task())
+        asyncio.create_task(channel.send("Sticky message reposting has started."))
 
     def stop_reposting(self, channel):
         """Stop the reposting task for a sticky message."""
         if channel.id in self.repost_tasks:
             self.repost_tasks[channel.id].cancel()
             del self.repost_tasks[channel.id]
+            asyncio.create_task(channel.send("Sticky message reposting has been stopped."))
 
     @commands.Cog.listener()
     async def on_message(self, message):
         """Reset the repost timer if a new message is sent in a sticky channel."""
         if message.channel.id in self.sticky_messages and not message.author.bot:
-            self.sticky_messages[message.channel.id]["last_message_id"] = None
+            # Reset the timer by canceling and restarting the task
+            self.stop_reposting(message.channel)
+            self.start_reposting(message.channel)
 
 async def setup(bot):
     await bot.add_cog(StickyMessage(bot))
