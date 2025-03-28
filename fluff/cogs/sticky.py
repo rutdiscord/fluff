@@ -32,6 +32,23 @@ class StickyMessage(commands.Cog):
             return
 
         async def repost_task():
+            # Post the sticky message immediately when the task starts
+            if channel.id in self.sticky_messages:
+                last_message_id = self.sticky_messages[channel.id]["last_message_id"]
+
+                # Delete the previous sticky message if it exists
+                if last_message_id:
+                    try:
+                        last_message = await channel.fetch_message(last_message_id)
+                        await last_message.delete()
+                    except discord.NotFound:
+                        pass  # Message was already deleted
+
+                # Send the new sticky message
+                new_message = await channel.send(self.sticky_messages[channel.id]["message"])
+                self.sticky_messages[channel.id]["last_message_id"] = new_message.id
+                self.save_sticky_data()  # Save updated last_message_id
+
             while channel.id in self.sticky_messages:
                 # Wait for the interval
                 await asyncio.sleep(self.sticky_messages[channel.id]["interval"] * 60)
@@ -66,6 +83,7 @@ class StickyMessage(commands.Cog):
                 self.sticky_messages[channel.id]["last_message_id"] = new_message.id
                 self.save_sticky_data()  # Save updated last_message_id
 
+        # Start the reposting task
         self.repost_tasks[channel.id] = self.bot.loop.create_task(repost_task())
 
     def stopsticky(self, channel):
