@@ -83,10 +83,10 @@ class StickyMessages(commands.Cog):
                 ctx.guild.id, "stickied_messages", json.dumps(stickied_channels)
             )
             return await ctx.reply(
-                f"Stickied message created in <#{ctx.channel.id}>:\n```\n{msg}\n```"
+                f"Stickied message created in <#{channel.id}>:\n```\n{msg}\n```"
             )
         else:
-            prev_msg = stickied_channels[str(ctx.channel.id)]
+            prev_msg = stickied_channels[str(channel.id)]
             stickied_channels[str(channel.id)] = msg
             set_guildfile(
                 ctx.guild.id, "stickied_messages", json.dumps(stickied_channels)
