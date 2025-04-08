@@ -164,7 +164,7 @@ properties:
   sticky:
     type: object
     properties:
-      time_elapsed:
+      fresh_stickied_threshold:
         type:
           - integer
           - "null"

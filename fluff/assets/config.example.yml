@@ -93,7 +93,7 @@ drive:
   # Set the ID of the Google Drive folder that the file should be uploaded to.
 
 sticky:
-  time_elapsed: 10
+  fresh_stickied_threshold: 10
   # In minutes. How long should a stickied message be considered fresh for?
 
 metadata:
