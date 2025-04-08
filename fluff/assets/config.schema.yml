@@ -161,8 +161,16 @@ properties:
         type: 
           - string
           - "null"
+  sticky:
+    type: object
+    properties:
+      time_elapsed:
+        type:
+          - integer
+          - "null"
+        minimum: 1
   metadata:
     type: object
     properties:
       version:
-        const: 20
+        const: 21
