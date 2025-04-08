@@ -42,6 +42,12 @@ class StickyMessages(commands.Cog):
     @commands.guild_only()
     @commands.group(invoke_without_command=True, aliases=["sticky"])
     async def stickies(self, ctx):
+        """Run a report on the server's channels, and come back with any that have a stickied message.
+
+        Anywhere in the guild.
+
+        No arguments.
+        """
         stickied_channels = get_guildfile(ctx.guild.id, "stickied_messages")
         if not stickied_channels:
             await ctx.send("There are no stickied messages in this server.")
@@ -65,9 +71,14 @@ class StickyMessages(commands.Cog):
     async def create(
         self, ctx: discord.abc.GuildChannel, channel: discord.abc.GuildChannel, msg: str
     ):
+        """Create a stickied message in the specified channel.
+
+        Anywhere in the guild.
+
+        Channel mention, then the intended sticky message."""
         stickied_channels = get_guildfile(ctx.guild.id, "stickied_messages")
-        if str(ctx.channel.id) not in stickied_channels:
-            stickied_channels[str(ctx.channel.id)] = msg
+        if str(channel.id) not in stickied_channels:
+            stickied_channels[str(channel.id)] = msg
             set_guildfile(
                 ctx.guild.id, "stickied_messages", json.dumps(stickied_channels)
             )
@@ -76,12 +87,12 @@ class StickyMessages(commands.Cog):
             )
         else:
             prev_msg = stickied_channels[str(ctx.channel.id)]
-            stickied_channels[str(ctx.channel.id)] = msg
+            stickied_channels[str(channel.id)] = msg
             set_guildfile(
                 ctx.guild.id, "stickied_messages", json.dumps(stickied_channels)
             )
             return await ctx.reply(
-                f"Stickied message updated in <#{ctx.channel.id}>:\nBefore:\n```\n{prev_msg}\n```\nAfter:\n```\n{msg}\n```"
+                f"Stickied message updated in <#{channel.id}>:\nBefore:\n```\n{prev_msg}\n```\nAfter:\n```\n{msg}\n```"
             )
 
     @commands.bot_has_permissions(manage_messages=True)
