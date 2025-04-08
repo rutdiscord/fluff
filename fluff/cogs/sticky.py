@@ -93,6 +93,14 @@ class StickyMessages(commands.Cog):
     ):
         stickied_channels = get_guildfile(ctx.guild.id, "stickied_messages")
         if str(channel.id) in stickied_channels:
+            if str(channel.id) in self.stickied_cache:
+                try:
+                    cached_message_id = self.stickied_cache[str(channel.id)]
+                    cached_message = await channel.fetch_message(cached_message_id)
+                    await cached_message.delete()
+                except discord.NotFound:
+                    pass
+                del self.stickied_cache[str(channel.id)]
             old_message = stickied_channels[str(channel.id)]
             del stickied_channels[str(channel.id)]
             set_guildfile(
