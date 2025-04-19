@@ -26,7 +26,7 @@ class StickiedPins(commands.Cog):
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
     @commands.guild_only()
-    @commands.group(invoke_without_command=True, aliases=["pin", "sticky"])
+    @commands.group(invoke_without_command=True, aliases=["pin"])
     async def pins(self, ctx):
         guild_pins = get_guildfile(ctx.guild.id, "pins")
 
