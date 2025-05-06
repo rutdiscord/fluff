@@ -82,9 +82,14 @@ class StickyMessages(commands.Cog):
             set_guildfile(
                 ctx.guild.id, "stickied_messages", json.dumps(stickied_channels)
             )
+
+            new_message = await channel.send(msg)
+            self.stickied_cache[str(channel.id)] = new_message.id
+
             return await ctx.reply(
                 f"Stickied message created in <#{channel.id}>:\n```\n{msg}\n```"
             )
+
         else:
             prev_msg = stickied_channels[str(channel.id)]
             stickied_channels[str(channel.id)] = msg
