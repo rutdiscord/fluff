@@ -83,7 +83,10 @@ class BunnyFacts(Cog):
                 "images": {"https://files.catbox.moe/2zk4ql.gif"},
                 "fact": "Rabbits will box as a way to establish dominance or defend themselves.\nIn the above gif, these are jackrabbits, which are a type of hare. Regardless, rabbits do the same thing.",
             },
-            "purring": {"summary": "They can puur!?", "images": {""}, "fact": ""},
+            "purring": {
+                "summary": "Bunnies can pur!",
+                "images": {""}, 
+                "fact": "Rabbits can purr too! They make this sound by lightly chattering their teeth together. This is a sign of contentment and affection."},
         }
 
     @commands.group(invoke_without_command=True, aliases=["bunfacts", "bunnyfacts"])
