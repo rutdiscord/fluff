@@ -50,7 +50,7 @@ class BunnyFacts(Cog):
             },
             "thumping": {
                 "summary": "Why that loud noise",
-                "images": {"https://tenor.com/view/bunny-thumper-thump-rabbit-tantrum-gif-18111178"},
+                "images": {"https://media1.tenor.com/m/oc5rFi8G5QgAAAAd/bunny-thumper.gif"},
                 "fact": "When a rabbit thumps their hind legs against the ground. This means that a rabbit senses danger or is very upset with something.\n[Link](https://bunnylady.com/rabbit-care-guide/)\n[Link to Video](https://www.youtube.com/watch?v=g9kiuQ1pql8)",
             },
             "chinning": {
