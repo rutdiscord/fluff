@@ -80,7 +80,7 @@ class BunnyFacts(Cog):
             "boxing": {
                 "summary": "Do bunnies fight?",
                 "images": {"https://files.catbox.moe/2zk4ql.gif"},
-                "fact": "Rabbits will box as a way to establish dominance or defend themselves.\nIn the above gif, these are jackrabbits, which are a type of hare. Regardless, rabbits do the same thing.",
+                "fact": "Rabbits will box as a way to establish dominance or defend themselves.\nIn the gif below, these are jackrabbits, which are a type of hare. Regardless, rabbits do the same thing.",
             },
             "purring": {
                 "summary": "Bunnies can pur!",
