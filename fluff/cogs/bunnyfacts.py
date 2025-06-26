@@ -68,7 +68,7 @@ class BunnyFacts(Cog):
                 "images": {
                     ""
                 }, 
-                "fact": "Rabbits will make a noise when they are excited or happy. This noise is often described as a honking sound. It tends to be a sign of affection.""
+                "fact": "Rabbits will make a noise when they are excited or happy. This noise is often described as a honking sound. It tends to be a sign of affection."
             },
             "grunting": {
                 "summary": "Do bunnies grunt?",
