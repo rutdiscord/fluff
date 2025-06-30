@@ -12,7 +12,7 @@ import discord
 import datetime
 import itertools
 from discord.ext import commands
-from helpers.datafiles import fill_profile, get_botfile
+from helpers.datafiles import get_botfile
 from helpers.errors import handle_code_error, handle_command_error
 
 
@@ -43,25 +43,11 @@ def cap_permutations(s):
     return ["".join(x) for x in itertools.product(*lu_sequence)]
 
 
-def get_userprefix(uid):
-    profile = fill_profile(uid)
-    if not profile:
-        return []
-    return profile["prefixes"]
-
-
-def get_useralias(uid):
-    profile = fill_profile(uid)
-    if not profile:
-        return []
-    return profile["aliases"]
-
-
 def get_prefix(bot, message):
     prefixes = []
     for prefix in config.prefixes:
         prefixes += cap_permutations(prefix)
-    userprefixes = get_userprefix(message.author.id)
+    userprefixes = [] #get_userprefix(message.author.id)
     if userprefixes is not None:
         return commands.when_mentioned_or(*prefixes + userprefixes)(bot, message)
     return commands.when_mentioned_or(*prefixes)(bot, message)
@@ -127,18 +113,6 @@ async def on_message(message):
             return a.id == message.id
 
         while True:
-            if ctx.prefix:
-                aliases = get_useralias(message.author.id)
-                for alias in aliases:
-                    command, alias = list(alias.items())[0]
-                    if message.content[len(ctx.prefix) :].startswith(alias):
-                        message.content = message.content[
-                            : len(ctx.prefix)
-                        ] + message.content[len(ctx.prefix) :].replace(
-                            alias, command, 1
-                        )
-                        ctx = await bot.get_context(message)
-                        break
             if ctx.valid:
                 break
             try:
