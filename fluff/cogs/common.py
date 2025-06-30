@@ -14,7 +14,7 @@ class Common(Cog):
         self.bot.pull_category = self.pull_category
         self.bot.pacify_name = self.pacify_name
 
-    def pull_role(self, guild, role):
+    def pull_role(self, guild: discord.Guild, role):
         if isinstance(role, str):
             role = discord.utils.get(guild.roles, name=role)
         else:
