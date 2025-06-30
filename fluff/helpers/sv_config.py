@@ -37,6 +37,14 @@ def fill_config(sid):
         else make_config(sid)
     )
 
+    if config["metadata"]["version"] < config_stock["metadata"]["version"]:
+
+        # UPGRADES, PEOPLE! UPGRADES ...
+
+        # Fluff 20 < 21
+        if config["metadata"]["version"] < 21:
+            config["sticky"] = {"fresh_stickied_threshold": 10}
+
     validate_config(config)
 
     return config
