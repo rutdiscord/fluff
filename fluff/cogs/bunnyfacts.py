@@ -19,13 +19,12 @@ class BunnyFacts(Cog):
                 "summary": "'An inexplicable expression of joy...'",
                 "images": {
                     "https://media-be.chewy.com/wp-content/uploads/2022/05/24112223/rabbit-binkying.gif",
-                    "https://global.discourse-cdn.com/business5/uploads/gemsofwar/original/3X/8/4/84364684586e83b84361ea90fce93dae8d0888d7.gif",
                     "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/93c11ea7-9de5-46e6-a1d7-b613cf57e399/d9753cz-e8e8a691-6bc2-4bfb-a9b3-af87a62809af.gif?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiJcL2ZcLzkzYzExZWE3LTlkZTUtNDZlNi1hMWQ3LWI2MTNjZjU3ZTM5OVwvZDk3NTNjei1lOGU4YTY5MS02YmMyLTRiZmItYTliMy1hZjg3YTYyODA5YWYuZ2lmIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlOmZpbGUuZG93bmxvYWQiXX0._B1a6DK7z1wDt50Ml0xWlyZN6BRDJBRyhviGmTHf4c8",
                     "https://elizabethannemartins.com/wp-content/uploads/2016/05/tumblr_mn7spsxk191ss93ulo1_400.gif?w=350&h=276",
                     "https://files.catbox.moe/m8us2w.gif",
                     "https://files.catbox.moe/p2fg1y.gif",
                 },
-                "fact": "A funky little jump along with a flick of the back legs (or head, if it's a smaller binky!). It's a way rabbits express excess energy they can't contain, usually joy. A binkying bunny is a very happy bunny!\n\n**Why do rabbits binky?**\n Nobody really knows why rabbits binky. All we know is that it's an instinct, an inexplicable expression of joy, much like laughing is for humans.\n\n Baby rabbits binky more often than adult rabbits - they're more energetic while adults are generally sleepier and calmer. Like puppies!\n[Link](https://bunnylady.com/bunny-binkies/)",
+                "fact": "A funky little jump along with a flick of the back legs (or head, if it's a smaller binky!). It's a way rabbits express excess energy they can't contain, usually joy. A binkying bunny is a very happy bunny!",
             },
             "flopping": {
                 "summary": "Is that bunny dead? (no)",
@@ -35,39 +34,69 @@ class BunnyFacts(Cog):
                     "https://files.catbox.moe/eezsl8.webp",
                     "https://files.catbox.moe/vko0fw.webp",
                     "https://files.catbox.moe/j13oqw.jpg",
+                    "https://files.catbox.moe/hoh0xv.gif",
+                    "https://files.catbox.moe/6jmpus.gif",
+                    "https://files.catbox.moe/pxrfil.gif",
+                    "https://files.catbox.moe/3rbnjk.gif",
+                    "https://files.catbox.moe/bxh2im.gif",
+                    "https://files.catbox.moe/nw1qid.gif",
+                    "https://files.catbox.moe/6we66x.gif",
+                    "https://files.catbox.moe/fxuect.gif",
+                    "https://files.catbox.moe/n9dc5d.gif",
+                    "https://files.catbox.moe/wgcmvs.gif",
+                    "https://files.catbox.moe/rvipql.gif",
                 },
-                "fact": "In most cases, a rabbit laying on their side is just sleeping. They aren't sick or dying in any way. Instead, this is a position rabbits will sleep in when they feel completely safe and secure in their environment.\n**Why do rabbits flop?**\nSince rabbits are at the bottom of the food chain, they need to be prepared to run away at the first sign of danger. When they sleep like this, rabbits cannot come to awareness and get up as quickly as other sleeping positions. Moreover, rabbits tend to sleep more deeply when they lay on their sides, not waking up as easily as when they sleep in a loaf position. This means that they need to have a high amount of trust in you before they'll be willing to flop over to sleep.\n[Link](https://bunnylady.com/laying-on-their-side/)",
+                "fact": "Bunnies will flop over on their sides when they feel safe and able to relax. When a bunny flops, it means they are comfortable and trust their environment (which often contains you!)",
             },
             "periscoping": {
-                "summary": "Why he stand on his hind leg",
+                "summary": "Why do bunnies stand on their hind legs?",
                 "images": {
                     "https://files.catbox.moe/dzgwnr.jpg",
                     "https://farm2.static.flickr.com/1069/1473341276_980253934b.jpg",
                     "https://files.catbox.moe/qc50g5.jpg",
                     "https://www.budgetbunny.ca/wp-content/uploads/2013/09/IMG_6163-510x729.gif",
                 },
-                "fact": "This is when a rabbit stands on their hind legs, it means they are curious and are trying to get a better vantage point. They often beg for treats like this.\n[Link](https://bunnylady.com/rabbit-care-guide/)",
+                "fact": "This behavior is often called 'periscoping'. Bunnies will stand on their hind legs to get a better view of their surroundings. They do this to investigate their environment to see if there are any potential dangers or interesting things to explore. This behavior is similar to how some animals, like meerkats, will stand on their hind legs to look around.",
             },
             "thumping": {
-                "summary": "Why that loud noise",
-                "images": {""},
-                "fact": "When a rabbit thumps their hind legs against the ground. This means that a rabbit senses danger or is very upset with something.\n[Link](https://bunnylady.com/rabbit-care-guide/)\n[Link to Video](https://www.youtube.com/watch?v=g9kiuQ1pql8)",
+                "summary": "Why do bunnies thump their feet?",
+                "images": {"https://files.catbox.moe/bwri44.gif",
+                           "https://files.catbox.moe/i12b9v.webp",
+                           "https://files.catbox.moe/9qkql8.gif",},
+                "fact": "Rabbits will thump when they're scared or annoyed. They thump to warn other rabbits of danger or to express their displeasure with something.",
             },
             "chinning": {
-                "summary": "Why is it rubbing its chin everywhere",
+                "summary": "Why do bunnies rub their chins on things?",
                 "images": {
-                    "https://64.media.tumblr.com/f2dc3fbe0834c9903e48a2c6818ed3d7/tumblr_o8158dq9Wh1uronh1o1_400.gif"
+                    "https://64.media.tumblr.com/f2dc3fbe0834c9903e48a2c6818ed3d7/tumblr_o8158dq9Wh1uronh1o1_400.gif",
+                    "https://files.catbox.moe/0d7ir4.gif",
+                    "https://files.catbox.moe/c3lblc.gif",
                 },
-                "fact": "",
+                "fact": "Rabbits have scent glands under their chin, and they will rub their chin on objects to mark them with their scent. This is a way for them to claim ownership of their territory and belongings. Sometimes they will also do this to show affection to their owners or other rabbits.",
             },
-            "honking": {"summary": "Bunnies honk!?", "images": {""}, "fact": ""},
-            "grunting": {"summary": "Bunnies grunt too!?", "images": {""}, "fact": ""},
+            "honking": {
+                "summary": "Do bunnies honk?",
+                "images": {
+                    ""
+                }, 
+                "fact": "Rabbits will make a noise when they are excited or happy. This noise is often described as a honking sound. It tends to be a sign of affection."
+            },
+            "grunting": {
+                "summary": "Do bunnies grunt?",
+                "images": {
+                ""
+                },
+                "fact": "Rabbits will grunt when they are annoyed or angry. This noise is often accompanied by a thump. It is a way for them to express their displeasure with something or someone.",
+            },
             "boxing": {
-                "summary": "Bunneis box and lunge at each other!?",
+                "summary": "Do bunnies fight?",
                 "images": {"https://files.catbox.moe/2zk4ql.gif"},
-                "fact": "",
+                "fact": "Rabbits will box as a way to establish dominance or defend themselves.\nIn the gif below, these are jackrabbits, which are a type of hare. Regardless, rabbits do the same thing.",
             },
-            "purring": {"summary": "They can puur!?", "images": {""}, "fact": ""},
+            "purring": {
+                "summary": "Bunnies can pur!",
+                "images": {""}, 
+                "fact": "Rabbits can purr too! They make this sound by lightly chattering their teeth together. This is a sign of contentment and affection."},
         }
 
     @commands.group(invoke_without_command=True, aliases=["bunfacts", "bunnyfacts"])
