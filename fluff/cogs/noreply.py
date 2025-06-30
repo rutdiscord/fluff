@@ -3,7 +3,6 @@ from discord.ext.commands import Cog
 from discord.ext import commands, tasks
 from helpers.datafiles import get_guildfile, set_guildfile
 from helpers.sv_config import get_config
-from helpers.datafiles import fill_profile, set_userfile
 from helpers.embeds import stock_embed, author_embed
 
 
@@ -145,118 +144,6 @@ class Reply(Cog):
         except ZeroDivisionError:
             return
 
-    @commands.bot_has_permissions(embed_links=True)
-    @commands.command()
-    async def replyconfig(self, ctx):
-        """This sets your reply ping preferences.
-
-        Use the reactions to pick your setting.
-        See the [documentation](https://3gou.0ccu.lt/as-a-user/reply-ping-preferences/) for more info.
-
-        No arguments."""
-        override = self.check_override(ctx.message)
-        if override:
-            return await ctx.reply(
-                content="You already have an indicator role, you don't need to set your preferences here.",
-                mention_author=False,
-            )
-
-        profile = fill_profile(ctx.author.id)
-        embed = stock_embed(self.bot)
-        embed.title = "Your reply preference"
-        embed.color = discord.Color.red()
-        author_embed(embed, ctx.author)
-        allowed_mentions = discord.AllowedMentions(replied_user=False)
-
-        def fieldadd():
-            unconfigured = "🔘" if not profile["replypref"] else "⚫"
-            embed.add_field(
-                name="🤷 Unconfigured",
-                value=unconfigured + " Indicates that you have no current preference.",
-                inline=False,
-            )
-
-            pleaseping = "🔘" if profile["replypref"] == "pleasereplyping" else "⚫"
-            embed.add_field(
-                name="<:pleaseping:1258418052651942053> Please Reply Ping",
-                value=pleaseping
-                + " Indicates that you would like to be pinged in replies.",
-                inline=False,
-            )
-
-            waitbeforeping = (
-                "🔘" if profile["replypref"] == "waitbeforereplyping" else "⚫"
-            )
-            embed.add_field(
-                name="<:waitbeforeping:1258418064781738076> Wait Before Reply Ping",
-                value=waitbeforeping
-                + " Indicates that you would only like to be pinged after some time has passed.",
-                inline=False,
-            )
-
-            noping = "🔘" if profile["replypref"] == "noreplyping" else "⚫"
-            embed.add_field(
-                name="<:noping:1258418038504689694> No Reply Ping",
-                value=noping
-                + " Indicates that you do not wish to be reply pinged whatsoever.",
-                inline=False,
-            )
-
-        fieldadd()
-
-        reacts = [
-            "🤷",
-            "<:pleaseping:1258418052651942053>",
-            "<:waitbeforeping:1258418064781738076>",
-            "<:noping:1258418038504689694>",
-        ]
-        configmsg = await ctx.reply(embed=embed, mention_author=False)
-        for react in reacts:
-            await configmsg.add_reaction(react)
-        embed.color = discord.Color.green()
-        await configmsg.edit(embed=embed, allowed_mentions=allowed_mentions)
-
-        def reactioncheck(r, u):
-            return u.id == ctx.author.id and str(r.emoji) in reacts
-
-        try:
-            reaction, user = await self.bot.wait_for(
-                "reaction_add", timeout=30.0, check=reactioncheck
-            )
-        except asyncio.TimeoutError:
-            embed.color = discord.Color.default()
-            for react in reacts:
-                await configmsg.remove_reaction(react, ctx.bot.user)
-            return await configmsg.edit(
-                embed=embed,
-                allowed_mentions=allowed_mentions,
-            )
-        else:
-            if str(reaction) == reacts[0]:
-                profile["replypref"] = None
-                role_name = None
-            elif str(reaction) == reacts[1]:
-                profile["replypref"] = "pleasereplyping"
-                role_name = "Please Ping"
-            elif str(reaction) == reacts[2]:
-                profile["replypref"] = "waitbeforereplyping"
-                role_name = "Ping after Delay"
-            elif str(reaction) == reacts[3]:
-                profile["replypref"] = "noreplyping"
-                role_name = "No Ping"
-
-            set_userfile(ctx.author.id, "profile", json.dumps(profile))
-            if role_name != None and ctx.guild:
-                role = self.bot.pull_role(ctx.guild, role_name)
-                if role:
-                    await ctx.author.add_roles(role)
-            embed.clear_fields()
-            fieldadd()
-            embed.color = discord.Color.gold()
-            for react in reacts:
-                await configmsg.remove_reaction(react, ctx.bot.user)
-            await configmsg.edit(embed=embed, allowed_mentions=allowed_mentions)
-
     # marr is pissed off mode
     @commands.command(name='pissedmode')
     async def pissedmode(self, ctx):
@@ -301,11 +188,10 @@ class Reply(Cog):
                 return
         except:
             return
+    
         preference = self.check_override(refmessage)
         if not preference:
-            preference = fill_profile(refmessage.author.id)["replypref"]
-            if not preference:
-                return
+            return
 
         async def wrap_violation(message):
             if not get_config(message.guild.id, "reaction", "noreply_remind_every"):
@@ -431,25 +317,6 @@ class Reply(Cog):
     async def counttimer(self):
         await self.bot.wait_until_ready()
         self.violations = {}
-
-    @Cog.listener()
-    async def on_member_update(self, before, after):
-        new_roles = set(after.roles) - set(before.roles)
-
-        role_preferences = {
-            "Please Ping": "pleasereplyping",
-            "Ping after Delay": "waitbeforereplyping",
-            "No Ping": "noreplyping",
-        }
-        for role in new_roles:
-            if role.name in role_preferences:
-                profile = fill_profile(after.id)
-                profile["replypref"] = role_preferences[role.name]
-                set_userfile(after.id, "profile", json.dumps(profile))
-                return
-        profile = fill_profile(after.id)
-        profile["replypref"] = None
-        set_userfile(after.id, "profile", json.dumps(profile))
 
 
 async def setup(bot):
