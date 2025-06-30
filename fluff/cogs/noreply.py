@@ -191,7 +191,7 @@ class Reply(Cog):
     
         preference = self.check_override(refmessage)
         if not preference:
-                return
+            return
 
         async def wrap_violation(message):
             if not get_config(message.guild.id, "reaction", "noreply_remind_every"):
