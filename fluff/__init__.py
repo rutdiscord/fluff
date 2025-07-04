@@ -56,6 +56,7 @@ def get_prefix(bot, message):
 # Bot setup.
 intents = discord.Intents.all()
 intents.typing = False
+intents.presences = False
 
 bot = commands.Bot(
     command_prefix=get_prefix,
