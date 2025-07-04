@@ -2,16 +2,6 @@ import json
 import os
 import datetime
 
-# Definitions
-
-userlog_event_types = {
-    "warns": "Warn",
-    "bans": "Ban",
-    "kicks": "Kick",
-    "tosses": "Toss",
-    "notes": "Note",
-}
-
 # Bot Files
 def make_botfile(filename):
     if not os.path.exists("data"):
