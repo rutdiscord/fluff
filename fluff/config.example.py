@@ -22,5 +22,3 @@ long_desc = (
 # [cogs.basic/catbox] Catbox Account Key.
 # Will default to anonymous upload if not supplied.
 catbox_key = None  # Example: "token_goes_here"
-
-database_location = "./data/bot.db"
