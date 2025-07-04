@@ -4,7 +4,6 @@ import traceback
 import random
 import shutil
 import os
-from datetime import datetime
 from discord.ext import commands, tasks
 from discord.ext.commands import Cog
 from helpers.datafiles import get_botfile, delete_job
