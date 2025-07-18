@@ -251,7 +251,7 @@ class Reply(Cog):
             and refmessage.author not in message.mentions
         ):
             try:
-                await message.add_reaction("<:pleaseping:1258418052651942053>")
+                await message.add_reaction("<:pleaseping:1395562189754077255>") #TODO: REMOVE HARDCODE
             except discord.errors.NotFound:
                 pass
             except discord.errors.Forbidden as err:
@@ -266,7 +266,7 @@ class Reply(Cog):
         # If reply pinged at all...
         elif preference == "noreplyping" and refmessage.author in message.mentions:
             try:
-                await message.add_reaction("<:noping:1258418038504689694>")
+                await message.add_reaction("<:noping:1395562187032100995>") #TODO: REMOVE HARDCODE
             except discord.errors.NotFound:
                 await message.channel.send(
                     f"*thump thump* {message.author.mention} Quickdeleting a message that violates ping preferences is not cool!",
@@ -299,7 +299,7 @@ class Reply(Cog):
                 <= self.timers[message.guild.id][refmessage.author.id]
             ):
                 try:
-                    await message.add_reaction("<:waitbeforeping:1258418064781738076>")
+                    await message.add_reaction("<:waitbeforeping:1395562184712654960>") #TODO:REMOVE HARDCODE
                 except discord.errors.NotFound:
                     await message.channel.send(
                         f"*thump thump* {message.author.mention} Quickdeleting a message that violates ping preferences is not cool!",
