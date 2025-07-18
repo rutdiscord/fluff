@@ -514,7 +514,7 @@ class ModToss(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command()
-    async def close(self, ctx, archive=True):
+    async def close(self, ctx, archive=False):
         """This closes a mute session.
 
         Please refer to the tossing section of the [documentation](https://3gou.0ccu.lt/as-a-moderator/the-tossing-system/).
