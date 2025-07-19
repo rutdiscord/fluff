@@ -676,7 +676,7 @@ the true/false portion tells me whether to reload cogs""",
 
         async for message in ctx.channel.history(limit=20):
             if message.author == target:
-                await message.add_reaction("<:rubberhammer:1281079056820998185>")
+                await message.add_reaction("<:rubberhammer:1396123363377811627>")
                 break
 
         await ctx.send(random_message, mention_author=False)
