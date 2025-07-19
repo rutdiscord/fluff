@@ -19,12 +19,6 @@ long_desc = (
     + "Built and coded by renavi, Marr, Meagus and DFU."
 )
 
-# [cogs.shortcuts/prefixes] Maximum prefixes allowed.
-# This setting will cap at 25 prefixes regardless.
-maxprefixes = 6
-# [cogs.shortcuts/aliases] Maximum aliases allowed.
-# This setting will cap at 25 aliases regardless.
-maxaliases = 6
 # [cogs.basic/catbox] Catbox Account Key.
 # Will default to anonymous upload if not supplied.
 catbox_key = None  # Example: "token_goes_here"
