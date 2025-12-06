@@ -60,50 +60,41 @@ Please review rule 6! Your nickname must be at least partially typable using a s
         )
 
     @Cog.listener()
-    async def on_member_join(self, member):
+    async def on_member_join(self, member: discord.Member):
         await self.bot.wait_until_ready()
         if not get_config(member.guild.id, "reaction", "autoreadableenable"):
             return
 
-        name = member.display_name
-
-        # Non-Alphanumeric
-        readable = len([b for b in name if b.isascii()])
-        if readable < self.readablereq:
-            name = unidecode(name) if unidecode(name) else "Unreadable Name"
-
-        # Hoist
-        if name[:1] in ("!", "-", ".", "(", ")", ":"):
-            name = "᲼" + name
-
-        # Validate
-        if len(name) > 32:
-            name = name[:29] + "..."
-        if name != member.display_name:
-            await member.edit(nick=name, reason="Automatic Namecheck")
+        await self.namefix(member)
 
     @Cog.listener()
-    async def on_member_update(self, member_before, member_after):
+    async def on_member_update(self, _, member_after: discord.Member):
         await self.bot.wait_until_ready()
         if not get_config(member_after.guild.id, "reaction", "autoreadableenable"):
             return
 
-        name = member_after.display_name
-
+        await self.namefix(member_after)
+    
+    async def namefix(self, member: discord.Member):
         # Non-Alphanumeric
-        readable = len([b for b in name if b.isascii()])
+        new_name = member.display_name
+        readable = len([b for b in new_name if b.isascii()])
         if readable < self.readablereq:
-            name = unidecode(name) if unidecode(name) else "Unreadable Name"
+            new_name = unidecode(new_name) if unidecode(new_name) else "Unreadable Name"
 
-        # Hoist
-        if name[:1] in ("!", "-", ".", "(", ")", ":"):
-            name = "᲼" + name
+        # Dehoist
+        if new_name[:1] in ("!", "-", ".", "(", ")", ":"):
+            new_name = "᲼" + new_name
 
         # Validate
-        if len(name) > 32:
-            name = name[:29] + "..."
-        if name != member_after.display_name:
-            await member_after.edit(nick=name, reason="Automatic Namecheck")
+        if len(new_name) > 32:
+            new_name = new_name[:29] + "..."
+        if new_name != member.display_name:
+            try:
+                await member.edit(nick=new_name, reason="Automatic Namecheck")
+            except discord.errors.HTTPException:
+                #User likely had a name that turns into a naughty word
+                await member.edit(nick="NAUGHTY_NICKNAME", reason="Automatic Namecheck")
 
 
 async def setup(bot):
