@@ -5,6 +5,7 @@ name = "pypi"
 
 [packages]
 aiohttp = "*"
+aiosqlite = "*"
 "discord.py" = "==2.3.*"
 httplib2 = "*"
 matplotlib = "*"

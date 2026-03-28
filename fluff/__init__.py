@@ -12,6 +12,8 @@ import discord
 import datetime
 import itertools
 from discord.ext import commands
+
+from database.database import Database
 from helpers.datafiles import get_botfile
 from helpers.errors import handle_code_error, handle_command_error
 
@@ -142,6 +144,10 @@ async def on_command_error(ctx, error):
 # Bot startup.
 async def main():
     async with bot:
+        db = Database()
+        await db.init()
+        bot.db = db
+
         for cog in [
             "cogs." + f[:-3]
             for f in os.listdir("cogs/")
@@ -151,7 +157,11 @@ async def main():
                 await bot.load_extension(cog)
             except:
                 log.exception(f"Failed to load cog {cog}.")
-        await bot.start(config.token)
+
+        try:
+            await bot.start(config.token)
+        finally:
+            await db.close()
 
 
 if __name__ == "__main__":
