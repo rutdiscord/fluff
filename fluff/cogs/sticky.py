@@ -90,7 +90,7 @@ class StickyMessage(Cog):
             self.bot.log.error(f"error inserting sticky message into the sticky_message table: {e}")
             return await ctx.send(f"Unable to create sticky message for {channel.mention}")
 
-        self.sticky_messages_by_server[ctx.guild.id][channel.id] = StickyEntry(message, sticky_message_db_id, None, None)
+        self.sticky_messages_by_server[ctx.guild.id][channel.id] = StickyEntry(message, sticky_message_db_id, None)
         return await ctx.send(f"Sticky message set in {channel.mention}")
 
     @sticky.command(aliases=["modify"])
@@ -186,13 +186,11 @@ class StickyMessage(Cog):
             except discord.NotFound:
                 pass
         sent_message = await self.bot.get_channel(channel_id).send(message_data.message)
-        sent_message_time = int(time.time())
         try:
-            await self.sticky_message_repo.update_sticky_message_sent_id_and_timestamp(message_data.db_sticky_message_id, sent_message.id, sent_message_time)
+            await self.sticky_message_repo.update_sticky_message_sent_id(message_data.db_sticky_message_id, sent_message.id)
         except sqlite3.Error as e:
             self.bot.log.error(f"error attempting to update sticky message entry in the database: {e}")
         self.sticky_messages_by_server[server_id][channel_id].last_sticky_message_id = sent_message.id
-        self.sticky_messages_by_server[server_id][channel_id].last_sticky_message_ts = sent_message_time
         await asyncio.sleep(1)  # crude rate limiting
 
     def insert_sticky_server_embed_data(self, ctx: commands.Context, embed: Embed, server_entries: dict[int, StickyEntry]):

@@ -18,12 +18,12 @@ class StickyMessageRepository:
         sticky_messages = {}
         async with self.db.get_read_connection() as conn:
             cursor = await conn.execute(
-                "SELECT id, server_id, channel_id, message, last_message_id, last_message_timestamp FROM sticky_message"
+                "SELECT id, server_id, channel_id, message, last_message_id FROM sticky_message"
             )
             rows = await cursor.fetchall()
 
         for row in rows:
-            db_id, server_id, channel_id, message, last_message_id, last_message_ts = row
+            db_id, server_id, channel_id, message, last_message_id = row
             server_id = int(server_id)
             channel_id = int(channel_id)
             if last_message_id is not None:
@@ -32,7 +32,7 @@ class StickyMessageRepository:
             if server_id not in sticky_messages:
                 sticky_messages[int(server_id)] = {}
 
-            sticky_messages[server_id][channel_id] = StickyEntry(message, db_id, last_message_id, last_message_ts)
+            sticky_messages[server_id][channel_id] = StickyEntry(message, db_id, last_message_id)
 
         return sticky_messages
 
@@ -43,9 +43,9 @@ class StickyMessageRepository:
             try:
                 await conn.execute("BEGIN IMMEDIATE")
                 cursor = await conn.execute(
-                    "INSERT INTO sticky_message (server_id, channel_id, message, last_message_id, last_message_timestamp) "
-                    "VALUES (?,?,?,?,?)",
-                    (server_id, channel_id, message, None, None)
+                    "INSERT INTO sticky_message (server_id, channel_id, message, last_message_id) "
+                    "VALUES (?,?,?,?)",
+                    (server_id, channel_id, message, None)
                 )
                 await conn.commit()
                 return cursor.lastrowid
@@ -67,14 +67,14 @@ class StickyMessageRepository:
                 await conn.rollback()
                 raise
 
-    async def update_sticky_message_sent_id_and_timestamp(self, sticky_message_db_id: int, last_message_id: int, last_message_timestamp: int) -> None:
-        """Updates an existing sticky message's last_message_id and last_message_timestamp column."""
+    async def update_sticky_message_sent_id(self, sticky_message_db_id: int, last_message_id: int) -> None:
+        """Updates an existing sticky message's last_message_id column."""
         async with self.db.get_write_connection() as conn:
             try:
                 await conn.execute("BEGIN IMMEDIATE")
                 await conn.execute(
-                    "UPDATE sticky_message SET last_message_id = ?, last_message_timestamp = ? WHERE id = ?",
-                    (last_message_id, last_message_timestamp, sticky_message_db_id)
+                    "UPDATE sticky_message SET last_message_id = ? WHERE id = ?",
+                    (last_message_id, sticky_message_db_id)
                 )
                 await conn.commit()
             except Exception:
