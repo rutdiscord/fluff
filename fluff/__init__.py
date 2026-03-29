@@ -143,9 +143,7 @@ async def on_command_error(ctx, error):
 
 # Bot startup.
 async def main():
-    async with bot:
-        db = Database()
-        await db.init()
+    async with bot, Database() as db:
         bot.db = db
 
         for cog in [
@@ -158,10 +156,7 @@ async def main():
             except:
                 log.exception(f"Failed to load cog {cog}.")
 
-        try:
-            await bot.start(config.token)
-        finally:
-            await db.close()
+        await bot.start(config.token)
 
 
 if __name__ == "__main__":

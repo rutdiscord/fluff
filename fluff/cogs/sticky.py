@@ -4,7 +4,6 @@ import discord
 from discord import Embed
 from discord.ext import commands, tasks
 from discord.ext.commands import Cog
-import asyncio
 import time
 import io
 
@@ -83,14 +82,13 @@ class StickyMessage(Cog):
         if channel.id in self.sticky_messages_by_server[ctx.guild.id]:
             return await ctx.send("There is already a sticky message in that channel. Use `update` to overwrite the sticky message")
 
-        sticky_message_db_id = None
         try:
-            sticky_message_db_id = await self.sticky_message_repo.create_sticky_message(ctx.guild.id, channel.id, message)
+            await self.sticky_message_repo.create_sticky_message(ctx.guild.id, channel.id, message)
         except sqlite3.Error as e:
             self.bot.log.error(f"error inserting sticky message into the sticky_message table: {e}")
             return await ctx.send(f"Unable to create sticky message for {channel.mention}")
 
-        self.sticky_messages_by_server[ctx.guild.id][channel.id] = StickyEntry(message, sticky_message_db_id, None)
+        self.sticky_messages_by_server[ctx.guild.id][channel.id] = StickyEntry(message, None)
         return await ctx.send(f"Sticky message set in {channel.mention}")
 
     @sticky.command(aliases=["modify"])
@@ -106,7 +104,7 @@ class StickyMessage(Cog):
                 "There is no sticky message for that channel. Use `create` to create a new sticky message")
 
         try:
-            await self.sticky_message_repo.update_sticky_message_content(self.sticky_messages_by_server[ctx.guild.id][channel.id].db_sticky_message_id, message)
+            await self.sticky_message_repo.update_sticky_message_content(ctx.guild.id, channel.id, message)
         except sqlite3.Error as e:
             self.bot.log.error(f"error updating sticky message field in the sticky_message table: {e}")
             return await ctx.send(f"Unable to update sticky message for {channel.mention}")
@@ -134,7 +132,7 @@ class StickyMessage(Cog):
                 pass
 
         try:
-            await self.sticky_message_repo.delete_sticky_message(server_entries[channel.id].db_sticky_message_id)
+            await self.sticky_message_repo.delete_sticky_message(ctx.guild.id, channel.id)
         except sqlite3.Error as e:
             self.bot.log.error(f"error deleting sticky message in the sticky_message table: {e}")
 
@@ -154,8 +152,7 @@ class StickyMessage(Cog):
 
                 latest_message = None
                 try:
-                    messages = [message async for message in channel.history(limit=1)]
-                    latest_message = messages[0] if messages else None
+                    latest_message = await anext(channel.history(limit=1), None)
                 except (discord.Forbidden, discord.HTTPException):
                     continue
 
@@ -187,11 +184,10 @@ class StickyMessage(Cog):
                 pass
         sent_message = await self.bot.get_channel(channel_id).send(message_data.message)
         try:
-            await self.sticky_message_repo.update_sticky_message_sent_id(message_data.db_sticky_message_id, sent_message.id)
+            await self.sticky_message_repo.update_sticky_message_sent_id(server_id, channel_id, sent_message.id)
         except sqlite3.Error as e:
             self.bot.log.error(f"error attempting to update sticky message entry in the database: {e}")
         self.sticky_messages_by_server[server_id][channel_id].last_sticky_message_id = sent_message.id
-        await asyncio.sleep(1)  # crude rate limiting
 
     def insert_sticky_server_embed_data(self, ctx: commands.Context, embed: Embed, server_entries: dict[int, StickyEntry]):
         """Inserts the necessary sticky message information into the embed object"""

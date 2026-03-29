@@ -27,7 +27,8 @@ class Database:
         self.write_conn: aiosqlite.Connection | None = None
         self.write_lock: asyncio.Lock | None = None
 
-    async def init(self):
+    async def __aenter__(self):
+        """Open and initialize the database and its connections"""
         self.read_conn_pool = asyncio.Queue(maxsize=READ_CONNECTION_POOL_SIZE)
         self.write_lock = asyncio.Lock()
 
@@ -42,7 +43,9 @@ class Database:
             await self._setup_wal(conn)
             await self.read_conn_pool.put(conn)
 
-    async def close(self):
+        return self
+
+    async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Close all database connections"""
         while not self.read_conn_pool.empty():
             conn = await self.read_conn_pool.get()
