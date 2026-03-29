@@ -1,205 +1,228 @@
+import sqlite3
+
 import discord
+from discord import Embed
 from discord.ext import commands, tasks
-import asyncio
-import json
-import os
+from discord.ext.commands import Cog
+import time
+import io
 
-STICKY_DATA_FILE = "sticky_messages.json"
+from database.model.StickyMessage import StickyEntry
+from database.repository.sticky_message_repository import StickyMessageRepository
+from helpers.checks import ismod
+from helpers.embeds import stock_embed
 
-class StickyMessage(commands.Cog):
+class StickyMessage(Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.sticky_messages = {}
-        self.repost_tasks = {}
-        self.load_sticky_data()
+        self.sticky_message_repo: StickyMessageRepository = StickyMessageRepository(self.bot.db)
+        self.sticky_messages_by_server: dict[int, dict[int, StickyEntry]] = {} #server id -> {channel id -> Sticky message data}
 
-    def save_sticky_data(self):
-        """Save sticky message data to a JSON file."""
-        with open(STICKY_DATA_FILE, "w") as f:
-            json.dump(self.sticky_messages, f)
+    async def cog_load(self):
+        self.sticky_messages_by_server = await self.sticky_message_repo.get_all_sticky_messages()
+        self.sticky_task.start()
 
-    def load_sticky_data(self):
-        """Load sticky message data from a JSON file."""
-        if os.path.exists(STICKY_DATA_FILE):
-            with open(STICKY_DATA_FILE, "r") as f:
-                self.sticky_messages = json.load(f)
+    async def cog_unload(self):
+        self.sticky_task.cancel()
+
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
+    @commands.check(ismod)
+    @commands.group(invoke_without_command=True)
+    async def sticky(self, ctx: commands.Context, channel: discord.TextChannel | None = None):
+        """Display sticky message information.
+
+        If no channel is provided, lists all sticky messages in the server with a short preview.
+        If a channel is provided, and the channel exists, displays the full sticky message for that channel.
+        Available commands:
+        pls sticky\npls sticky add/create #channel my sticky message\npls sticky update/modify #channel new message here
+        pls sticky delete/remove #channel
+
+        - `channel`
+        The name of the channel that contains the sticky message to display. Optional.
+        """
+        embed = stock_embed(self.bot)
+        embed.title = "Available Sticky Messages"
+        embed.color = discord.Color.red()
+        embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
+
+        server_entries = self.sticky_messages_by_server.get(ctx.guild.id)
+        if not server_entries:
+            embed.add_field(
+                name="No sticky messages",
+                value="There are no sticky messages available in this server.",
+                inline=True
+            )
+            return await self.send_sticky_server_embed(ctx, embed, server_entries)
+        if not channel:
+            self.insert_sticky_server_embed_data(ctx, embed, server_entries)
+            return await self.send_sticky_server_embed(ctx, embed, server_entries)
+
+        message_data = server_entries.get(channel.id)
+        if message_data:
+            return await ctx.reply(
+                message_data.message,
+                mention_author=False,
+                allowed_mentions=discord.AllowedMentions.none()
+            )
         else:
-            self.sticky_messages = {}
+            return await ctx.reply(
+                f"no sticky messages available for {channel.name}",
+                mention_author=False,
+                allowed_mentions=discord.AllowedMentions.none()
+            )
 
-    def startsticky(self, channel):
-        """Start the reposting task for a sticky message."""
-        if channel.id in self.repost_tasks:
-            return  # Prevent multiple tasks for the same channel
+    @sticky.command(aliases=["add"])
+    @commands.guild_only()
+    @commands.check(ismod)
+    async def create(self, ctx: commands.Context, channel: discord.TextChannel, *, message: str):
+        """Create a sticky message for a channel."""
+        if ctx.guild.id not in self.sticky_messages_by_server:
+            self.sticky_messages_by_server[ctx.guild.id] = {}
+        if channel.id in self.sticky_messages_by_server[ctx.guild.id]:
+            return await ctx.send("There is already a sticky message in that channel. Use `update` to overwrite the sticky message")
 
-        async def repost_task():
-            while channel.id in self.sticky_messages:
-                # Wait 60 seconds before checking the latest message
-                await asyncio.sleep(60)
+        try:
+            await self.sticky_message_repo.create_sticky_message(ctx.guild.id, channel.id, message)
+        except sqlite3.Error as e:
+            self.bot.log.error(f"error inserting sticky message into the sticky_message table: {e}")
+            return await ctx.send(f"Unable to create sticky message for {channel.mention}")
 
-                # Check if the sticky message is still active
-                if channel.id not in self.sticky_messages:
-                    break
+        self.sticky_messages_by_server[ctx.guild.id][channel.id] = StickyEntry(message, None)
+        return await ctx.send(f"Sticky message set in {channel.mention}")
 
-                # Fetch the latest message in the channel
-                try:
-                    latest_message = (await channel.history(limit=1).flatten())[0]
-                except IndexError:
-                    latest_message = None
+    @sticky.command(aliases=["modify"])
+    @commands.guild_only()
+    @commands.check(ismod)
+    async def update(self, ctx: commands.Context, channel: discord.TextChannel, *, message: str):
+        """Update an existing sticky message for a channel."""
+        if ctx.guild.id not in self.sticky_messages_by_server:
+            return await ctx.send(
+                "There is no sticky message for this server")
+        if channel.id not in self.sticky_messages_by_server[ctx.guild.id]:
+            return await ctx.send(
+                "There is no sticky message for that channel. Use `create` to create a new sticky message")
 
-                # Get the last sticky message ID
-                last_message_id = self.sticky_messages[channel.id]["last_message_id"]
+        try:
+            await self.sticky_message_repo.update_sticky_message_content(ctx.guild.id, channel.id, message)
+        except sqlite3.Error as e:
+            self.bot.log.error(f"error updating sticky message field in the sticky_message table: {e}")
+            return await ctx.send(f"Unable to update sticky message for {channel.mention}")
 
-                # If the latest message is the bot's sticky, skip waiting for the interval
-                if latest_message and latest_message.id == last_message_id:
+        self.sticky_messages_by_server[ctx.guild.id][channel.id].message = message
+        return await ctx.send(f"Sticky message updated in {channel.mention}")
+
+    @sticky.command(aliases=["remove"])
+    @commands.guild_only()
+    @commands.check(ismod)
+    async def delete(self, ctx: commands.Context, channel: discord.TextChannel):
+        """Delete an existing sticky message for a channel."""
+        server_entries = self.sticky_messages_by_server.get(ctx.guild.id)
+        if not server_entries:
+            return await ctx.send("There are no sticky messages for this server")
+
+        if channel.id not in server_entries:
+            return await ctx.send("There is no sticky message set for that channel")
+
+        if server_entries[channel.id].last_sticky_message_id is not None:
+            try:
+                previous_message = await channel.fetch_message(server_entries[channel.id].last_sticky_message_id)
+                await previous_message.delete()
+            except discord.NotFound:
+                pass
+
+        try:
+            await self.sticky_message_repo.delete_sticky_message(ctx.guild.id, channel.id)
+        except sqlite3.Error as e:
+            self.bot.log.error(f"error deleting sticky message in the sticky_message table: {e}")
+
+        del server_entries[channel.id]
+        return await ctx.send(f"Sticky message removed in {channel.mention}")
+
+
+    @tasks.loop(minutes=1)
+    async def sticky_task(self):
+        """Scheduled cron job task that runs every minute. This job is responsible for
+        determining if a channel with a sticky message needs to re-send the message."""
+        for server_id, server_sticky_messages in list(self.sticky_messages_by_server.items()):
+            for channel_id, message_data in list(server_sticky_messages.items()):
+                channel = self.bot.get_channel(channel_id)
+                if channel is None:
                     continue
 
-                # Wait for the interval specified in the setsticky command
-                await asyncio.sleep(self.sticky_messages[channel.id]["interval"] * 60)
-
-                # Check again if the sticky message is still active
-                if channel.id not in self.sticky_messages:
-                    break
-
-                # Fetch the latest message again to ensure it's not the bot's sticky
+                latest_message = None
                 try:
-                    latest_message = (await channel.history(limit=1).flatten())[0]
-                except IndexError:
-                    latest_message = None
+                    latest_message = await anext(channel.history(limit=1), None)
+                except (discord.Forbidden, discord.HTTPException):
+                    continue
 
-                # If the latest message is still not the bot's sticky, repost the sticky
-                if not latest_message or latest_message.id != last_message_id:
-                    # Delete the previous sticky message if it exists
-                    if last_message_id:
-                        try:
-                            last_message = await channel.fetch_message(last_message_id)
-                            await last_message.delete()
-                        except discord.NotFound:
-                            pass  # Message was already deleted
-
-                    # Send the new sticky message
-                    new_message = await channel.send(self.sticky_messages[channel.id]["message"])
-                    self.sticky_messages[channel.id]["last_message_id"] = new_message.id
-                    self.save_sticky_data()  # Save updated last_message_id
-
-        # Start the reposting task
-        self.repost_tasks[channel.id] = self.bot.loop.create_task(repost_task())
-
-    def stopsticky(self, channel):
-        """Stop the reposting task for a sticky message."""
-        if channel.id in self.repost_tasks:
-            self.repost_tasks[channel.id].cancel()
-            del self.repost_tasks[channel.id]
-
-    @commands.command()
-    @commands.has_permissions(manage_messages=True)
-    async def setsticky(self, ctx, channel: discord.TextChannel, interval: int, *, message: str):
-        """Set a sticky message in a channel."""
-        if channel.id in self.sticky_messages:
-            await ctx.send("There is already a sticky message in this channel. Use `removesticky` to remove it first.")
-            return
-
-        self.sticky_messages[channel.id] = {
-            "message": message,
-            "interval": interval,
-            "last_message_id": None
-        }
-        self.save_sticky_data()
-        self.startsticky(channel)
-        await ctx.send(f"Sticky message set in {channel.mention} with an interval of {interval} minutes.")
-
-    @commands.command()
-    @commands.has_permissions(manage_messages=True)
-    async def removesticky(self, ctx, channel: discord.TextChannel):
-        """Remove the sticky message from a channel."""
-        if channel.id in self.sticky_messages:
-            self.stopsticky(channel)
-            del self.sticky_messages[channel.id]
-            self.save_sticky_data()
-            await ctx.send(f"Sticky message removed from {channel.mention}.")
-        else:
-            await ctx.send(f"There is no sticky message set in {channel.mention}.")
-
-    @commands.command()
-    @commands.has_permissions(manage_messages=True)
-    async def clearstickies(self, ctx):
-        """
-        Stop all sticky messages and clear all data.
-        This will stop all running sticky tasks and clear the sticky message data.
-        """
-        # Stop all running sticky tasks
-        for channel_id, task in list(self.repost_tasks.items()):
-            task.cancel()  # Cancel the task
-            del self.repost_tasks[channel_id]  # Remove it from the task dictionary
-
-        # Clear sticky message data
-        self.sticky_messages.clear()
-        self.save_sticky_data()  # Save the cleared state to JSON
-
-        await ctx.send("All sticky messages have been stopped and cleared.")
-
-    @commands.command()
-    @commands.has_permissions(manage_messages=True)
-    async def liststickies(self, ctx):
-        """
-        List all active sticky messages.
-        This will display all channels with active sticky messages and their details.
-        """
-        if not self.sticky_messages:
-            await ctx.send("There are no active sticky messages.")
-            return
-
-        description = []
-        for channel_id, data in self.sticky_messages.items():
-            channel = self.bot.get_channel(int(channel_id))
-            if channel:
-                description.append(
-                    f"**Channel:** {channel.mention}\n"
-                    f"**Message:** {data['message']}\n"
-                    f"**Interval:** {data['interval']} minutes\n"
+                time_since_last_message = (
+                    int(time.time()) - int(latest_message.created_at.timestamp())
+                    if latest_message is not None
+                    else 0
                 )
 
-        embed = discord.Embed(
-            title="Active Sticky Messages",
-            description="\n\n".join(description),
-            color=discord.Color.blue(),
-        )
-        await ctx.send(embed=embed)
+                if latest_message is not None and latest_message.id == message_data.last_sticky_message_id:
+                    continue
+                if latest_message is None or time_since_last_message >= 300:
+                    try:
+                        await self.send_sticky_message(server_id, channel_id, channel, message_data)
+                    except Exception as e:
+                        self.bot.log.error(f"error attempting to send/save sticky message data: {e}")
 
-    @commands.Cog.listener()
-    async def on_message(self, message):
-        """Reset the repost timer if a new message is sent in a sticky channel."""
-        if message.channel.id in self.sticky_messages and not message.author.bot:
-            # Cancel the current task
-            if message.channel.id in self.repost_tasks:
-                self.repost_tasks[message.channel.id].cancel()
-                del self.repost_tasks[message.channel.id]
+    @sticky_task.before_loop
+    async def before_sticky_task(self):
+        await self.bot.wait_until_ready()
 
-            # Restart the sticky task
-            self.startsticky(message.channel)
+    async def send_sticky_message(self, server_id: int, channel_id: int, channel: discord.TextChannel, message_data: StickyEntry):
+        """Sends a sticky message to a channel. If a previous sticky message exists, it is deleted before sending the new message."""
+        if message_data.last_sticky_message_id is not None:
+            try:
+                previous_message = await channel.fetch_message(message_data.last_sticky_message_id)
+                await previous_message.delete()
+            except discord.NotFound:
+                pass
+        sent_message = await self.bot.get_channel(channel_id).send(message_data.message)
+        try:
+            await self.sticky_message_repo.update_sticky_message_sent_id(server_id, channel_id, sent_message.id)
+        except sqlite3.Error as e:
+            self.bot.log.error(f"error attempting to update sticky message entry in the database: {e}")
+        self.sticky_messages_by_server[server_id][channel_id].last_sticky_message_id = sent_message.id
+
+    def insert_sticky_server_embed_data(self, ctx: commands.Context, embed: Embed, server_entries: dict[int, StickyEntry]):
+        """Inserts the necessary sticky message information into the embed object"""
+        for channel_id, message_data in list(server_entries.items()):
+            embed.add_field(
+                name=f"**{ctx.guild.get_channel(channel_id)}**",
+                value=(
+                        "> "
+                        + discord.utils.remove_markdown(
+                    message_data.message[:60].replace("\n", " ")
+                )
+                ),
+                inline=True
+            )
+
+    async def send_sticky_server_embed(self, ctx: commands.Context, embed: Embed, server_entries: dict[int, StickyEntry]):
+        """Sends the constructed embed as a reply to the user. If there are too many fields inside the embed, then
+        the embed is converted and sent as a file."""
+        try:
+            await ctx.reply(embed=embed, mention_author=False)
+        except discord.errors.HTTPException as exception:  # Over 25 embed fields
+            if exception.code == 50035:
+                file_content = ""
+                for channel_id, message_data in list(server_entries.items()):
+                    file_content += f"\nChannel: {ctx.guild.get_channel(channel_id).name}\n" + (
+                            "> "
+                            + message_data.message
+                            + "\n"
+                    )
+                await ctx.send(
+                    file=discord.File(
+                        io.StringIO(file_content),  # type:ignore
+                        filename=f"stickies-{ctx.guild.id}.txt",
+                    )
+                )
 
 async def setup(bot):
-    cog = StickyMessage(bot)
-    cog.load_sticky_data()
-
-    # Start sticky tasks for all channels in sticky_messages
-    for channel_id in cog.sticky_messages.keys():
-        channel = bot.get_channel(int(channel_id))
-        if channel:
-            # Immediately post the sticky message
-            last_message_id = cog.sticky_messages[channel_id].get("last_message_id")
-            if last_message_id:
-                try:
-                    last_message = await channel.fetch_message(last_message_id)
-                    await last_message.delete()
-                except discord.NotFound:
-                    pass  # Message was already deleted
-
-            # Send the sticky message immediately
-            new_message = await channel.send(cog.sticky_messages[channel_id]["message"])
-            cog.sticky_messages[channel_id]["last_message_id"] = new_message.id
-            cog.save_sticky_data()
-
-            # Start the sticky task
-            cog.startsticky(channel)
-
-    await bot.add_cog(cog)
+    await bot.add_cog(StickyMessage(bot))
