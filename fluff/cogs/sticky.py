@@ -112,7 +112,7 @@ class StickyMessage(Cog):
         message_id_to_update = self.sticky_messages_by_server[ctx.guild.id][channel.id].last_sticky_message_id
         if message_id_to_update is not None:
             try:
-                current_message = await channel.fetch_message(self.sticky_messages_by_server[ctx.guild.id][channel.id].last_sticky_message_id)
+                current_message = await channel.fetch_message(message_id_to_update)
                 await current_message.edit(content=message)
             except (discord.NotFound, discord.HTTPException):
                 pass

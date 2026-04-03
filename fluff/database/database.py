@@ -23,9 +23,9 @@ logger = logging.getLogger('discord')
 class Database:
     def __init__(self):
         self.db_path: str = f"data/{DB_NAME}"
-        self.read_conn_pool: asyncio.Queue[aiosqlite.Connection] | None = None
-        self.write_conn: aiosqlite.Connection | None = None
-        self.write_lock: asyncio.Lock | None = None
+        self.read_conn_pool: asyncio.Queue[aiosqlite.Connection]
+        self.write_conn: aiosqlite.Connection
+        self.write_lock: asyncio.Lock
 
     async def __aenter__(self):
         """Open and initialize the database and its connections"""
@@ -67,7 +67,12 @@ class Database:
     async def get_write_connection(self):
         """Context manager for preventing multiple write connections"""
         async with self.write_lock:
-            yield self.write_conn
+            try:
+                yield self.write_conn
+            except Exception:
+                await self.write_conn.rollback()
+                raise
+
 
     async def _setup_wal(self, conn: aiosqlite.Connection):
         """Helper method to apply standard pragmas for each connection"""
