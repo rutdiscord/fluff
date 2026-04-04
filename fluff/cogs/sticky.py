@@ -109,6 +109,14 @@ class StickyMessage(Cog):
             self.bot.log.error(f"error updating sticky message field in the sticky_message table: {e}")
             return await ctx.send(f"Unable to update sticky message for {channel.mention}")
 
+        message_id_to_update = self.sticky_messages_by_server[ctx.guild.id][channel.id].last_sticky_message_id
+        if message_id_to_update is not None:
+            try:
+                current_message = await channel.fetch_message(message_id_to_update)
+                await current_message.edit(content=message)
+            except (discord.NotFound, discord.HTTPException):
+                pass
+
         self.sticky_messages_by_server[ctx.guild.id][channel.id].message = message
         return await ctx.send(f"Sticky message updated in {channel.mention}")
 
