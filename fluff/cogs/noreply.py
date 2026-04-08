@@ -1,10 +1,17 @@
+import sqlite3
+
 import discord, json, asyncio
 from discord.ext.commands import Cog
 from discord.ext import commands, tasks
+
+from database.repository.whitelist_ping_repository import WhitelistPingRepository
 from helpers.datafiles import get_guildfile, set_guildfile
 from helpers.sv_config import get_config
-from helpers.embeds import stock_embed, author_embed
 
+REPLY_PING = "pleasereplyping"
+NO_REPLY_PING = "noreplyping"
+PING_AFTER_DELAY = "waitbeforereplyping"
+WHITELIST_PING = "whitelistping"
 
 class Reply(Cog):
     """
@@ -13,6 +20,7 @@ class Reply(Cog):
 
     def __init__(self, bot):
         self.bot = bot
+        self.whitelist_ping_repo: WhitelistPingRepository = WhitelistPingRepository(self.bot.db)
         self.violations = {}
         self.timers = {}
         self.counttimer.start()
@@ -22,16 +30,20 @@ class Reply(Cog):
     def cog_unload(self):
         self.counttimer.cancel()
 
-    def check_override(self, message):
+    def check_override(self, message) -> str | None:
         if not message.guild:
             return None
         setting_roles = [
-            (self.bot.pull_role(message.guild, "Please Ping"), "pleasereplyping"),
+            (self.bot.pull_role(message.guild, "Please Ping"), REPLY_PING),
             (
                 self.bot.pull_role(message.guild, "Ping after Delay"),
-                "waitbeforereplyping",
+                PING_AFTER_DELAY,
             ),
-            (self.bot.pull_role(message.guild, "No Ping"), "noreplyping"),
+            (
+                self.bot.pull_role(message.guild, "Whitelist Ping"),
+                WHITELIST_PING
+            ),
+            (self.bot.pull_role(message.guild, "No Ping"), NO_REPLY_PING),
         ]
         for role, identifier in setting_roles:
             if role == None:
@@ -247,7 +259,7 @@ class Reply(Cog):
 
         # If not reply pinged...
         if (
-            preference == "pleasereplyping"
+            preference == REPLY_PING
             and refmessage.author not in message.mentions
         ):
             try:
@@ -263,8 +275,14 @@ class Reply(Cog):
             await self.bot.await_message(message.channel, refmessage.author, 86400)
             return await pokemsg.delete()
 
-        # If reply pinged at all...
-        elif preference == "noreplyping" and refmessage.author in message.mentions:
+        # If reply pinged with no_reply_ping role,
+        # or reply pinged with whitelist_ping role, and user is not in the pinged users whitelist
+        elif (
+                (preference == NO_REPLY_PING and refmessage.author in message.mentions) or
+                (preference == WHITELIST_PING and refmessage.author in message.mentions and
+                 not await self.is_user_whitelisted(refmessage.author.id, message.author.id)
+                )
+        ):
             try:
                 await message.add_reaction("<:noping:1395562187032100995>") #TODO: REMOVE HARDCODE
             except discord.errors.NotFound:
@@ -282,7 +300,7 @@ class Reply(Cog):
 
         # If reply pinged in a window of time...
         elif (
-            preference == "waitbeforereplyping"
+            preference == PING_AFTER_DELAY
             and refmessage.author in message.mentions
         ):
             if message.guild.id not in self.timers:
@@ -308,6 +326,14 @@ class Reply(Cog):
                         )
                 await wrap_violation(message)
             return
+
+    async def is_user_whitelisted(self, pinged_user_id: int, pinged_by_id: int) -> bool:
+        """Returns whether the pinged_by user is in the pinged users whitelist"""
+        try:
+            return await self.whitelist_ping_repo.is_user_in_whitelist(pinged_user_id, pinged_by_id)
+        except sqlite3.Error as err:
+            self.bot.log.error(f"Error checking if {pinged_by_id} is in {pinged_user_id}'s whitelist")
+            return True #fail open
 
     @tasks.loop(hours=1)
     async def counttimer(self):

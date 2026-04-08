@@ -43,7 +43,7 @@ class StickyMessageRepository:
             await conn.execute(
                 "INSERT INTO sticky_message (server_id, channel_id, message, last_message_id) "
                 "VALUES (?,?,?,?)",
-                (server_id, channel_id, message, None)
+                (str(server_id), str(channel_id), message, None)
             )
             await conn.commit()
 
@@ -54,7 +54,7 @@ class StickyMessageRepository:
         async with self.db.get_write_connection() as conn:
             await conn.execute(
                 "UPDATE sticky_message SET message = ? WHERE server_id = ? AND channel_id = ?",
-                (message, server_id, channel_id)
+                (message, str(server_id), str(channel_id))
             )
             await conn.commit()
 
@@ -63,7 +63,7 @@ class StickyMessageRepository:
         async with self.db.get_write_connection() as conn:
             await conn.execute(
                 "UPDATE sticky_message SET last_message_id = ? WHERE server_id = ? AND channel_id = ?",
-                (last_message_id, server_id, channel_id)
+                (str(last_message_id), str(server_id), str(channel_id))
             )
             await conn.commit()
 
@@ -72,6 +72,6 @@ class StickyMessageRepository:
         async with self.db.get_write_connection() as conn:
             await conn.execute(
                 "DELETE FROM sticky_message WHERE server_id = ? AND channel_id = ?",
-                (server_id, channel_id)
+                (str(server_id), str(channel_id))
             )
             await conn.commit()
