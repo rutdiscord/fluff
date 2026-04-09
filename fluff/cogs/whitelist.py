@@ -7,7 +7,7 @@ from discord.ext.commands import Cog
 
 from database.repository.whitelist_ping_repository import WhitelistPingRepository
 from helpers.embeds import stock_embed
-from helpers.mention_or_id_converter import MentionOrIDMember
+from converter.mention_or_id_converter import MentionOrIDUser, MentionOrIDMember
 import io
 
 MAX_CHARACTERS_PER_EMBED = 980
@@ -22,7 +22,7 @@ class Whitelist(Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.group(invoke_without_command=True)
-    async def whitelist(self, ctx: commands.Context, user: Optional[MentionOrIDMember] = None):
+    async def whitelist(self, ctx: commands.Context, user: Optional[MentionOrIDUser] = None):
         """Display whitelisted users.
 
         Please note that whitelisting only applies if you have the whitelist ping role.
@@ -101,7 +101,7 @@ class Whitelist(Cog):
 
     @whitelist.command()
     @commands.guild_only()
-    async def remove(self, ctx: commands.Context, members: commands.Greedy[MentionOrIDMember]):
+    async def remove(self, ctx: commands.Context, members: commands.Greedy[MentionOrIDUser]):
         """Removes a list of members from the users whitelist."""
         if not members:
             return await ctx.reply(content="Please include at least one valid user ID or user mention",
