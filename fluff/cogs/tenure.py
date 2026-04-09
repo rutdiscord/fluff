@@ -92,25 +92,25 @@ class Tenure(Cog):
                 mention_author=False,
             )
 
+        if tenure_role in ctx.author.roles:
+            return await ctx.reply(
+                f"You joined around {tenure_timestamp} (to be more exact, {tenure_dt} ago), and you've already been assigned the {tenure_role.name} role!",
+                mention_author=False,
+            )
+
         if tenure_days >= tenure_threshold:
-            if tenure_role not in ctx.author.roles:
-                await ctx.author.add_roles(tenure_role, reason="Fluff Tenure")
-                return await ctx.reply(
-                    f"You joined around {tenure_timestamp} (to be more exact, `{tenure_dt}` ago)! You've been here long enough to be assigned the {tenure_role.name} role!",
-                    mention_author=False,
-                )
-            else:
-                await ctx.reply(
-                    f"You joined around {tenure_timestamp} (to be more exact, `{tenure_dt}` ago), and you've already been assigned the {tenure_role.name} role!",
-                    mention_author=False,
-                )
+            await ctx.author.add_roles(tenure_role, reason="Fluff Tenure")
+            return await ctx.reply(
+                f"You joined around {tenure_timestamp} (to be more exact, {tenure_dt} ago)! You've been here long enough to be assigned the {tenure_role.name} role!",
+                mention_author=False,
+            )
         else:
             time_dt = timedelta(days=tenure_threshold) - tenure_dt
             time_now = datetime.now().timestamp()
             try_in = int(time_now + time_dt.total_seconds())
             try_timestamp = time(try_in, 'R')
 
-            await ctx.reply(
+            return await ctx.reply(
                 f"You joined around {tenure_timestamp} (to be more exact, `{tenure_dt}` ago)! Not long enough, though... Try again {try_timestamp}!",
                 mention_author=False,
             )

@@ -15,13 +15,17 @@ class ModLocks(Cog):
         self, channel: discord.TextChannel, role, allow_send, issuer
     ):
         try:
-            roleobj = channel.guild.get_role(role)
+            roleobj = role if isinstance(role, discord.Role) else channel.guild.get_role(role)
             overrides = channel.overwrites_for(roleobj)
             overrides.send_messages = allow_send
+            overrides.create_public_threads = allow_send
+            overrides.create_private_threads = allow_send
+            overrides.send_messages_in_threads = allow_send
             await channel.set_permissions(
                 roleobj, overwrite=overrides, reason=str(issuer)
             )
-        except:
+        except Exception as e:
+            self.bot.log.error(f"error in set_sendmessage: {str(e)}")
             pass
 
     async def unlock_for_staff(self, channel: discord.TextChannel, issuer):
