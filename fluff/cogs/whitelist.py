@@ -1,4 +1,5 @@
 import sqlite3
+from typing import Optional
 
 import discord
 from discord.ext import commands
@@ -21,28 +22,55 @@ class Whitelist(Cog):
     @commands.bot_has_permissions(embed_links=True)
     @commands.guild_only()
     @commands.group(invoke_without_command=True)
-    async def whitelist(self, ctx: commands.Context):
-        """Display users you have whitelisted.
+    async def whitelist(self, ctx: commands.Context, user: Optional[MentionOrIDMember] = None):
+        """Display whitelisted users.
 
         Please note that whitelisting only applies if you have the whitelist ping role.
         Available commands:
         pls whitelist\npls whitelist add user1, user2, etc\npls whitelist remove user1, user2, etc
+        pls whitelist user\n pls whitelist check
 
-        No arguments
+        - `user`
+        The user whose whitelist you would like to check. Optional. returns your own whitelist if no user is passed
         """
         whitelisted_users = list()
+        user_id = user.id if user else ctx.author.id
         try:
-            whitelisted_users = await self.whitelist_ping_repo.get_whitelisted_users(ctx.author.id)
+            whitelisted_users = await self.whitelist_ping_repo.get_whitelisted_users(user_id)
         except sqlite3.Error as err:
-            self.bot.log.error(f"Failed to get whitelisted users for user ID {ctx.author.id}: {err}")
+            self.bot.log.error(f"Failed to get whitelisted users for user ID {user_id}: {err}")
             return await ctx.reply(content="Unable to get whitelisted users", mention_author=False)
 
         if not whitelisted_users:
+            if user_id == ctx.author.id:
+                return await ctx.reply(
+                    content="You have not whitelisted any users yet. Use `pls whitelist add` to add users to your whitelist.",
+                    mention_author=False)
+            else:
+                return await ctx.reply(
+                    content="This user has not whitelisted any users yet.",
+                    mention_author=False)
+
+        user_name = user.display_name if user else ctx.author.display_name
+        return await self.create_and_send_whitelist_embed(f"Whitelisted users for {user_name}", f"whitelisted-users-{user_id}", ctx, whitelisted_users)
+
+    @whitelist.command()
+    @commands.guild_only()
+    async def check(self, ctx: commands.Context):
+        """Returns all users who have the author in their whitelist"""
+        users_who_have_whitelisted_author = list()
+        try:
+            users_who_have_whitelisted_author = await self.whitelist_ping_repo.get_users_who_whitelisted_user(ctx.author.id)
+        except sqlite3.Error as err:
+            self.bot.log.error(f"Failed to get users who have whitelisted user ID {ctx.author.id}: {err}")
+            return await ctx.reply(content="Unable to get users who have whitelisted you", mention_author=False)
+
+        if not users_who_have_whitelisted_author:
             return await ctx.reply(
-                content="You have not whitelisted any users yet. Use `pls whitelist add` to add users to your whitelist",
+                content="No one has whitelisted you yet.",
                 mention_author=False)
 
-        return await self.create_and_send_whitelist_embed(ctx, whitelisted_users)
+        return await self.create_and_send_whitelist_embed(f"Users who have whitelisted {ctx.author.display_name}", f"users-who-whitelisted-{ctx.author.id}", ctx, users_who_have_whitelisted_author)
 
     @whitelist.command()
     @commands.guild_only()
@@ -59,16 +87,16 @@ class Whitelist(Cog):
             if member.bot:
                 return await ctx.reply(content="Bots cannot be added to your whitelist", mention_author=False)
             user_ids_to_whitelist.append(member.id)
-
+        inserted = 0
         try:
-            await self.whitelist_ping_repo.add_whitelisted_users(ctx.author.id, user_ids_to_whitelist)
+            inserted = await self.whitelist_ping_repo.add_whitelisted_users(ctx.author.id, user_ids_to_whitelist)
         except sqlite3.Error as err:
             self.bot.log.error(f"Failed to add whitelisted users for {ctx.author.id}: {err}")
             return await ctx.reply(
-                content="Unable to add users to your whitelist. Make sure you aren't trying to whitelist someone who you have already whitelisted",
+                content="Unable to add users to your whitelist. Make sure you aren't trying to whitelist someone who you have already whitelisted.",
                 mention_author=False)
 
-        return await ctx.reply(content=f"Successfully added {len(user_ids_to_whitelist)} users to your whitelist",
+        return await ctx.reply(content=f"Successfully added {inserted} users to your whitelist",
                                mention_author=False)
 
     @whitelist.command()
@@ -96,11 +124,11 @@ class Whitelist(Cog):
             return await ctx.reply(content=f"Removed {user_ids_deleted}/{len(user_ids_to_remove)} mentioned users. Some users were not in your whitelist",
                                    mention_author=False)
 
-    async def create_and_send_whitelist_embed(self, ctx: commands.Context, user_ids: list[int]):
+    async def create_and_send_whitelist_embed(self, embed_title: str, file_title: str, ctx: commands.Context, user_ids: list[int]):
         """Constructs the embed consisting of the users that are whitelisted, and sends the response"""
         embed = stock_embed(self.bot)
         embed.color = discord.Color.light_embed()
-        embed.title = f"Whitelisted users for {ctx.author.display_name}"
+        embed.title = embed_title
 
         partitioned_user_mentions = self.partition_user_mentions(user_ids)
         for user_mention in partitioned_user_mentions:
@@ -120,7 +148,7 @@ class Whitelist(Cog):
             await ctx.send(
                 file=discord.File(
                     io.StringIO(file_content),  # type:ignore
-                    filename=f"whitelisted-users-{ctx.author.display_name}.txt",
+                    filename=f"{file_title}.txt",
                 )
             )
         else:
@@ -139,10 +167,10 @@ class Whitelist(Cog):
 
         for user_id in user_ids:
             mention = f"<@{user_id}>"
-            # + 2 for ", "
-            characters_added = len(mention) + 2
+            # + 3 for " | "
+            characters_added = len(mention) + 3
             if current_len + characters_added > MAX_CHARACTERS_PER_EMBED:
-                partitions.append(', '.join(current))
+                partitions.append(' | '.join(current))
                 current = [mention]
                 current_len = characters_added
             else:
@@ -150,7 +178,7 @@ class Whitelist(Cog):
                 current_len += characters_added
 
         if current:
-            partitions.append(', '.join(current))
+            partitions.append(' | '.join(current))
 
         return partitions
 
