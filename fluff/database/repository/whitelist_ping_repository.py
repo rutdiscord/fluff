@@ -16,6 +16,17 @@ class WhitelistPingRepository:
 
             return [int(row[0]) for row in rows]
 
+    async def get_users_who_whitelisted_user(self, user_id: int) -> list[int]:
+        """Gets a list of user ID's who have whitelisted this user"""
+        async with self.db.get_read_connection() as conn:
+            cursor = await conn.execute(
+                "SELECT user_id FROM whitelist_ping WHERE whitelisted_user_id = ?",
+                (str(user_id),)
+            )
+            rows = await cursor.fetchall()
+
+            return [int(row[0]) for row in rows]
+
 
     async def is_user_in_whitelist(self, pinged_user_id: int, pinged_by_id: int) -> bool:
         """Determines if the pinged_by user is in the pinged user's whitelist.
@@ -31,16 +42,20 @@ class WhitelistPingRepository:
             row = await cursor.fetchone()
             return bool(row[0])
 
-    async def add_whitelisted_users(self, user_id: int, users_to_whitelist: list[int]) -> None:
+    async def add_whitelisted_users(self, user_id: int, users_to_whitelist: list[int]) -> int:
         """Adds the list of user ID's to the users whitelist"""
         async with self.db.get_write_connection() as conn:
+            inserted = 0
             for user_id_to_whitelist in users_to_whitelist:
-                await conn.execute(
-                    "INSERT INTO whitelist_ping (user_id, whitelisted_user_id) "
+                cursor = await conn.execute(
+                    "INSERT OR IGNORE INTO whitelist_ping (user_id, whitelisted_user_id) "
                     "VALUES (?,?)",
                     (str(user_id), str(user_id_to_whitelist))
                 )
+                inserted += cursor.rowcount
             await conn.commit()
+
+            return inserted
 
     async def remove_whitelisted_users(self, user_id: int, users_to_remove: list[int]) -> int:
         """removes the list of user ID's from the users whitelist
