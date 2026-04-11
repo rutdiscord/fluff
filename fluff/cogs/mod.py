@@ -732,6 +732,17 @@ class Mod(Cog):
         async with channel.typing():
             await asyncio.sleep(duration)
 
+    @commands.check(ismod)
+    @commands.guild_only()
+    @commands.command(aliases=["msg"])
+    async def message(self, ctx: commands.Context, target: discord.User, *, message: str = ""):
+        try:
+            await target.send(message)
+        except Exception as e:
+            return await ctx.reply("Unable to send a DM to this user", mention_author=False)
+
+        return await ctx.reply(f"Message sent to {target.display_name}.", mention_author=False)
+
 
 async def setup(bot):
     await bot.add_cog(Mod(bot))
