@@ -13,6 +13,8 @@ import os
 import base64
 from io import StringIO
 from contextlib import redirect_stdout
+
+from helpers import datafiles
 from helpers.embeds import stock_embed
 from helpers.checks import ismanager
 from helpers.sv_config import get_config
@@ -174,15 +176,18 @@ class Admin(Cog):
         be a massive security risk.
 
         No arguments."""
-        shutil.make_archive("data_export", "zip", "data")
+        # make backup of database first.
+        await self.bot.db.perform_backup()
+        zip_name = "data_export"
+        datafiles.make_backup(zip_name)
         try:
             await ctx.author.send(
                 content=f"Current bot data...",
-                file=discord.File("data_export.zip"),
+                file=discord.File(f"{zip_name}.zip"),
             )
         except:
             await ctx.reply(content=random_msg("err_dmfail"), mention_author=False)
-        os.remove("data_export.zip")
+        os.remove(f"{zip_name}.zip")
 
     @commands.check(ismanager)
     @commands.dm_only()

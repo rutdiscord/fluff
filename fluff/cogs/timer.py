@@ -2,14 +2,14 @@ import time
 import discord
 import traceback
 import random
-import shutil
 import os
 from discord.ext import commands, tasks
 from discord.ext.commands import Cog
+
+from helpers import datafiles
 from helpers.datafiles import get_botfile, delete_job
 from helpers.checks import ismanager
 from helpers.placeholders import game_type, game_names
-
 
 class Timer(Cog):
     def __init__(self, bot):
@@ -115,13 +115,16 @@ class Timer(Cog):
         await self.bot.wait_until_ready()
         log_channel = self.bot.get_channel(self.bot.config.logchannel)
         try:
-            shutil.make_archive("data_backup", "zip", "data")
+            #make backup of database first.
+            await self.bot.db.perform_backup()
+            zip_name = "data_backup"
+            datafiles.make_backup(zip_name)
             for m in self.bot.config.managers:
                 await self.bot.get_user(m).send(
                     content="Daily backups:",
-                    file=discord.File("data_backup.zip"),
+                    file=discord.File(f"{zip_name}.zip"),
                 )
-            os.remove("data_backup.zip")
+            os.remove(f"{zip_name}.zip")
         except:
             # Don't kill cronjobs if something goes wrong.
             await log_channel.send(
