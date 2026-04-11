@@ -8,6 +8,7 @@ import aiosqlite
 from contextlib import asynccontextmanager
 
 DB_NAME = "fluff_database.db"
+BACKUP_DB_NAME = "fluff_database_backup.db"
 READ_CONNECTION_POOL_SIZE = 3
 
 # ^V     -> Starts with a capital V
@@ -23,6 +24,7 @@ logger = logging.getLogger('discord')
 class Database:
     def __init__(self):
         self.db_path: str = f"data/{DB_NAME}"
+        self.db_backup_path: str = f"data/{BACKUP_DB_NAME}"
         self.read_conn_pool: asyncio.Queue[aiosqlite.Connection]
         self.write_conn: aiosqlite.Connection
         self.write_lock: asyncio.Lock
@@ -72,6 +74,12 @@ class Database:
             except Exception:
                 await self.write_conn.rollback()
                 raise
+
+    async def perform_backup(self):
+        """Creates a backup of the sqlite database"""
+        async with self.get_write_connection() as conn:
+            async with aiosqlite.connect(self.db_backup_path) as backup_conn:
+                await conn.backup(backup_conn)
 
 
     async def _setup_wal(self, conn: aiosqlite.Connection):
