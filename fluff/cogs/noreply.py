@@ -287,7 +287,7 @@ class Reply(Cog):
                 if preference == NO_REPLY_PING:
                     await message.add_reaction("<:noping:1395562187032100995>") #TODO: REMOVE HARDCODE
                 elif preference == WHITELIST_PING:
-                    await message.add_reaction("<:whitelistping:1491923887171305492>")  # TODO: REMOVE HARDCODE
+                    await message.add_reaction("<:whitelistping~1:1492675723494948924>")  # TODO: REMOVE HARDCODE
             except discord.errors.NotFound:
                 await message.channel.send(
                     f"*thump thump* {message.author.mention} Quickdeleting a message that violates ping preferences is not cool!",
