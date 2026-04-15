@@ -19,6 +19,7 @@ import re
 
 from helpers.time import parse_duration
 
+#for the love of god, this cog really needs to be split out into multiple cogs for better readability
 class Mod(Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -921,6 +922,68 @@ class Mod(Cog):
             return await ctx.reply("Unable to send a DM to this user", mention_author=False)
 
         return await ctx.reply(f"Message sent to {target.display_name}.", mention_author=False)
+
+    @commands.bot_has_permissions(moderate_members=True)
+    @commands.check(ismod)
+    @commands.guild_only()
+    @commands.group(invoke_without_command=True)
+    async def timeout(self, ctx: commands.Context, target: discord.Member, duration: str, *, reason: str):
+        """This times out a user for a specified amount of time, and DM's the user with the reason for the timeout.
+
+           Available commands:
+           pls timeout user duration reason
+           pls timeout remove user
+
+           - `target`
+           The target user to timeout. A user ID or @mention.
+           - `duration`
+           The duration of the timeout. You can specify minutes, hours, days, or weeks, e.g. 15m, 3h, 25d, 6w, etc.
+           - `reason`
+           The reason for the timeout."""
+        if target == ctx.author:
+            return await ctx.send(
+                random_msg("warn_targetself", authorname=ctx.author.name)
+            )
+        elif target == self.bot.user:
+            return await ctx.send(
+                random_msg("warn_targetbot", authorname=ctx.author.name)
+            )
+        if ctx.guild.get_member(target.id):
+            if self.check_if_target_is_staff(ctx.guild.get_member(target.id)):
+                return await ctx.send("I cannot timeout Staff members.")
+
+        length_of_timeout: int = 0
+        timeout_unit: str = ""
+        try:
+            date_timeout_ends, length_of_timeout, timeout_unit = parse_duration(duration)
+            timeout_datetime = datetime.fromtimestamp(date_timeout_ends, tz=timezone.utc)
+            await target.timeout(timeout_datetime, reason=reason)
+        except ValueError as err:
+            return await ctx.reply(str(err), mention_author=False)
+        except Exception as e:
+            self.bot.log.error(f"error trying to timeout member {target.id}: {str(e)}")
+            return await ctx.reply("Unable to timeout user. Make sure the timeout is no longer than 28 days", mention_author=False)
+
+        try:
+            await target.send(reason)
+        except Exception as e:
+            return await ctx.reply("The user was timed out, but I was unable to send the user a DM", mention_author=False)
+
+        return await ctx.reply(f"User was timed out for {length_of_timeout} {timeout_unit}", mention_author=False)
+
+    @commands.bot_has_permissions(moderate_members=True)
+    @timeout.command()
+    @commands.check(ismod)
+    @commands.guild_only()
+    async def remove(self, ctx: commands.Context, target: discord.Member):
+        """Removes a timeout for a user"""
+        try:
+            await target.timeout(None)
+        except Exception as e:
+            self.bot.log.error(f"error trying to remove timeout for user {target.id}: {str(e)}")
+            return await ctx.reply("Unable to remove timeout. Maybe the user is not timed out?", mention_author=False)
+
+        return await ctx.reply("Timeout removed", mention_author=False)
 
     async def remove_user_from_tempban(self, ctx: commands.Context, user_id: int, ban_version: str = "") -> int:
         """Removes a user from the temp ban table, if such an entry for that user and server exists"""
