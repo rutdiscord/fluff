@@ -120,16 +120,23 @@ class Timer(Cog):
             zip_name = "data_backup"
             datafiles.make_backup(zip_name)
             for m in self.bot.config.managers:
-                await self.bot.get_user(m).send(
-                    content="Daily backups:",
-                    file=discord.File(f"{zip_name}.zip"),
-                )
+                try:
+                    await self.bot.get_user(m).send(
+                        content="Daily backups:",
+                        file=discord.File(f"{zip_name}.zip"),
+                    )
+                except Exception as e:
+                    self.bot.log.error(f"Error attempting to send daily backups to {m}: {str(e)}")
             os.remove(f"{zip_name}.zip")
-        except:
+        except Exception as e:
             # Don't kill cronjobs if something goes wrong.
-            await log_channel.send(
-                f"Cron-daily has errored: ```{traceback.format_exc()}```"
-            )
+            self.bot.log.error(f"Error in daily backup task: {str(e)}")
+            try:
+                await log_channel.send(
+                    f"Cron-daily has errored: ```{traceback.format_exc()}```"
+                )
+            except Exception as e2:
+                self.bot.log.error(f"Error trying to send log message after cron-daily failed: {str(e2)}")
 
 
 async def setup(bot):
