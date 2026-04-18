@@ -796,6 +796,7 @@ class ModToss(Cog):
             del tosses[channel.name]
             set_tossfile(channel.guild.id, "tosses", json.dumps(tosses))
 
+    #TODO: this should also be moved to noreply.py eventually
     @Cog.listener()
     async def on_autotoss_blocked(
         self, message, msgauthor
@@ -918,6 +919,9 @@ class ModToss(Cog):
             mod_embed(embed, msgauthor, message.guild.me)
             await modlog_channel.send(embed=embed)
 
+    #TODO: this really should be refactored and moved to noreply.py, because its only used for tossing
+    #      those who have reached the ping reply threshold violation. Only reason its here is because
+    #      of its reliance on the session methods in this cog. Those should be refactored as well.
     @Cog.listener()
     async def on_violation_threshold_reached(self, message, msgauthor):
         await self.bot.wait_until_ready()
