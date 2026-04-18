@@ -151,7 +151,7 @@ class Mod(Cog):
         pls tempban update user duration
         pls tempban list
         pls tempban info target
-        pls tempban remove (note that this only removes the tempban entry but does not unban. Use pls unban instead.)
+        pls tempban delete (note that this only deletes the tempban entry but does not unban. Use pls unban instead.)
 
         - `target`
         The target user to ban. A user ID or @mention.
@@ -238,16 +238,16 @@ class Mod(Cog):
 
         return await ctx.reply(f"Unban date set to {length_of_ban} {ban_unit} from now", mention_author=False)
 
-    @tempban.command(aliases=["delete"])
+    @tempban.command()
     @commands.check(isadmin)
     @commands.guild_only()
-    async def remove(self, ctx: commands.Context, target: discord.User):
-        """Removes a temp banned user"""
+    async def delete(self, ctx: commands.Context, target: discord.User):
+        """Deletes a temp banned user entry"""
         row_removed_count = await self.remove_user_from_tempban(ctx, target.id, "un")
         if row_removed_count == 0:
             return await ctx.reply("No tempban entry found for that user", mention_author=False)
         else:
-            return await ctx.reply("Tempban removed. Use `pls unban` if you want to actually unban the user.", mention_author=False)
+            return await ctx.reply("Tempban deleted. Use `pls unban` if you want to actually unban the user.", mention_author=False)
 
     async def create_and_send_tempban_list(self, ctx: commands.Context, banned_users: List[tuple[int, int]]):
         embed = stock_embed(self.bot)
