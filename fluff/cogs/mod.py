@@ -969,7 +969,7 @@ class Mod(Cog):
         except Exception as e:
             return await ctx.reply("The user was timed out, but I was unable to send the user a DM", mention_author=False)
 
-        return await ctx.reply(f"User was timed out for {length_of_timeout} {timeout_unit}", mention_author=False)
+        return await ctx.reply(f"<@{target.id}> was timed out for {length_of_timeout} {timeout_unit}", mention_author=False)
 
     @commands.bot_has_permissions(moderate_members=True)
     @timeout.command()
@@ -983,7 +983,7 @@ class Mod(Cog):
             self.bot.log.error(f"error trying to remove timeout for user {target.id}: {str(e)}")
             return await ctx.reply("Unable to remove timeout. Maybe the user is not timed out?", mention_author=False)
 
-        return await ctx.reply("Timeout removed", mention_author=False)
+        return await ctx.reply(f"<@{target.id}> had their timeout removed", mention_author=False)
 
     async def remove_user_from_tempban(self, ctx: commands.Context, user_id: int, ban_version: str = "") -> int:
         """Removes a user from the temp ban table, if such an entry for that user and server exists"""
