@@ -152,7 +152,7 @@ class ModToss(Cog):
                 if not rr.is_assignable():
                     fail_roles.append(rr)
                     roles.remove(rr)
-        await user.edit(roles=[toss_role], reason=f"User tossed by {staff} ({staff.id})")
+        await user.edit(roles=fail_roles + [toss_role], reason=f"User tossed by {staff} ({staff.id})")
 
         return fail_roles, roles
 
@@ -450,12 +450,16 @@ class ModToss(Cog):
                 tosses[ctx.channel.name]["untossed"].append(us.id)
             del tosses[ctx.channel.name]["tossed"][str(us.id)]
 
+            fail_roles = []
             if roles:
                 roles = [ctx.guild.get_role(r) for r in roles]
                 for r in list(roles):
-                    if not r or not r.is_assignable():
+                    if not r:
                         roles.remove(r)
-            await us.edit(roles=roles, reason=f"Untossed by {ctx.author} ({ctx.author.id})")
+                    elif not r.is_assignable():
+                        roles.remove(r)
+                        fail_roles.append(r)
+            await us.edit(roles=roles + fail_roles, reason=f"Untossed by {ctx.author} ({ctx.author.id})")
 
             await ctx.channel.set_permissions(us, overwrite=None)
 
