@@ -146,18 +146,13 @@ class ModToss(Cog):
         tosses[toss_channel.name]["tossed"][str(user.id)] = [role.id for role in roles]
         set_tossfile(user.guild.id, "tosses", json.dumps(tosses))
 
-        await user.add_roles(toss_role, reason="User tossed.")
         fail_roles = []
         if roles:
-            for rr in roles:
+            for rr in list(roles):
                 if not rr.is_assignable():
                     fail_roles.append(rr)
                     roles.remove(rr)
-            await user.remove_roles(
-                *roles,
-                reason=f"User tossed by {staff} ({staff.id})",
-                atomic=False,
-            )
+        await user.edit(roles=[toss_role], reason=f"User tossed by {staff} ({staff.id})")
 
         return fail_roles, roles
 
@@ -252,7 +247,7 @@ class ModToss(Cog):
         )
 
         errors = ""
-        for us in users:
+        for us in list(users):
             if us.id == ctx.author.id:
                 errors += f"\n- {self.username_system(us)}\n  You cannot toss yourself."
             elif us.id == self.bot.application_id:
@@ -423,7 +418,7 @@ class ModToss(Cog):
         output = ""
         invalid = []
 
-        for us in users:
+        for us in list(users):
             if us.id == self.bot.application_id:
                 output += "\n" + random_msg(
                     "warn_targetbot", authorname=ctx.author.name
@@ -457,18 +452,10 @@ class ModToss(Cog):
 
             if roles:
                 roles = [ctx.guild.get_role(r) for r in roles]
-                for r in roles:
+                for r in list(roles):
                     if not r or not r.is_assignable():
                         roles.remove(r)
-                await us.add_roles(
-                    *roles,
-                    reason=f"Untossed by {ctx.author} ({ctx.author.id})",
-                    atomic=False,
-                )
-            await us.remove_roles(
-                toss_role,
-                reason=f"Untossed by {ctx.author} ({ctx.author.id})",
-            )
+            await us.edit(roles=roles, reason=f"Untossed by {ctx.author} ({ctx.author.id})")
 
             await ctx.channel.set_permissions(us, overwrite=None)
 
