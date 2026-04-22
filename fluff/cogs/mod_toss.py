@@ -1,4 +1,6 @@
 # This Cog contained code from Tosser2, which was made by OblivionCreator.
+from typing import Literal
+
 import discord
 import json
 import os
@@ -129,7 +131,14 @@ class ModToss(Cog):
 
                 return toss_channel
 
-    async def perform_toss(self, user, staff, toss_channel):
+    async def perform_toss(self, user, staff, toss_channel) -> Literal[False] | tuple[list, list]:
+        """Removes all roles, sets users role to the toss role, and stores the toss data in the toss file
+
+        Returns:
+            a boolean `False` value if the user already has the toss role, otherwise returns a tuple of lists,
+            where the first list is the list of roles that this bot is not able to assign, and the second list
+            is the list of roles that this bot can assign
+        """
         toss_role = self.bot.pull_role(
             user.guild, get_config(user.guild.id, "toss", "tossrole")
         )
@@ -670,13 +679,9 @@ class ModToss(Cog):
                 tosses[toss_channel.name]["left"].remove(member.id)
             else:
                 toss_channel = await self.new_session(member.guild)
-                failed_roles, previous_roles = await self.perform_toss(
-                    member, member.guild.me, toss_channel
-                )
+                await self.perform_toss(member, member.guild.me, toss_channel)
                 tosses = get_tossfile(member.guild.id, "tosses")
-                tosses[toss_channel.name]["tossed"][str(member.id)] = tosses[
-                    "LEFTGUILD"
-                ][str(member.id)]
+                tosses[toss_channel.name]["tossed"][str(member.id)] = tosses["LEFTGUILD"][str(member.id)]
         else:
             return
 
