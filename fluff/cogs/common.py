@@ -48,7 +48,7 @@ class Common(Cog):
     def pacify_name(self, name):
         return discord.utils.escape_markdown(name.replace("@", "@ "))
 
-    async def await_message(self, channel, author, timeout=60):
+    async def await_message(self, channel, author, timeout=60) -> discord.Message | None:
         """Nice wrapper for waiting for a message"""
 
         def check(m):

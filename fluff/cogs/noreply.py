@@ -286,7 +286,8 @@ class Reply(Cog):
                 and cur_violation_count % remind_frequency == 0
             ):
                 try:
-                    await message.reply(content=textwrap.dedent(f"""**{message.author.mention}, You have me blocked, or you have DMs disabled!**
+                    await message.reply(content=textwrap.dedent(f"""
+                                        **{message.author.mention}, You have me blocked, or you have DMs disabled!**
                                         **Do not reply ping users who do not wish to be pinged.**
                                         You have currently received {cur_violation_count} violation(s).
                                         {violation_threshold} violations will result in a penalty.""").strip(),
@@ -342,11 +343,15 @@ class Reply(Cog):
                 await notify_modlog(additional="Next violation will result in penalty.")
 
                 await message.reply(
-                    content=textwrap.dedent(f"""# {message.author.mention}, your next violation will result in penalty.
+                    content=textwrap.dedent(f"""
+                    # {message.author.mention}, your next violation will result in penalty.
                     You have currently received {str(violation_count)} violations.
                     As a reminder, **please respect ping preferences, and do not reply ping users who do not wish to be pinged**.""").strip(),
                     file=discord.File("assets/noreply.png"))
-
+            elif violation_count >= violation_threshold:
+                return self.bot.dispatch(
+                    "violation_threshold_reached", message, message.author
+                )
             elif (violation_count % remind_frequency) == 0:
                 await notify_modlog("Reminder sent.")
                 return await message.author.send(
@@ -354,10 +359,6 @@ class Reply(Cog):
                     + f"You have currently received {str(violation_count)} violations.\n"
                     + f"{violation_threshold} violations will result in a penalty.",
                     file=discord.File("assets/noreply.png"),
-                )
-            elif violation_count >= violation_threshold:
-                return self.bot.dispatch(
-                    "violation_threshold_reached", message, message.author
                 )
         except ZeroDivisionError:
             return

@@ -1,3 +1,4 @@
+import re
 import time
 import discord
 import io
@@ -15,6 +16,8 @@ from helpers.sv_config import get_config
 import aiohttp
 from helpers.placeholders import random_msg
 
+
+THANKS_REGEX = re.compile(r'\b(ty|thanks|thank\s+you)\s+fluff\b', re.IGNORECASE)
 
 class Basic(Cog):
     def __init__(self, bot):
@@ -690,6 +693,18 @@ the true/false portion tells me whether to reload cogs""",
 
         No arguments."""
         await ctx.send(content=random_msg("rules_1"))
+
+
+    @commands.Cog.listener()
+    async def on_message(self, message: discord.Message):
+        if message.author.bot or not message.content or not message.guild or not THANKS_REGEX.search(message.content):
+            return
+
+        permissions: discord.Permissions = message.channel.permissions_for(message.guild.me)
+        if not permissions.send_messages or not permissions.read_message_history:
+            return
+
+        return await message.reply(":3", mention_author=False)
 
 
 async def setup(bot):
