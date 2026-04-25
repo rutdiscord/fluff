@@ -545,7 +545,7 @@ class Mod(Cog):
     @commands.guild_only()
     @commands.group(invoke_without_command=True, aliases=["clear"])
     async def purge(
-        self, ctx, limit: int | None, channel: discord.abc.GuildChannel | None
+        self, ctx: commands.Context, limit: int | None, channel: discord.abc.GuildChannel | None
     ):
         """This clears a given number of messages.
 
@@ -566,6 +566,11 @@ class Mod(Cog):
                 content=f"Your purge limit of `{limit}` is too high. Are you trying to `purge from {limit}`?",
                 mention_author=False,
             )
+
+        should_purge: bool = await self.confirm_purge(ctx, channel)
+        if not should_purge:
+            return
+
         deleted = len(await channel.purge(limit=limit))
         await ctx.send(
             f"<a:bunnytrashjump:1256812177768185878> `{deleted}` messages purged.",
@@ -592,6 +597,10 @@ class Mod(Cog):
 
         def is_bot(m):
             return any((m.author.bot, m.author.discriminator == "0000"))
+
+        should_purge: bool = await self.confirm_purge(ctx, channel)
+        if not should_purge:
+            return
 
         deleted = len(await channel.purge(limit=limit, check=is_bot))
         await ctx.send(
@@ -626,6 +635,10 @@ class Mod(Cog):
         def is_mentioned(m):
             return target.id == m.author.id
 
+        should_purge: bool = await self.confirm_purge(ctx, channel)
+        if not should_purge:
+            return
+
         deleted = len(await channel.purge(limit=limit, check=is_mentioned))
         await ctx.send(
             f"<a:bunnytrashjump:1256812177768185878> `{deleted}` messages from {target} purged.",
@@ -658,6 +671,10 @@ class Mod(Cog):
 
         def contains(m):
             return string in m.content
+
+        should_purge: bool = await self.confirm_purge(ctx, channel)
+        if not should_purge:
+            return
 
         deleted = len(await channel.purge(limit=limit, check=contains))
         await ctx.send(
@@ -693,6 +710,10 @@ class Mod(Cog):
                 )
             )
 
+        should_purge: bool = await self.confirm_purge(ctx, channel)
+        if not should_purge:
+            return
+
         deleted = len(await channel.purge(limit=limit, check=has_emote))
         await ctx.send(
             f"<a:bunnytrashjump:1256812177768185878> `{deleted}` emotes purged.",
@@ -722,6 +743,10 @@ class Mod(Cog):
         def has_embed(m):
             return any((m.embeds, m.attachments, m.stickers))
 
+        should_purge: bool = await self.confirm_purge(ctx, channel)
+        if not should_purge:
+            return
+
         deleted = len(await channel.purge(limit=limit, check=has_embed))
         await ctx.send(
             f"<a:bunnytrashjump:1256812177768185878> `{deleted}` embeds purged.",
@@ -744,6 +769,10 @@ class Mod(Cog):
         The channel to purge from. Optional."""
         if not channel:
             channel = ctx.channel
+
+        should_purge: bool = await self.confirm_purge(ctx, channel)
+        if not should_purge:
+            return
 
         deleted = 0
         async for msg in channel.history(limit=limit):
@@ -995,6 +1024,20 @@ class Mod(Cog):
             await ctx.send(f"Please double check that the user is currently temp banned")
 
         return 0
+
+    async def confirm_purge(self, ctx: commands.Context, channel: discord.abc.GuildChannel) -> bool:
+        """Waits up to one minute for the purge invoking user to confirm they actually want to purge
+
+        Returns: true if a purge should actually occur, false otherwise"""
+        await ctx.reply(
+            "Are you sure? Type `yes` to confirm. (I will wait 1 minute for your response before automatically cancelling the purge)",
+            mention_author=False)
+        response: discord.Message = await self.bot.await_message(channel, ctx.author, 60)
+        if response is None or response.content.lower() != "yes":
+            await ctx.reply("purge cancelled", mention_author=False)
+            return False
+
+        return True
 
     @tasks.loop(minutes=1)
     async def unban_user_task(self):

@@ -117,6 +117,22 @@ properties:
         type:
           - integer
           - "null"
+      please_ping_emoji:
+        type:
+          - string
+          - "null"
+      no_ping_emoji:
+        type:
+          - string
+          - "null"
+      wait_ping_emoji:
+        type:
+          - string
+          - "null"
+      whitelist_ping_emoji:
+        type:
+          - string
+          - "null"
   tenure:
     type: object
     properties:
@@ -165,4 +181,4 @@ properties:
     type: object
     properties:
       version:
-        const: 20
+        const: 21

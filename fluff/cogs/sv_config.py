@@ -101,6 +101,7 @@ class sv_config(Cog):
                 mention_author=False,
             )
         set_raw_config(ctx.guild.id, config)
+        self.bot.config_service.reload_configs()
         return await ctx.reply(
             content="The configuration has been updated.", mention_author=False
         )

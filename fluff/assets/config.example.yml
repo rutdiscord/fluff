@@ -76,7 +76,19 @@ reaction:
   noreply_threshold: 
 
   # Integer value of how frequently a user is reminded of their violations.
-  noreply_remind_every: 
+  noreply_remind_every:
+
+  # String value representing the full name of the server-specific please ping emoji
+  please_ping_emoji:
+
+  # String value representing the full name of the server-specific no ping emoji
+  no_ping_emoji:
+
+  # String value representing the full name of the server-specific wait ping emoji
+  wait_ping_emoji:
+
+  # String value representing the full name of the server-specific whitelist ping emoji
+  whitelist_ping_emoji:
 
 tenure:
   # Number in days as a threshold for when a 'regular' role can be assigned
@@ -93,4 +105,4 @@ drive:
   # Set the ID of the Google Drive folder that the file should be uploaded to.
 
 metadata:
-  version: 20
+  version: 21
