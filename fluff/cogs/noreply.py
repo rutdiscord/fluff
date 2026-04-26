@@ -126,6 +126,9 @@ class Reply(Cog):
 
     @Cog.listener()
     async def on_message_delete(self, message: discord.PartialMessage):
+        return
+
+        #TODO: this code doesnt really work well because it cant tell who deleted the message.
         reply_ping_msg: ReplyPing | None = self.recent_reply_pings.pop(message.id, None)
         if reply_ping_msg is None:
             return
