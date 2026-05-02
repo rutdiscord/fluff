@@ -468,7 +468,11 @@ class ModToss(Cog):
                     elif not r.is_assignable():
                         roles.remove(r)
                         fail_roles.append(r)
-            await us.edit(roles=roles + fail_roles, reason=f"Untossed by {ctx.author} ({ctx.author.id})")
+            try:
+                await us.edit(roles=roles + fail_roles, reason=f"Untossed by {ctx.author} ({ctx.author.id})")
+            except discord.Forbidden:
+                #this can happen if the user was a server booster when tossed, and the server boost expired when trying to untoss
+                await us.edit(roles=roles, reason=f"Untossed by {ctx.author} ({ctx.author.id})")
 
             await ctx.channel.set_permissions(us, overwrite=None)
 
