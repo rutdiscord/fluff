@@ -472,10 +472,7 @@ class ModToss(Cog):
                 await us.edit(roles=roles + fail_roles, reason=f"Untossed by {ctx.author} ({ctx.author.id})")
             except discord.Forbidden:
                 #this can happen if the user was a server booster when tossed, and the server boost expired when trying to untoss
-                try:
-                    await us.edit(roles=roles, reason=f"Untossed by {ctx.author} ({ctx.author.id})")
-                except Exception:
-                    output += f"\n⚠️ Could not restore roles for {self.username_system(us)} due to missing permissions."
+                await us.edit(roles=roles, reason=f"Untossed by {ctx.author} ({ctx.author.id})")
 
             await ctx.channel.set_permissions(us, overwrite=None)
 
