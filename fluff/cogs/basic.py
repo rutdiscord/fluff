@@ -471,21 +471,6 @@ class Basic(Cog):
                 "inline": True,
             },
             {
-                "name": "pls setsdata [server ID] {attachment}",
-                "value": """replaces server data files""",
-                "inline": True,
-            },
-            {
-                "name": "pls getudata [user ID]",
-                "value": """gets user data files""",
-                "inline": True,
-            },
-            {
-                "name": "pls setudata [user ID] {attachment}",
-                "value": """replaces user data files""",
-                "inline": True,
-            },
-            {
                 "name": "pls getlogs",
                 "value": """gets bots log file""",
                 "inline": True,
@@ -501,24 +486,8 @@ class Basic(Cog):
                 "inline": True,
             },
             {
-                "name": "pls setdata {attachment}",
-                "value": """replaces bot data files
-only to use with backups if the bot explodes or something""",
-                "inline": False,
-            },
-            {
                 "name": "pls threadlock [channel]",
                 "value": """locks all threads in one channel""",
-                "inline": True,
-            },
-            {
-                "name": "pls botban [user]",
-                "value": """bans a user from using me. naughty!""",
-                "inline": True,
-            },
-            {
-                "name": "pls unbotban [user]",
-                "value": """back on the nice list. lets a user use me again""",
                 "inline": True,
             },
             {
@@ -530,38 +499,7 @@ only to use with backups if the bot explodes or something""",
                 "name": "pls setbanner",
                 "value": """sets my banner!""",
                 "inline": True,
-            },
-            {
-                "name": "pls eval {code}",
-                "value": """evaluates some code""",
-                "inline": True,
-            },
-            {
-                "name": "pls exec {code}",
-                "value": """executes some code""",
-                "inline": True,
-            },
-            {
-                "name": "pls load cogs.[cog name]",
-                "value": """loads a cog""",
-                "inline": True,
-            },
-            {
-                "name": "pls unload cogs.[cog name]",
-                "value": """unloads a cog""",
-                "inline": True,
-            },
-            {
-                "name": "pls reload cogs.[cog name]",
-                "value": """reloads a cog""",
-                "inline": True,
-            },
-            {
-                "name": "pls pull [true/false]",
-                "value": """you can pull from git
-the true/false portion tells me whether to reload cogs""",
-                "inline": False,
-            },
+            }
         ]
 
         half = len(fields) // 2

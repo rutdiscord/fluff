@@ -1,5 +1,7 @@
+import discord
 from discord.ext import commands
 from helpers.sv_config import get_config
+from service.ConfigService import ConfigService
 
 
 def isbot(ctx):
@@ -55,3 +57,20 @@ async def ismod(ctx):
     return await commands.has_role(
         get_config(ctx.guild.id, "staff", "modrole")
     ).predicate(ctx)
+
+def check_if_target_is_staff(bot, target: discord.Member, config_service: ConfigService) -> bool:
+    """Alternative way to check if target is staff"""
+    mod_role = bot.pull_role(
+        target.guild, config_service.get_server_config(target.guild.id, "staff", "modrole")
+    )
+    admin_role = bot.pull_role(
+        target.guild, config_service.get_server_config(target.guild.id, "staff", "adminrole")
+    )
+
+    if mod_role is None or admin_role is None:
+        return False
+
+    return any(
+        r == mod_role or r == admin_role
+        for r in target.roles
+    )

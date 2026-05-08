@@ -10,7 +10,7 @@ import emoji
 
 from database.model.TempBannedUser import TempBannedUser
 from database.repository.tempban_repository import TempBanRepository
-from helpers.checks import ismod, isadmin
+from helpers.checks import ismod, isadmin, check_if_target_is_staff
 from helpers.datafiles import add_userlog
 from helpers.embeds import stock_embed
 from helpers.placeholders import random_msg
@@ -23,7 +23,6 @@ from helpers.time import parse_duration
 class Mod(Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.bot.check_if_target_is_staff = self.check_if_target_is_staff
         self.bot.modqueue = {}
         self.tempban_repo: TempBanRepository = TempBanRepository(self.bot.db)
 
@@ -32,19 +31,6 @@ class Mod(Cog):
 
     async def cog_unload(self):
         self.unban_user_task.cancel()
-
-    def check_if_target_is_staff(self, target):
-        return any(
-            r
-            == self.bot.pull_role(
-                target.guild, get_config(target.guild.id, "staff", "modrole")
-            )
-            or r
-            == self.bot.pull_role(
-                target.guild, get_config(target.guild.id, "staff", "adminrole")
-            )
-            for r in target.roles
-        )
 
     @commands.bot_has_permissions(kick_members=True)
     @commands.check(ismod)
@@ -67,7 +53,8 @@ class Mod(Cog):
             return await ctx.send(
                 random_msg("warn_targetbot", authorname=ctx.author.name)
             )
-        elif self.check_if_target_is_staff(target):
+
+        elif check_if_target_is_staff(self.bot, target, self.bot.config_service):
             return await ctx.send("I cannot kick Staff members.")
 
         add_userlog(ctx.guild.id, target.id, ctx.author, reason, "kicks")
@@ -361,8 +348,9 @@ class Mod(Cog):
                 random_msg("warn_targetbot", authorname=ctx.author.name)
             )
             return True
-        if ctx.guild.get_member(target.id):
-            if self.check_if_target_is_staff(ctx.guild.get_member(target.id)):
+        guild_member = ctx.guild.get_member(target.id)
+        if guild_member:
+            if check_if_target_is_staff(self.bot, guild_member, self.bot.config_service):
                 await ctx.send("I cannot ban Staff members.")
                 return True
 
@@ -474,7 +462,8 @@ class Mod(Cog):
                 # Prevents ban issues on bots
                 pass
 
-        await target.ban(
+        await ctx.guild.ban(
+            target,
             reason=f"[Ban performed by {ctx.author}] {reason}",
             delete_message_days=day_count,
         )
@@ -1030,8 +1019,10 @@ class Mod(Cog):
             return await ctx.send(
                 random_msg("warn_targetbot", authorname=ctx.author.name)
             )
-        if ctx.guild.get_member(target.id):
-            if self.check_if_target_is_staff(ctx.guild.get_member(target.id)):
+
+        guild_member = ctx.guild.get_member(target.id)
+        if guild_member:
+            if check_if_target_is_staff(self.bot, guild_member, self.bot.config_service):
                 return await ctx.send("I cannot timeout Staff members.")
 
         length_of_timeout: int = 0
