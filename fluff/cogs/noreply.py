@@ -352,6 +352,7 @@ class Reply(Cog):
                     As a reminder, **please respect ping preferences, and do not reply ping users who do not wish to be pinged**.""").strip(),
                     file=discord.File("assets/noreply.png"))
             elif violation_count >= violation_threshold:
+                self.remove_user_violation_count(message.guild.id, message.author.id)
                 return self.bot.dispatch(
                     "violation_threshold_reached", message, message.author
                 )
@@ -394,6 +395,16 @@ class Reply(Cog):
             violations_deque.popleft()
 
         return len(violations_deque)
+
+    def remove_user_violation_count(self,server_id: int, user_id: int) -> None:
+        """Removes all violations for a user"""
+        if server_id not in self.violations:
+            return
+
+        if user_id not in self.violations[server_id]:
+            return
+
+        del self.violations[server_id][user_id]
 
     @tasks.loop(minutes=1)
     async def cleanup_violations(self):
