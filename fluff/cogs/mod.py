@@ -143,7 +143,7 @@ class Mod(Cog):
     @commands.check(isadmin)
     @commands.guild_only()
     @commands.command()
-    async def uban(self, ctx, target: discord.User, *, reason: str = ""):
+    async def aban(self, ctx, target: discord.User, *, reason: str = ""):
         """This bans a user anonymously.
 
         Giving a `reason` will send the reason to the user.
