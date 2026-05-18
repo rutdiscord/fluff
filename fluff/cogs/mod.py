@@ -142,6 +142,49 @@ class Mod(Cog):
     @commands.bot_has_permissions(ban_members=True)
     @commands.check(isadmin)
     @commands.guild_only()
+    @commands.command()
+    async def uban(self, ctx, target: discord.User, *, reason: str = ""):
+        """This bans a user anonymously.
+
+        Giving a `reason` will send the reason to the user.
+
+        - `target`
+        The target to ban.
+        - `reason`
+        The reason for the ban. Optional."""
+        if await self.should_skip_ban(ctx, target):
+            return
+
+        # remove the user from the temp ban table, if an entry exists. We dont want them to be unbanned automatically if we are
+        # permanently banning them
+        await self.remove_user_from_tempban(ctx, target.id)
+
+        if reason:
+            add_userlog(ctx.guild.id, target.id, ctx.author, reason, "bans")
+        else:
+            add_userlog(
+                ctx.guild.id,
+                target.id,
+                ctx.author,
+                f"No reason provided. ({ctx.message.jump_url})",
+                "bans",
+            )
+
+        dm_message = f"**You were banned** from `{ctx.guild.name}`."
+        if reason:
+            dm_message += f'\n*The given reason is:* "{reason}".'
+        dm_message += "\n\nThis ban does not expire"
+        dm_message += (
+            f", but you may appeal it here (although you must wait 1 week minimum before attempting to appeal):\n{get_config(ctx.guild.id, 'staff', 'appealurl')}"
+            if get_config(ctx.guild.id, "staff", "appealurl")
+            else "."
+        )
+
+        await self.handle_ban(ctx, target, dm_message, reason, "", True)
+
+    @commands.bot_has_permissions(ban_members=True)
+    @commands.check(isadmin)
+    @commands.guild_only()
     @commands.group(invoke_without_command=True)
     async def tempban(self, ctx: commands.Context, target: discord.User, duration: str, *, reason: str):
         """This bans a user for a specified amount of time, after which they will be automatically unbanned from the server.
@@ -339,7 +382,7 @@ class Mod(Cog):
 
         return False
 
-    async def handle_ban(self, ctx: commands.Context, target: discord.User, dm_message: str, reason: str, length_of_ban: str = ""):
+    async def handle_ban(self, ctx: commands.Context, target: discord.User, dm_message: str, reason: str, length_of_ban: str = "", anonymous: bool = False):
         """Handles banning the user and sending them a message"""
         failmsg = ""
         if ctx.guild.get_member(target.id) is not None:
@@ -354,11 +397,18 @@ class Mod(Cog):
                 # Prevents ban issues on bots
                 pass
 
-        await ctx.guild.ban(
-            target,
-            reason=f"[Ban performed by {ctx.author}] {reason}",
-            delete_message_days=0,
-        )
+        if anonymous:
+            await ctx.guild.ban(
+                target,
+                reason=f"[Ban performed by Fluff] {reason}",
+                delete_message_days=0,
+            )
+        else:
+            await ctx.guild.ban(
+                target,
+                reason=f"[Ban performed by {ctx.author}] {reason}",
+                delete_message_days=0,
+            )
         duration_part = f" for {length_of_ban}" if length_of_ban else ""
         await ctx.send(f"**{target.mention}** is now BANNED{duration_part}.\n{failmsg}")
 
