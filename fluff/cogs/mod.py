@@ -543,10 +543,13 @@ class Mod(Cog):
             ctx, str(target)
         )
 
-        await ctx.guild.unban(
-            target, reason=f"[Unban performed by {ctx.author}] {reason}"
-        )
-        await ctx.send(f"{safe_name} is now UNBANNED.")
+        try:
+            await ctx.guild.unban(
+                target, reason=f"[Unban performed by {ctx.author}] {reason}"
+            )
+            await ctx.send(f"{safe_name} is now UNBANNED.")
+        except discord.NotFound:
+            await ctx.send(f"No ban entry for {safe_name} found.")
 
     @commands.bot_has_permissions(ban_members=True)
     @commands.check(ismod)
