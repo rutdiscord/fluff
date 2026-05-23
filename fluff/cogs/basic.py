@@ -646,7 +646,7 @@ the true/false portion tells me whether to reload cogs""",
 
     @commands.cooldown(1, 5, type=commands.BucketType.default)
     @commands.guild_only()
-    @commands.command(aliases=["banne"])
+    @commands.command(aliases=["banne", "tosse"])
     async def mutedmute(self, ctx, target: discord.Member):
         """This mutes a user in a special way.
 
