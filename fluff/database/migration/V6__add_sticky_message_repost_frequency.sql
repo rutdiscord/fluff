@@ -1,0 +1,1 @@
+ALTER TABLE sticky_message ADD COLUMN repost_frequency INTEGER NOT NULL DEFAULT 5;
