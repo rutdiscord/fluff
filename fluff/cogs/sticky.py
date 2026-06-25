@@ -35,7 +35,7 @@ class StickyMessage(Cog):
         If no channel is provided, lists all sticky messages in the server with a short preview.
         If a channel is provided, and the channel exists, displays the full sticky message for that channel.
         Available commands:
-        pls sticky\npls sticky add/create #channel my sticky message\npls sticky update/modify #channel new message here
+        pls sticky\npls sticky add/create repostfrequency #channel my sticky message\npls sticky update/modify repostfrequency #channel new message here
         pls sticky delete/remove #channel
 
         - `channel`
