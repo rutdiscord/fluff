@@ -35,7 +35,7 @@ class StickyMessage(Cog):
         If no channel is provided, lists all sticky messages in the server with a short preview.
         If a channel is provided, and the channel exists, displays the full sticky message for that channel.
         Available commands:
-        pls sticky\npls sticky add/create #channel my sticky message\npls sticky update/modify #channel new message here
+        pls sticky\npls sticky add/create repostfrequency #channel my sticky message\npls sticky update/modify repostfrequency #channel new message here
         pls sticky delete/remove #channel
 
         - `channel`
@@ -75,7 +75,7 @@ class StickyMessage(Cog):
     @sticky.command(aliases=["add"])
     @commands.guild_only()
     @commands.check(ismod)
-    async def create(self, ctx: commands.Context, channel: discord.TextChannel, *, message: str):
+    async def create(self, ctx: commands.Context, channel: discord.TextChannel, repost_frequency: int, *, message: str):
         """Create a sticky message for a channel."""
         if ctx.guild.id not in self.sticky_messages_by_server:
             self.sticky_messages_by_server[ctx.guild.id] = {}
@@ -83,18 +83,26 @@ class StickyMessage(Cog):
             return await ctx.send("There is already a sticky message in that channel. Use `update` to overwrite the sticky message")
 
         try:
-            await self.sticky_message_repo.create_sticky_message(ctx.guild.id, channel.id, message)
+            repost_frequency = int(repost_frequency)
+        except ValueError:
+            return await ctx.send("repost frequency must be an integer greater than 0, e.g. `pls sticky create #channel 2 my message content here`", mention_author=False)
+
+        if repost_frequency < 1:
+            return await ctx.send("repost frequency must be an integer greater than 0, e.g. `pls sticky create #channel 2 my message content here`", mention_author=False)
+
+        try:
+            await self.sticky_message_repo.create_sticky_message(ctx.guild.id, channel.id, repost_frequency, message)
         except sqlite3.Error as e:
             self.bot.log.error(f"error inserting sticky message into the sticky_message table: {e}")
             return await ctx.send(f"Unable to create sticky message for {channel.mention}")
 
-        self.sticky_messages_by_server[ctx.guild.id][channel.id] = StickyEntry(message, None)
+        self.sticky_messages_by_server[ctx.guild.id][channel.id] = StickyEntry(message, None, repost_frequency)
         return await ctx.send(f"Sticky message set in {channel.mention}")
 
     @sticky.command(aliases=["modify"])
     @commands.guild_only()
     @commands.check(ismod)
-    async def update(self, ctx: commands.Context, channel: discord.TextChannel, *, message: str):
+    async def update(self, ctx: commands.Context, channel: discord.TextChannel, repost_frequency: int, *, message: str = None):
         """Update an existing sticky message for a channel."""
         if ctx.guild.id not in self.sticky_messages_by_server:
             return await ctx.send(
@@ -104,20 +112,34 @@ class StickyMessage(Cog):
                 "There is no sticky message for that channel. Use `create` to create a new sticky message")
 
         try:
-            await self.sticky_message_repo.update_sticky_message_content(ctx.guild.id, channel.id, message)
+            repost_frequency = int(repost_frequency)
+        except ValueError:
+            return await ctx.send(
+                "repost frequency must be an integer greater than 0, e.g. `pls sticky create #channel 2 my message content here`",
+                mention_author=False)
+
+        if repost_frequency < 1:
+            return await ctx.send(
+                "repost frequency must be an integer greater than 0, e.g. `pls sticky create #channel 2 my message content here`",
+                mention_author=False)
+
+        try:
+            await self.sticky_message_repo.update_sticky_message(ctx.guild.id, channel.id, repost_frequency, None if message is None or len(message) <= 0 else message)
         except sqlite3.Error as e:
             self.bot.log.error(f"error updating sticky message field in the sticky_message table: {e}")
             return await ctx.send(f"Unable to update sticky message for {channel.mention}")
 
         message_id_to_update = self.sticky_messages_by_server[ctx.guild.id][channel.id].last_sticky_message_id
-        if message_id_to_update is not None:
+        if message_id_to_update is not None and message is not None and len(message) > 0:
             try:
                 current_message = await channel.fetch_message(message_id_to_update)
                 await current_message.edit(content=message)
             except (discord.NotFound, discord.HTTPException):
                 pass
 
-        self.sticky_messages_by_server[ctx.guild.id][channel.id].message = message
+        self.sticky_messages_by_server[ctx.guild.id][channel.id].repost_frequency = repost_frequency
+        if message is not None and len(message) > 0:
+            self.sticky_messages_by_server[ctx.guild.id][channel.id].message = message
         return await ctx.send(f"Sticky message updated in {channel.mention}")
 
     @sticky.command(aliases=["remove"])
@@ -148,7 +170,7 @@ class StickyMessage(Cog):
         return await ctx.send(f"Sticky message removed in {channel.mention}")
 
 
-    @tasks.loop(minutes=1)
+    @tasks.loop(seconds=30)
     async def sticky_task(self):
         """Scheduled cron job task that runs every minute. This job is responsible for
         determining if a channel with a sticky message needs to re-send the message."""
@@ -170,9 +192,12 @@ class StickyMessage(Cog):
                     else 0
                 )
 
+                #subtract 10 so that we have a little leeway if the repost time is within ten seconds of now
+                repost_limit_seconds = (message_data.repost_frequency * 60) - 10
+
                 if latest_message is not None and latest_message.id == message_data.last_sticky_message_id:
                     continue
-                if latest_message is None or time_since_last_message >= 300:
+                if latest_message is None or time_since_last_message >= repost_limit_seconds:
                     try:
                         await self.send_sticky_message(server_id, channel_id, channel, message_data)
                     except Exception as e:
@@ -201,14 +226,14 @@ class StickyMessage(Cog):
         """Inserts the necessary sticky message information into the embed object"""
         for channel_id, message_data in list(server_entries.items()):
             embed.add_field(
-                name=f"**{ctx.guild.get_channel(channel_id)}**",
+                name=f"**{ctx.guild.get_channel(channel_id)}** ({message_data.repost_frequency} minute{'s' if message_data.repost_frequency > 1 else ''})",
                 value=(
                         "> "
                         + discord.utils.remove_markdown(
                     message_data.message[:60].replace("\n", " ")
                 )
                 ),
-                inline=True
+                inline=False
             )
 
     async def send_sticky_server_embed(self, ctx: commands.Context, embed: Embed, server_entries: dict[int, StickyEntry]):
