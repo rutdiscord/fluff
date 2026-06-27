@@ -5,27 +5,6 @@ import zipfile
 
 IGNORE_FILES = {"fluff_database.db", "fluff_database.db-wal", "fluff_database.db-shm"}
 
-# Bot Files
-def make_botfile(filename):
-    if not os.path.exists("data"):
-        os.makedirs("data")
-    with open(f"data/{filename}.json", "w") as f:
-        f.write("{}")
-        return json.loads("{}")
-
-
-def get_botfile(filename):
-    if not os.path.exists(f"data/{filename}.json"):
-        make_botfile(filename)
-    with open(f"data/{filename}.json", "r") as f:
-        return json.load(f)
-
-
-def set_botfile(filename, contents):
-    with open(f"data/{filename}.json", "w") as f:
-        f.write(contents)
-
-
 # Guild Files
 def make_guildfile(serverid, filename):
     if not os.path.exists(f"data/servers/{serverid}"):
@@ -120,23 +99,6 @@ def toss_userlog(sid, uid, issuer, mlink, cid):
     userlogs[uid]["tosses"].append(toss_data)
     set_guildfile(sid, "userlog", json.dumps(userlogs))
     return len(userlogs[uid]["tosses"])
-
-
-# Dishtimer Features
-
-
-def delete_job(timestamp, job_type, job_name):
-    timestamp = str(timestamp)
-    job_name = str(job_name)
-    ctab = get_botfile("timers")
-
-    del ctab[job_type][timestamp][job_name]
-
-    # smh, not checking for empty timestamps. Smells like bloat!
-    if not ctab[job_type][timestamp]:
-        del ctab[job_type][timestamp]
-
-    set_botfile("timers", json.dumps(ctab))
 
 def make_backup(zip_name: str):
     """Makes a backup zip file containing all the data inside the root data folder, not including

@@ -21,6 +21,7 @@ from helpers.embeds import (
 )
 from helpers.sv_config import get_config
 from helpers.google import upload
+from model.RolebanStatus import RolebanStatus
 
 
 class ModToss(Cog):
@@ -518,7 +519,7 @@ class ModToss(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command()
-    async def close(self, ctx, archive=False):
+    async def close(self, ctx: commands.Context, archive=False):
         """This closes a mute session.
 
         Please refer to the tossing section of the [documentation](https://3gou.0ccu.lt/as-a-moderator/the-tossing-system/).
@@ -528,6 +529,28 @@ class ModToss(Cog):
         """
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
+
+        #TODO: refactor properly once toss also uses roleban service
+        if ctx.channel.name.startswith("rulepush"):
+            session = await self.bot.roleban_service.get_roleban_session_by_channel(ctx.guild.id, ctx.channel.id)
+            if session is None:
+                return await ctx.reply("No session found.", mention_author=False)
+
+            if session.users is None or len(session.users) <= 0:
+                return
+
+            # always exactly 1 user per rulepush session
+            if session.users[0].status != RolebanStatus.LEFT.value:
+                return await ctx.reply("Cannot close channel while rulepushed user is still in the server.", mention_author=False)
+
+            embed = stock_embed(self.bot)
+            embed.title = "Rulepush Session Closed (Fluff)"
+            embed.description = f"`#{ctx.channel.name}`'s session was closed by {ctx.author.mention} ({ctx.author.id})."
+            embed.color = ctx.author.color
+            embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
+            await self.bot.notification_service.send_notification(ctx.channel.guild, embed)
+            return await ctx.channel.delete(reason="Channel closed by staff")
+
         if ctx.channel.name not in get_config(ctx.guild.id, "toss", "tosschannels"):
             return await ctx.reply(
                 content="This command must be run inside of a muted channel.",

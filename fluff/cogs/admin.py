@@ -2,33 +2,20 @@ import discord
 from discord.ext import commands
 from discord.ext.commands import Cog
 import traceback
-import inspect
-import re
-import datetime
-import json
-import random
 import asyncio
 import shutil
 import os
 import base64
-from io import StringIO
-from contextlib import redirect_stdout
 
 from helpers import datafiles
 from helpers.embeds import stock_embed
 from helpers.checks import ismanager
-from helpers.sv_config import get_config
-from helpers.datafiles import get_botfile, set_botfile
 from helpers.placeholders import random_msg
 
 
 class Admin(Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.last_eval_result = None
-        self.previous_eval_code = None
-        self.last_exec_result = None
-        self.previous_exec_code = None
         self.loaded_exception = ()
 
     @commands.check(ismanager)
@@ -189,23 +176,6 @@ class Admin(Cog):
             await ctx.reply(content=random_msg("err_dmfail"), mention_author=False)
         os.remove(f"{zip_name}.zip")
 
-    @commands.check(ismanager)
-    @commands.dm_only()
-    @commands.command()
-    async def setdata(self, ctx, attachment: discord.Attachment):
-        """This replaces the bot's data files.
-
-        This can be insanely destructive. Use caution.
-
-        - `attachment`
-        The ZIP file to use as the data folder."""
-        await attachment.save("data.zip")
-        if os.path.exists("data"):
-            shutil.rmtree("data")
-        shutil.unpack_archive("data.zip", "data")
-        os.remove("data.zip")
-        await ctx.reply(content=f"Data saved.", mention_author=False)
-
     @commands.bot_has_permissions(attach_files=True)
     @commands.check(ismanager)
     @commands.command(aliases=["getserverdata"])
@@ -232,77 +202,6 @@ class Admin(Cog):
                 content="That server doesn't have any data yet.",
                 mention_author=False,
             )
-
-    @commands.check(ismanager)
-    @commands.command(aliases=["setserverdata"])
-    async def setsdata(
-        self, ctx, attachment: discord.Attachment, server: discord.Guild = None
-    ):
-        """This replaces the server's data files.
-
-        This can be insanely destructive. Use caution.
-
-        - `attachment`
-        The ZIP file to use as the data folder.
-        - `server`
-        The server to upload the data to. Optional."""
-        if not server:
-            server = ctx.guild
-        await attachment.save(f"data/{server.id}.zip")
-        if os.path.exists(f"data/servers/{server.id}"):
-            shutil.rmtree(f"data/servers/{server.id}")
-        shutil.unpack_archive(f"data/{server.id}.zip", f"data/servers/{server.id}")
-        os.remove(f"data/{server.id}.zip")
-        await ctx.reply(content=f"{server.name}'s data saved.", mention_author=False)
-
-    @commands.bot_has_permissions(attach_files=True)
-    @commands.check(ismanager)
-    @commands.command(aliases=["getuserdata"])
-    async def getudata(self, ctx, user: discord.User | None):
-        """This returns the user files.
-
-        Useful for debugging things.
-
-        - `user`
-        The user you want the data files of. Optional."""
-        if not user:
-            user = ctx.author
-        try:
-            shutil.make_archive(f"data/{user.id}", "zip", f"data/users/{user.id}")
-            sdata = discord.File(f"data/{user.id}.zip")
-            await ctx.message.reply(
-                content=f"{user}'s data...",
-                file=sdata,
-                mention_author=False,
-            )
-            os.remove(f"data/{user.id}.zip")
-        except FileNotFoundError:
-            await ctx.message.reply(
-                content="That user doesn't have any data.",
-                mention_author=False,
-            )
-
-    @commands.check(ismanager)
-    @commands.command(aliases=["setuserdata"])
-    async def setudata(
-        self, ctx, attachment: discord.Attachment, user: discord.User = None
-    ):
-        """This replaces the user's data files.
-
-        This can be insanely destructive. Use caution.
-
-        - `attachment`
-        The ZIP file to use as the data folder.
-        - `user`
-        The user to upload the data to. Optional."""
-        if not user:
-            user = ctx.author
-        await attachment.save(f"data/{user.id}.zip")
-        if os.path.exists(f"data/users/{user.id}"):
-            shutil.rmtree(f"data/users/{user.id}")
-        shutil.unpack_archive(f"data/{user.id}.zip", f"data/users/{user.id}")
-        os.remove(f"data/users/{user.id}")
-        await ctx.reply(content=f"{user}'s data saved.", mention_author=False)
 
     @commands.bot_has_permissions(attach_files=True)
     @commands.check(ismanager)
@@ -413,50 +312,6 @@ class Admin(Cog):
 
     @commands.check(ismanager)
     @commands.command()
-    async def botban(self, ctx, user: discord.User):
-        """This bars a user from using the bot.
-
-        Oh joy, naughty naughty!
-
-        - `user`
-        The user to bar."""
-        botusers = get_botfile("botusers")
-        if "botban" not in botusers:
-            botusers["botban"] = []
-        if user.id in botusers["botban"]:
-            return await ctx.reply(
-                content="This user is already botbanned.", mention_author=False
-            )
-        botusers["botban"].append(user.id)
-        set_botfile("botusers", json.dumps(botusers))
-        return await ctx.reply(
-            content="This user is now botbanned.", mention_author=False
-        )
-
-    @commands.check(ismanager)
-    @commands.command()
-    async def unbotban(self, ctx, user: discord.User):
-        """This unbars a user from using the bot.
-
-        Give them a second chance.
-
-        - `user`
-        The user to unbar."""
-        botusers = get_botfile("botusers")
-        if "botban" not in botusers:
-            botusers["botban"] = []
-        if user.id not in botusers["botban"]:
-            return await ctx.reply(
-                content="This user is not already botbanned.", mention_author=False
-            )
-        botusers["botban"].remove(user.id)
-        set_botfile("botusers", json.dumps(botusers))
-        return await ctx.reply(
-            content="This user is now unbotbanned.", mention_author=False
-        )
-
-    @commands.check(ismanager)
-    @commands.command()
     async def setavy(self, ctx, avy: discord.Attachment):
         """This sets the avy for a bot.
 
@@ -489,253 +344,6 @@ class Admin(Cog):
             "https://discord.com/api/v10/users/@me", json=data, headers=headers
         ) as response:
             return await ctx.reply(content=f"Done. {response}", mention_author=False)
-
-    @commands.check(ismanager)
-    @commands.command(name="eval")
-    async def _eval(self, ctx, *, code: str):
-        """This evaluates some code.
-
-        NICE TRY FUNNYMAN, YOU THINK THIS BOT
-        HAS UNSECURED EVAL? LMAO LOL HAHAHAHA
-
-        - `code`
-        The code to eval."""
-        try:
-            code = code.strip("` ")
-
-            env = {
-                "bot": self.bot,
-                "ctx": ctx,
-                "message": ctx.message,
-                "server": ctx.guild,
-                "guild": ctx.guild,
-                "channel": ctx.message.channel,
-                "author": ctx.message.author,
-                # modules
-                "discord": discord,
-                "commands": commands,
-                "datetime": datetime,
-                "json": json,
-                "asyncio": asyncio,
-                "random": random,
-                "os": os,
-                "get_config": get_config,
-                # utilities
-                "_get": discord.utils.get,
-                "_find": discord.utils.find,
-                # last result
-                "_": self.last_eval_result,
-                "_p": self.previous_eval_code,
-                # loaded error
-                "e": self.loaded_exception,
-            }
-            env.update(globals())
-
-            self.bot.log.info(f"Evaling {repr(code)}:")
-            result = eval(code, env)
-            if inspect.isawaitable(result):
-                result = await result
-
-            if result is not None:
-                self.last_eval_result = result
-
-            self.previous_eval_code = code
-
-            sliced_message = self.bot.slice_message(
-                repr(result), prefix="```", suffix="```"
-            )
-            for msg in sliced_message:
-                await ctx.send(msg)
-        except:
-            sliced_message = self.bot.slice_message(
-                traceback.format_exc(), prefix="```", suffix="```"
-            )
-            for msg in sliced_message:
-                await ctx.send(msg)
-
-    @commands.check(ismanager)
-    @commands.command(name="exec")
-    async def _exec(self, ctx, *, code: str):
-        """This executes some code.
-
-        Look at you, prying around! I see you. I know
-        who you are. I'm coming to your house soon.
-        Your Pepsi ain't safe.
-
-        - `code`
-        The code to exec."""
-        try:
-            code = code.strip("` ")
-
-            env = {
-                "bot": self.bot,
-                "ctx": ctx,
-                "message": ctx.message,
-                "server": ctx.guild,
-                "guild": ctx.guild,
-                "channel": ctx.message.channel,
-                "author": ctx.message.author,
-                # modules
-                "discord": discord,
-                "commands": commands,
-                "datetime": datetime,
-                "json": json,
-                "asyncio": asyncio,
-                "random": random,
-                "os": os,
-                "get_config": get_config,
-                # utilities
-                "_get": discord.utils.get,
-                "_find": discord.utils.find,
-                # last result
-                "_": self.last_exec_result,
-                "_p": self.previous_exec_code,
-            }
-            env.update(globals())
-
-            tmp_stdout = StringIO()
-
-            self.bot.log.info(f"Execing {repr(code)}:")
-            with redirect_stdout(tmp_stdout):
-                exec(code, env)
-            result = tmp_stdout.getvalue()
-
-            if result is not None:
-                self.last_exec_result = result
-
-            self.previous_exec_code = code
-
-            sliced_message = self.bot.slice_message(result, prefix="```", suffix="```")
-            for msg in sliced_message:
-                await ctx.send(msg)
-        except:
-            sliced_message = self.bot.slice_message(
-                traceback.format_exc(), prefix="```", suffix="```"
-            )
-            for msg in sliced_message:
-                await ctx.send(msg)
-
-    @commands.check(ismanager)
-    @commands.command()
-    async def pull(self, ctx, auto=True):
-        """This performs a Git Pull.
-
-        I really wouldn't use this unless you're fine
-        with me breaking the bot every five seconds.
-
-        - `auto`
-        Whether you want it to reload the cogs for you. Optional."""
-        tmp = await ctx.message.reply(content="Pulling...", mention_author=False)
-        git_output = await self.bot.async_call_shell("git pull")
-        allowed_mentions = discord.AllowedMentions(replied_user=False)
-        if len(git_output) > 2000:
-            parts = self.bot.slice_message(git_output, prefix="```", suffix="```")
-            await tmp.edit(
-                content=f"Output too long. Sending in new message...",
-                allowed_mentions=allowed_mentions,
-            )
-            for x in parts:
-                await ctx.send(content=x)
-        else:
-            await tmp.edit(
-                content=f"Pull complete. Output: ```{git_output}```",
-                allowed_mentions=allowed_mentions,
-            )
-        if auto:
-            cogs_to_reload = re.findall(r"cogs/([a-z_]*).py[ ]*\|", git_output)
-            for cog in cogs_to_reload:
-                cog_name = "cogs." + cog
-
-                try:
-                    await self.bot.unload_extension(cog_name)
-                    await self.bot.load_extension(cog_name)
-                    self.bot.log.info(f"Reloaded cog {cog}")
-                    await ctx.message.reply(
-                        content=f":white_check_mark: `{cog}` successfully reloaded.",
-                        mention_author=False,
-                    )
-                except:
-                    await ctx.message.reply(
-                        content=f":x: Cog reloading failed, traceback: "
-                        f"```\n{traceback.format_exc()}\n```",
-                        mention_author=False,
-                    )
-                    return
-
-    @commands.check(ismanager)
-    @commands.command()
-    async def load(self, ctx, ext: str):
-        """This loads a cog.
-
-        You have to prefix it with `cogs.`. No no, don't ask!
-
-        - `ext`
-        The cog to load."""
-        try:
-            await self.bot.load_extension(ext)
-        except:
-            if len(traceback.format_exc()) > 2000:
-                parts = self.bot.slice_message(
-                    traceback.format_exc(), prefix="```", suffix="```"
-                )
-                await ctx.send(content=":x: Cog loading failed, traceback:")
-                for x in parts:
-                    await ctx.send(content=x)
-            else:
-                await ctx.message.reply(
-                    content=f":x: Cog loading failed, traceback: ```\n{traceback.format_exc()}\n```",
-                    mention_author=False,
-                )
-            return
-        self.bot.log.info(f"Loaded cog {ext}")
-        await ctx.message.reply(
-            content=f":white_check_mark: `{ext}` successfully loaded.",
-            mention_author=False,
-        )
-
-    @commands.check(ismanager)
-    @commands.command()
-    async def unload(self, ctx, ext: str):
-        """This unloads a cog.
-
-        You have to prefix it with `cogs.`. No no, don't ask!
-
-        - `ext`
-        The cog to unload."""
-        await self.bot.unload_extension(ext)
-        self.bot.log.info(f"Unloaded cog {ext}")
-        await ctx.message.reply(
-            content=f":white_check_mark: `{ext}` successfully unloaded.",
-            mention_author=False,
-        )
-
-    @commands.check(ismanager)
-    @commands.command()
-    async def reload(self, ctx, ext=None):
-        """This reloads a cog.
-
-        You have to prefix it with `cogs.`. No no, don't ask!
-
-        - `ext`
-        The cog to reload."""
-        if ext:
-            self.lastreload = ext
-
-        try:
-            await self.bot.unload_extension(ext)
-            await self.bot.load_extension(ext)
-        except:
-            await ctx.message.reply(
-                content=f":x: Cog reloading failed, traceback: "
-                f"```\n{traceback.format_exc()}\n```",
-                mention_author=False,
-            )
-            return
-        self.bot.log.info(f"Reloaded cog {ext}")
-        await ctx.message.reply(
-            content=f":white_check_mark: `{ext}` successfully reloaded.",
-            mention_author=False,
-        )
 
     @Cog.listener()
     async def on_guild_join(self, guild):

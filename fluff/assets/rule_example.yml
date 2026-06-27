@@ -1,0 +1,13 @@
+#this is the title for the rule. no markdown should be added. do not add a rule number to this input. The title will
+#automatically be displayed as "Rule 1. your rule title name here."
+title: your rule title name here
+
+#this is the content of the rule. each line MUST be indented.
+#the | must remain untouched.
+#use double curly braces {{}} for areas of the rule you would like rulepush to apply.
+#note that all instances of {{}} will be removed when users invoke the pls rules command
+content: |
+ Some rule **content** here.
+ Line breaks, markdown, etc are `preserved`
+ And here, we have a section {{that is eligible for rulepush word insertion}}.
+ You can also define individual {{}} spots for {{}} rulepush word insertion.

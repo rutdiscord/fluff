@@ -14,7 +14,6 @@ import itertools
 from discord.ext import commands
 
 from database.database import Database
-from helpers.datafiles import get_botfile
 from helpers.errors import handle_code_error, handle_command_error
 
 
@@ -102,11 +101,6 @@ async def on_message(message):
     await bot.wait_until_ready()
 
     if message.author.bot:
-        return
-    if (
-        "botban" in get_botfile("botusers")
-        and message.author.id in get_botfile("botusers")["botban"]
-    ):
         return
 
     ctx = await bot.get_context(message)
