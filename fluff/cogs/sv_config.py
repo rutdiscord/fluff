@@ -37,23 +37,6 @@ class sv_config(Cog):
 
         return await ctx.reply(embed=embed, file=configs, mention_author=False)
 
-    @commands.check(ismanager)
-    @configs.command()
-    async def reset(self, ctx, guild: discord.Guild | None):
-        """This resets the configuration for a guild.
-
-        Dev only command. Server admins should use the `stock` command.
-
-        - `guild`
-        The guild to reset configs for."""
-        if not guild:
-            guild = ctx.guild
-        make_config(guild.id)
-        await ctx.reply(
-            content=f"The configuration for **{guild}** has been reset.",
-            mention_author=False,
-        )
-
     @commands.bot_has_permissions(attach_files=True)
     @commands.check(isadmin)
     @commands.guild_only()

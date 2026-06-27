@@ -1,7 +1,7 @@
 from discord.ext import commands
 from discord.ext.commands import Cog
 import discord
-from helpers.checks import ismod
+from helpers.checks import ismod, check_if_target_is_staff
 from helpers.sv_config import get_config
 from helpers.placeholders import random_msg
 
@@ -189,7 +189,7 @@ class ModLocks(Cog):
             return await ctx.reply(random_msg("warn_targetself"), mention_author=False)
         elif target == self.bot.user:
             return await ctx.reply(random_msg("warn_targetbot"), mention_author=False)
-        elif self.bot.check_if_target_is_staff(target):
+        elif check_if_target_is_staff(self.bot, target, self.bot.config_service):
             return await ctx.reply(
                 "I cannot lockout Staff members.", mention_author=False
             )
@@ -212,7 +212,7 @@ class ModLocks(Cog):
             return await ctx.reply(random_msg("warn_targetself"), mention_author=False)
         elif target == self.bot.user:
             return await ctx.reply(random_msg("warn_targetbot"), mention_author=False)
-        elif self.bot.check_if_target_is_staff(target):
+        elif check_if_target_is_staff(self.bot, target, self.bot.config_service):
             return await ctx.reply(
                 "I cannot unlockout Staff members.", mention_author=False
             )

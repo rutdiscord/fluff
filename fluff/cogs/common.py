@@ -3,12 +3,13 @@ import discord
 from discord.ext.commands import Cog
 
 from service.ConfigService import ConfigService
+from service.NotificationService import NotificationService
+from service.RolebanService import RolebanService
 
 
 class Common(Cog):
     def __init__(self, bot):
         self.bot = bot
-        self.bot.async_call_shell = self.async_call_shell
         self.bot.slice_message = self.slice_message
         self.bot.await_message = self.await_message
         self.bot.pull_role = self.pull_role
@@ -16,6 +17,8 @@ class Common(Cog):
         self.bot.pull_category = self.pull_category
         self.bot.pacify_name = self.pacify_name
         self.bot.config_service = ConfigService()
+        self.bot.notification_service = NotificationService(self.bot)
+        self.bot.roleban_service = RolebanService(self.bot)
 
     def pull_role(self, guild: discord.Guild, role):
         if isinstance(role, str):
@@ -70,36 +73,6 @@ class Common(Cog):
             text = text[size_wo_fix:]
         fragment_list.append(f"{prefix}{text}{suffix}")
         return fragment_list
-
-    async def async_call_shell(
-        self, shell_command: str, inc_stdout=True, inc_stderr=True
-    ):
-        pipe = asyncio.subprocess.PIPE
-        proc = await asyncio.create_subprocess_shell(
-            str(shell_command), stdout=pipe, stderr=pipe
-        )
-
-        if not (inc_stdout or inc_stderr):
-            return "??? you set both stdout and stderr to False????"
-
-        proc_result = await proc.communicate()
-        stdout_str = proc_result[0].decode("utf-8").strip()
-        stderr_str = proc_result[1].decode("utf-8").strip()
-
-        if inc_stdout and not inc_stderr:
-            return stdout_str
-        elif inc_stderr and not inc_stdout:
-            return stderr_str
-
-        if stdout_str and stderr_str:
-            return f"stdout:\n\n{stdout_str}\n\n" f"======\n\nstderr:\n\n{stderr_str}"
-        elif stdout_str:
-            return f"stdout:\n\n{stdout_str}"
-        elif stderr_str:
-            return f"stderr:\n\n{stderr_str}"
-
-        return "No output."
-
 
 async def setup(bot):
     await bot.add_cog(Common(bot))
