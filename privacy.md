@@ -41,10 +41,10 @@ Data is retained only for as long as it is needed to provide the bot's features.
  
 You have the right to request access to, correction of, or deletion of the data the bot holds about you. To make a request, server members can contact the administrators of the server.
  
-## 8. Changes to This Policy
+## 7. Changes to This Policy
  
 We may update this privacy policy from time to time. Material changes will be reflected by updating the "Last updated" date above. Your continued use of the bot after changes take effect constitutes acceptance of the revised policy.
  
-## 9. Contact
+## 8. Contact
  
 For questions about this privacy policy, or to make a data request, please join the undertale discord server and request to speak with staff.
