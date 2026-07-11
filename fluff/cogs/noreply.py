@@ -235,12 +235,18 @@ class Reply(Cog):
     async def handle_violation_acknowledgement(self, message: discord.Message):
         """Sends the user a temporary discord DM explaining the violation rules, and stores
         the resulting acknowledgement in the ping acknowledgement table"""
-        temp_reminder_msg = await message.author.send(
-            content="**Please do not reply ping users who do not wish to be pinged.**\n"
-                    + "This incident will be excused, but further incidents will be counted as **violations**. (Reply to this message or wait sixty seconds to acknowledge)",
-            file=discord.File("assets/noreply.png"),
-            mention_author=False,
-        )
+        try:
+            temp_reminder_msg = await message.author.send(
+                content="**Please do not reply ping users who do not wish to be pinged.**\n"
+                        + "This incident will be excused, but further incidents will be counted as **violations**. (Reply to this message or wait sixty seconds to acknowledge)",
+                file=discord.File("assets/noreply.png"),
+                mention_author=False,
+            )
+        except discord.errors.Forbidden as err:
+            if err.code == 50278: #the user has server DMs turned off
+                return self.bot.dispatch(
+                    "autotoss_blocked", message, message.author
+                )
 
         def wait_check(new_msg):
             return new_msg.author == message.author and isinstance(

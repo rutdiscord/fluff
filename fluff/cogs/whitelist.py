@@ -96,8 +96,10 @@ class Whitelist(Cog):
                 content="Unable to add users to your whitelist. Make sure you aren't trying to whitelist someone who you have already whitelisted.",
                 mention_author=False)
 
-        return await ctx.reply(content=f"Successfully added {inserted} users to your whitelist",
-                               mention_author=False)
+        if inserted == 0:
+            return await ctx.reply(content=f"No users added to your whitelist", mention_author=False)
+
+        return await ctx.reply(content=f"{inserted} users added to your whitelist", mention_author=False)
 
     @whitelist.command()
     @commands.guild_only()
@@ -118,7 +120,7 @@ class Whitelist(Cog):
                 mention_author=False)
 
         if user_ids_deleted == len(user_ids_to_remove):
-            return await ctx.reply(content=f"Successfully removed {user_ids_deleted} users from your whitelist",
+            return await ctx.reply(content=f"{user_ids_deleted} users removed from your whitelist",
                                    mention_author=False)
         else:
             return await ctx.reply(content=f"Removed {user_ids_deleted}/{len(user_ids_to_remove)} mentioned users. Some users were not in your whitelist",
