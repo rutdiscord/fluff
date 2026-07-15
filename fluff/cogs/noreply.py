@@ -235,6 +235,8 @@ class Reply(Cog):
     async def handle_violation_acknowledgement(self, message: discord.Message):
         """Sends the user a temporary discord DM explaining the violation rules, and stores
         the resulting acknowledgement in the ping acknowledgement table"""
+
+        temp_reminder_msg: discord.Message | None = None
         try:
             temp_reminder_msg = await message.author.send(
                 content="**Please do not reply ping users who do not wish to be pinged.**\n"
@@ -242,21 +244,19 @@ class Reply(Cog):
                 file=discord.File("assets/noreply.png"),
                 mention_author=False,
             )
-        except discord.errors.Forbidden as err:
-            if err.code == 50278: #the user has server DMs turned off
-                return self.bot.dispatch(
-                    "autotoss_blocked", message, message.author
-                )
+        except Exception as e:
+            pass
 
         def wait_check(new_msg):
             return new_msg.author == message.author and isinstance(
                 new_msg.channel, discord.DMChannel
             )
 
-        try:
-            await self.bot.wait_for("message", timeout=60, check=wait_check)
-        except (asyncio.CancelledError, asyncio.TimeoutError):
-            await temp_reminder_msg.delete()
+        if temp_reminder_msg is not None:
+            try:
+                await self.bot.wait_for("message", timeout=60, check=wait_check)
+            except (asyncio.CancelledError, asyncio.TimeoutError):
+                await temp_reminder_msg.delete()
 
         try:
             await self.ping_violation_ack_repo.add_user_acknowledgement(message.guild.id, message.author.id)
