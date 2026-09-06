@@ -58,11 +58,14 @@ class StarboardApprovalView(View):
 
             embeds: list[discord.Embed] = await build_message_embed(message)
             try:
-                await starboard_channel.send(embeds=embeds)
+                sent_message = await starboard_channel.send(embeds=embeds)
+                await self.starboard_queue_repo.update_starboard_message_id(starboard_queue_entry.message_id, sent_message.id)
             except Exception as e:
                 await self.rollback_status(starboard_queue_entry)
                 self.bot.log.error(f"Error sending starboard queue entry message: {e}")
                 return await interaction.response.send_message("Something went wrong.", ephemeral=True)
+            except sqlite3.Error as err:
+                self.bot.log.error(f"Error updating starboard queue entry message ID: {err}")
 
         disabled_view = View(timeout=None)
         for item in self.children:

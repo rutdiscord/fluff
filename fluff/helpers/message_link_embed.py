@@ -1,6 +1,6 @@
 import discord
 
-
+STAR_EMOJI = "⭐"
 async def build_message_embed(message: discord.Message) -> list[discord.Embed]:
     """Build a list of embeds for a message."""
     description_parts = []
@@ -49,6 +49,14 @@ async def build_message_embed(message: discord.Message) -> list[discord.Embed]:
                 image_urls.append(e.thumbnail.url)
 
     embeds = [primary]
+
+    star_count = 0
+    for reaction in message.reactions:
+        if str(reaction.emoji) == STAR_EMOJI:
+            star_count = reaction.count
+            break
+
+    primary.set_footer(text=f"{STAR_EMOJI} {star_count}")
 
     if image_urls:
         for image_url in image_urls:

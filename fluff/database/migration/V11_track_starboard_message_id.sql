@@ -1,0 +1,1 @@
+ALTER TABLE starboard_queue ADD COLUMN starboard_message_id TEXT DEFAULT NULL; --the ID of the message posted in the starboard channel

@@ -35,14 +35,12 @@ class Starboard(Cog):
             return
 
         queue_channel_id = int(queue_channel_id)
+        starboard_channel_id = int(starboard_channel_id)
 
         try:
             starboard_queue_entry: StarboardQueue | None = await self.starboard_queue_repo.get_starboard_queue_entry_by_id(payload.message_id)
         except sqlite3.Error as err:
             self.bot.log.error(f"Failed to get starboard queue entry for message ID {payload.message_id}: {err}")
-            return
-
-        if starboard_queue_entry is not None:
             return
 
         channel = await self.get_channel(payload.channel_id)
@@ -58,11 +56,25 @@ class Starboard(Cog):
         if not message or not message.reactions:
             return
 
-        star_emoji_count = 0
-        for reaction in message.reactions:
-            if reaction.emoji == STAR_EMOJI:
-                star_emoji_count = reaction.count
-                break
+        star_emoji_count = self.count_emojis(message)
+
+        if starboard_queue_entry is not None:
+            if starboard_queue_entry.starboard_message_id is None:
+                return
+            starboard_message_id = starboard_queue_entry.starboard_message_id
+            starboard_channel = await self.get_channel(starboard_channel_id)
+            if starboard_channel is None:
+                return
+            try:
+                starboard_message = await starboard_channel.fetch_message(starboard_message_id)
+                embeds = starboard_message.embeds
+                embeds[0].set_footer(text=f"{STAR_EMOJI} {star_emoji_count}")
+                await starboard_message.edit(embeds=embeds)
+            except discord.HTTPException as e:
+                self.bot.log.error(f"Failed to fetch message {starboard_message_id}: {e}")
+                return
+
+            return
 
         if star_emoji_count < STAR_EMOJI_COUNT_THRESHOLD:
             return
@@ -89,6 +101,61 @@ class Starboard(Cog):
         except sqlite3.Error as err:
             self.bot.log.error(f"Failed to update starboard queue entry for message ID {payload.message_id}: {err}")
 
+    @Cog.listener()
+    async def on_raw_reaction_remove(self, payload: discord.RawReactionActionEvent):
+        if payload is None or payload.guild_id is None or payload.channel_id is None or payload.message_id is None or payload.emoji is None:
+            return
+
+        if str(payload.emoji) != STAR_EMOJI:
+            return
+
+        starboard_channel_id: int = self.bot.config_service.get_server_config(payload.guild_id, "starboard", "starboard_channel")
+        if starboard_channel_id is None:
+            return
+
+        starboard_channel_id = int(starboard_channel_id)
+
+        try:
+            starboard_queue_entry: StarboardQueue | None = await self.starboard_queue_repo.get_starboard_queue_entry_by_id(payload.message_id)
+        except sqlite3.Error as err:
+            self.bot.log.error(f"Failed to get starboard queue entry for message ID {payload.message_id}: {err}")
+            return
+
+        if starboard_queue_entry is None:
+            return
+
+        channel = await self.get_channel(payload.channel_id)
+        if channel is None:
+            return
+
+        try:
+            message = await channel.fetch_message(payload.message_id)
+        except discord.HTTPException as e:
+            self.bot.log.error(f"Failed to fetch message {payload.message_id}: {e}")
+            return
+
+        if not message:
+            return
+
+        star_emoji_count = self.count_emojis(message)
+
+        if starboard_queue_entry.starboard_message_id is None:
+            return
+
+        starboard_message_id = starboard_queue_entry.starboard_message_id
+
+        starboard_channel = await self.get_channel(starboard_channel_id)
+        if starboard_channel is None:
+            return
+        try:
+            starboard_message = await starboard_channel.fetch_message(starboard_message_id)
+            embeds = starboard_message.embeds
+            embeds[0].set_footer(text=f"{STAR_EMOJI} {star_emoji_count}")
+            await starboard_message.edit(embeds=embeds)
+        except discord.HTTPException as e:
+            self.bot.log.error(f"Failed to fetch message {starboard_message_id}: {e}")
+            return
+
     async def get_channel(self, channel_id: int) -> TextChannel | None:
         channel = self.bot.get_channel(channel_id)
         if channel is None:
@@ -99,6 +166,13 @@ class Starboard(Cog):
                 return None
 
         return channel
+
+    def count_emojis(self, message: discord.Message) -> int:
+        for reaction in message.reactions:
+            if reaction.emoji == STAR_EMOJI:
+                return reaction.count
+
+        return 0
 
 
 async def setup(bot):

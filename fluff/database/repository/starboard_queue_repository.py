@@ -11,7 +11,7 @@ class StarboardQueueRepository:
         """Fetches Starboard Queue entry by message_id, if it exists"""
         async with self.db.get_read_connection() as conn:
             cursor = await conn.execute(
-                "SELECT message_id, channel_id, queue_message_id, status FROM starboard_queue WHERE message_id = ?",
+                "SELECT message_id, channel_id, queue_message_id, starboard_message_id, status FROM starboard_queue WHERE message_id = ?",
                 (str(message_id),)
             )
             row = await cursor.fetchone()
@@ -20,10 +20,12 @@ class StarboardQueueRepository:
                 return None
 
             queue_message_id = row["queue_message_id"]
+            starboard_message_id = row["starboard_message_id"]
             return StarboardQueue(
                 message_id=int(row["message_id"]),
                 channel_id=int(row["channel_id"]),
                 queue_message_id=int(queue_message_id) if queue_message_id is not None else None,
+                starboard_message_id=int(starboard_message_id) if starboard_message_id is not None else None,
                 status=StarboardQueueStatus(row["status"])
             )
 
@@ -31,7 +33,7 @@ class StarboardQueueRepository:
         """Fetches Starboard Queue entry by queue_message_id, if it exists"""
         async with self.db.get_read_connection() as conn:
             cursor = await conn.execute(
-                "SELECT message_id, channel_id, queue_message_id, status FROM starboard_queue WHERE queue_message_id = ?",
+                "SELECT message_id, channel_id, queue_message_id, starboard_message_id, status FROM starboard_queue WHERE queue_message_id = ?",
                 (str(queue_message_id),)
             )
             row = await cursor.fetchone()
@@ -40,10 +42,12 @@ class StarboardQueueRepository:
                 return None
 
             queue_message_id = row["queue_message_id"]
+            starboard_message_id = row["starboard_message_id"]
             return StarboardQueue(
                 message_id=int(row["message_id"]),
                 channel_id=int(row["channel_id"]),
                 queue_message_id=int(queue_message_id) if queue_message_id is not None else None,
+                starboard_message_id=int(starboard_message_id) if starboard_message_id is not None else None,
                 status=StarboardQueueStatus(row["status"])
             )
 
@@ -65,6 +69,7 @@ class StarboardQueueRepository:
                 message_id=int(message_id),
                 channel_id=int(channel_id),
                 queue_message_id=None,
+                starboard_message_id=None,
                 status=StarboardQueueStatus.CREATED
             )
 
@@ -74,6 +79,15 @@ class StarboardQueueRepository:
             await conn.execute(
                 "UPDATE starboard_queue SET queue_message_id = ? WHERE message_id = ?",
                 (str(queue_message_id), str(message_id))
+            )
+            await conn.commit()
+
+    async def update_starboard_message_id(self, message_id: int, starboard_message_id: int) -> None:
+        """Updates an existing starboard entry with the ID of the message in the public starboard channel"""
+        async with self.db.get_write_connection() as conn:
+            await conn.execute(
+                "UPDATE starboard_queue SET starboard_message_id = ? WHERE message_id = ?",
+                (str(starboard_message_id), str(message_id))
             )
             await conn.commit()
 
