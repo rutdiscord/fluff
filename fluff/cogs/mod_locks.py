@@ -60,7 +60,7 @@ class ModLocks(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command(aliases=["lockdown"])
-    async def lock(self, ctx, channel: discord.TextChannel = None, soft: bool = False):
+    async def lock(self, ctx, channel: discord.TextChannel | discord.Thread = None, soft: bool = False):
         """This prevents people from typing in a channel.
 
         Useful for rowdy bunches. It saves the channel
@@ -154,7 +154,7 @@ class ModLocks(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command()
-    async def unlock(self, ctx, channel: discord.TextChannel | None):
+    async def unlock(self, ctx, channel: discord.TextChannel | discord.Thread = None):
         """This allows people to type in a channel again.
 
         This reloads the pre-lockdown state.
