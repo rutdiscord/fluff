@@ -96,7 +96,16 @@ class ModLocks(Cog):
                 '**Do not** bring the topic to other channels or risk action taken. This includes "What happened?" messages.'
             )
 
+        if isinstance(channel, discord.Thread):
+            channel: discord.Thread = channel
+            if channel.locked:
+                return await ctx.reply("This thread is already locked.", mention_author=False)
+            else:
+                await ctx.reply(public_msg, mention_author=False)
+            return await channel.edit(locked=True)
+
         await ctx.reply(public_msg, mention_author=False)
+
         # Take a snapshot of current channel state before making any changes
         if ctx.guild.id not in self.snapshots:
             self.snapshots[ctx.guild.id] = {}
@@ -154,6 +163,13 @@ class ModLocks(Cog):
         The channel to unlock."""
         if not channel:
             channel = ctx.channel
+
+        if isinstance(channel, discord.Thread):
+            channel: discord.Thread = channel
+            if not channel.locked:
+                return await ctx.reply("This thread is already unlocked.", mention_author=False)
+            await channel.edit(locked=False)
+            return await ctx.reply("🔓 Thread unlocked.", mention_author=False)
 
         # Restore from snapshot state.
         overwrites = self.snapshots[ctx.guild.id][channel.id]
