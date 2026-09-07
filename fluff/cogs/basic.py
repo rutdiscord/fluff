@@ -624,15 +624,6 @@ class Basic(Cog):
 
         await ctx.send(random_message, mention_author=False)
 
-    @commands.guild_only()
-    @commands.command()
-    async def postrules(self, ctx):
-        """This posts the rules.
-
-        No arguments."""
-        await ctx.send(content=random_msg("rules_1"))
-
-
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if message.author.bot or not message.content or not message.guild or not THANKS_REGEX.search(message.content):
