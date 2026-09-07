@@ -63,10 +63,13 @@ async def build_message_embed(message: discord.Message) -> list[discord.Embed]:
     primary.set_footer(text=f"{STAR_EMOJI} {star_count}")
 
     if image_urls:
-        for image_url in image_urls:
-            gallery_embed = discord.Embed(color=discord.Color.gold(), url=message.jump_url)
-            gallery_embed.set_image(url=image_url)
-            embeds.append(gallery_embed)
+        if len(image_urls) == 1:
+            primary.set_image(url=image_urls[0])
+        else:
+            for image_url in image_urls:
+                gallery_embed = discord.Embed(color=discord.Color.gold(), url=message.jump_url)
+                gallery_embed.set_image(url=image_url)
+                embeds.append(gallery_embed)
 
     primary.timestamp = message.created_at
 
