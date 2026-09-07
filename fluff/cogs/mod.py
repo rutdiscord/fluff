@@ -907,12 +907,7 @@ class Mod(Cog):
         The channel to post the text in.
         - `text`
         The text to repeat."""
-        output = await channel.send(text)
-        if ctx.author.id in self.bot.config.managers:
-            output.author = ctx.author
-            newctx = await self.bot.get_context(output)
-            newctx.message.author = ctx.guild.me
-            await self.bot.invoke(newctx)
+        await channel.send(text)
         await ctx.reply("👍", mention_author=False)
 
     @commands.check(isadmin)
@@ -933,12 +928,7 @@ class Mod(Cog):
         The message to reply to. Message link preferred.
         - `text`
         The text to repeat."""
-        output = await message.reply(content=f"{text}", mention_author=False)
-        if ctx.author.id in self.bot.config.managers:
-            output.author = ctx.author
-            newctx = await self.bot.get_context(output)
-            newctx.message.author = ctx.guild.me
-            await self.bot.invoke(newctx)
+        await message.reply(content=f"{text}", mention_author=False)
         await ctx.reply("👍", mention_author=False)
 
     @commands.check(isadmin)

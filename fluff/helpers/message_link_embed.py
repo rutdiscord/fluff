@@ -22,6 +22,10 @@ async def build_message_embed(message: discord.Message) -> list[discord.Embed]:
 
     if message.content:
         description_parts.append(message.content)
+    elif message.embeds:
+        root_embed: discord.Embed = message.embeds[0]
+        if root_embed.description:
+            description_parts.append(f"> {root_embed.description}")
 
     if reply_description:
         description_parts.append(reply_description)
