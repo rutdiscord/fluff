@@ -2,10 +2,14 @@ import sqlite3
 
 import discord
 from discord import TextChannel
+from discord.ext import commands
 from discord.ext.commands import Cog
 
 from database.model.StarboardQueue import StarboardQueue
+from database.repository.starboard_channel_blacklist_repository import StarboardChannelBlacklistRepository
 from database.repository.starboard_queue_repository import StarboardQueueRepository
+from helpers.checks import ismod
+from helpers.embeds import stock_embed
 from helpers.message_link_embed import build_message_embed
 from view.StarboardApprovalView import StarboardApprovalView
 
@@ -20,6 +24,83 @@ class Starboard(Cog):
     def __init__(self, bot):
         self.bot = bot
         self.starboard_queue_repo: StarboardQueueRepository = StarboardQueueRepository(self.bot.db)
+        self.starboard_channel_blacklist_repo: StarboardChannelBlacklistRepository = StarboardChannelBlacklistRepository(self.bot.db)
+
+    @commands.check(ismod)
+    @commands.guild_only()
+    @commands.group(invoke_without_command=True)
+    async def starboard(self, ctx: commands.Context):
+        """This handles the starboard blacklist.
+
+        Available commands:
+        pls starboard - lists available commands
+        pls starboard blacklist - lists channels that are blacklisted
+        pls starboard blacklist add channel - adds a channel to the starboard blacklist
+        pls starboard blacklist remove channel - removes a channel from the starboard blacklist
+
+        - `channel`
+        The channel to add/remove from the blacklist. Required."""
+        return await ctx.reply(f"Use `pls starboard blacklist` to view blacklisted channels, and `pls starboard blacklist add/remove` to add or remove channels from the blacklist", mention_author=False)
+
+    @starboard.group(name="blacklist", invoke_without_command=True)
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
+    @commands.check(ismod)
+    async def blacklist(self, ctx: commands.Context):
+        """This shows the blacklisted starboard channels.
+
+        No arguments."""
+        blacklisted_channel_ids: list[int] = await self.starboard_channel_blacklist_repo.get_blacklisted_channels()
+
+        if not blacklisted_channel_ids:
+            return await ctx.reply("No channels are blacklisted.", mention_author=False)
+
+        embed = stock_embed(self.bot)
+        embed.title = "Blacklisted Starboard Channels"
+        embed.color = ctx.author.color
+
+        for channel_id in blacklisted_channel_ids:
+            embed.add_field(
+                name=f"<#{channel_id}>",
+                value="",
+                inline=False
+            )
+
+        return await ctx.reply(embed=embed, mention_author=False)
+
+    @blacklist.command(name="add")
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
+    @commands.check(ismod)
+    async def blacklist_add(self, ctx: commands.Context, channel: discord.TextChannel):
+        """Adds a channel to the starboard blacklist."""
+        try:
+            channel_added: bool = await self.starboard_channel_blacklist_repo.add_channel_to_blacklist(channel.id)
+        except sqlite3.Error as err:
+            self.bot.log.error(f"Failed to add starboard channel to blacklist: {err}")
+            return await ctx.reply("Error adding channel to blacklist table")
+
+        if not channel_added:
+            return await ctx.reply(f"{channel.mention} is already in the blacklist.", mention_author=False)
+
+        return await ctx.reply(f"{channel.mention} was added to the starboard blacklist.", mention_author=False)
+
+    @blacklist.command(name="remove")
+    @commands.bot_has_permissions(embed_links=True)
+    @commands.guild_only()
+    @commands.check(ismod)
+    async def blacklist_remove(self, ctx: commands.Context, channel: discord.TextChannel):
+        """Removes a channel from the starboard blacklist."""
+        try:
+            channel_removed: bool = await self.starboard_channel_blacklist_repo.remove_channel_from_blacklist(channel.id)
+        except sqlite3.Error as err:
+            self.bot.log.error(f"Failed to remove starboard channel from blacklist: {err}")
+            return await ctx.reply("Error removing channel from blacklist table")
+
+        if not channel_removed:
+            return await ctx.reply(f"{channel.mention} is not in the blacklist.", mention_author=False)
+
+        return await ctx.reply(f"{channel.mention} was removed from the starboard blacklist.", mention_author=False)
 
     @Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
@@ -45,6 +126,16 @@ class Starboard(Cog):
 
         channel = await self.get_channel(payload.channel_id)
         if channel is None:
+            return
+
+        try:
+            channel_id = payload.channel_id
+            if isinstance(channel, discord.Thread):
+                channel_id = channel.parent_id
+            if await self.starboard_channel_blacklist_repo.is_channel_blacklisted(channel_id):
+                return
+        except sqlite3.Error as err:
+            self.bot.log.error(f"Failed to check if channel is in starboard blacklist: {err}")
             return
 
         try:
