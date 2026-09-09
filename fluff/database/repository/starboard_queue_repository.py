@@ -2,7 +2,7 @@ from database.database import Database
 from database.model.StarboardQueue import StarboardQueue
 from model.StarboardQueueStatus import StarboardQueueStatus
 
-"""Repository class responsible for handling any reads and writes to the whitelist_ping table"""
+"""Repository class responsible for handling any reads and writes to the starboard_queue table"""
 class StarboardQueueRepository:
     def __init__(self, db: Database):
         self.db = db
