@@ -994,7 +994,7 @@ class Mod(Cog):
     async def typing(
         self,
         ctx,
-        channel: discord.abc.TextChannel,
+        channel: discord.abc.GuildChannel,
         duration: int,
     ):
         """This makes the bot type in a channel for some time.
