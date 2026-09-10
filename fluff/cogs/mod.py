@@ -889,7 +889,7 @@ class Mod(Cog):
                     f"Slowmode disabled in {channel.mention}.", mention_author=False
                 )
 
-    @commands.check(isadmin)
+    @commands.check(ismod)
     @commands.guild_only()
     @commands.command(aliases=["send"])
     async def speak(
@@ -901,8 +901,6 @@ class Mod(Cog):
     ):
         """This makes the bot repeat some text in a specific channel.
 
-        If you manage the bot, it can even run commands.
-
         - `channel`
         The channel to post the text in.
         - `text`
@@ -910,7 +908,7 @@ class Mod(Cog):
         await channel.send(text)
         await ctx.reply("👍", mention_author=False)
 
-    @commands.check(isadmin)
+    @commands.check(ismod)
     @commands.guild_only()
     @commands.command()
     async def reply(
@@ -922,8 +920,6 @@ class Mod(Cog):
     ):
         """This makes the bot reply to a message.
 
-        If you manage the bot, it can even run commands.
-
         - `message`
         The message to reply to. Message link preferred.
         - `text`
@@ -931,7 +927,7 @@ class Mod(Cog):
         await message.reply(content=f"{text}", mention_author=False)
         await ctx.reply("👍", mention_author=False)
 
-    @commands.check(isadmin)
+    @commands.check(ismod)
     @commands.guild_only()
     @commands.command()
     async def react(
@@ -952,7 +948,7 @@ class Mod(Cog):
         await message.add_reaction(emoji)
         await ctx.reply("👍", mention_author=False)
 
-    @commands.check(isadmin)
+    @commands.check(ismod)
     @commands.guild_only()
     @commands.command()
     async def typing(
