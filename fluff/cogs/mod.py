@@ -591,8 +591,7 @@ class Mod(Cog):
     ):
         """This clears a given number of messages.
 
-        Please see the sister subcommands as well, in the [documentation](https://3gou.0ccu.lt/as-a-moderator/basic-functionality/#purging).
-        Defaults to 50 messages in the current channel. Max of one million.
+        Defaults to 50 messages in the current channel. Max of five hundred.
 
         - `limit`
         The limit of messages to delete. Optional.
@@ -603,9 +602,9 @@ class Mod(Cog):
 
         if not channel:
             channel = ctx.channel
-        if limit >= 1000000:
+        if limit > 500:
             return await ctx.reply(
-                content=f"Your purge limit of `{limit}` is too high. Are you trying to `purge from {limit}`?",
+                content=f"Your purge limit of `{limit}` is too high. Maximum of 500.",
                 mention_author=False,
             )
 
@@ -626,7 +625,7 @@ class Mod(Cog):
     async def bots(self, ctx, limit: int, channel: discord.abc.GuildChannel | None):
         """This clears a given number of bot messages.
 
-        Defaults to 50 messages in the current channel. Max of one million.
+        Defaults to 50 messages in the current channel. Max of five hundred.
 
         - `limit`
         The limit of messages to delete. Optional.
@@ -634,8 +633,14 @@ class Mod(Cog):
         The channel to purge from. Optional."""
         if not limit:
             limit = 50
+
         if not channel:
             channel = ctx.channel
+        if limit > 500:
+            return await ctx.reply(
+                content=f"Your purge limit of `{limit}` is too high. Maximum of 500.",
+                mention_author=False,
+            )
 
         def is_bot(m):
             return any((m.author.bot, m.author.discriminator == "0000"))
@@ -663,7 +668,7 @@ class Mod(Cog):
     ):
         """This clears a given number of user messages.
 
-        Defaults to 50 messages in the current channel. Max of one million.
+        Defaults to 50 messages in the current channel. Max of five hundred.
 
         - `target`
         The user to purge messages from.
@@ -671,8 +676,16 @@ class Mod(Cog):
         The limit of messages to delete. Optional.
         - `channel`
         The channel to purge from. Optional."""
+        if not limit:
+            limit = 50
+
         if not channel:
             channel = ctx.channel
+        if limit > 500:
+            return await ctx.reply(
+                content=f"Your purge limit of `{limit}` is too high. Maximum of 500.",
+                mention_author=False,
+            )
 
         def is_mentioned(m):
             return target.id == m.author.id
@@ -700,7 +713,7 @@ class Mod(Cog):
     ):
         """This clears a given number of specific messages.
 
-        Defaults to 50 messages in the current channel. Max of one million.
+        Defaults to 50 messages in the current channel. Max of five hundred.
 
         - `string`
         Messages containing this will be deleted.
@@ -708,8 +721,16 @@ class Mod(Cog):
         The limit of messages to delete. Optional.
         - `channel`
         The channel to purge from. Optional."""
+        if not limit:
+            limit = 50
+
         if not channel:
             channel = ctx.channel
+        if limit > 500:
+            return await ctx.reply(
+                content=f"Your purge limit of `{limit}` is too high. Maximum of 500.",
+                mention_author=False,
+            )
 
         def contains(m):
             return string in m.content
@@ -731,17 +752,23 @@ class Mod(Cog):
     async def emotes(self, ctx, limit: int, channel: discord.abc.GuildChannel | None):
         """This clears a given number of emotes.
 
-        Defaults to 50 messages in the current channel. Max of one million.
+        Defaults to 50 messages in the current channel. Max of five hundred.
 
         - `limit`
         The limit of emotes to delete. Optional.
         - `channel`
         The channel to purge from. Optional."""
-        if not channel:
-            channel = ctx.channel
-
         if not limit:
             limit = 50
+
+        if not channel:
+            channel = ctx.channel
+        if limit > 500:
+            return await ctx.reply(
+                content=f"Your purge limit of `{limit}` is too high. Maximum of 500.",
+                mention_author=False,
+            )
+
         emote_re = re.compile(r":[A-Za-z0-9_]+:", re.IGNORECASE)
 
         def has_emote(m):
@@ -770,17 +797,22 @@ class Mod(Cog):
         """This clears a given number of messages with embeds.
 
         This includes stickers, by the way, but not emoji.
-        Defaults to 50 messages in the current channel. Max of one million.
+        Defaults to 50 messages in the current channel. Max of five hundred.
 
         - `limit`
         The limit of messages to delete. Optional.
         - `channel`
         The channel to purge from. Optional."""
-        if not channel:
-            channel = ctx.channel
-
         if not limit:
             limit = 50
+
+        if not channel:
+            channel = ctx.channel
+        if limit > 500:
+            return await ctx.reply(
+                content=f"Your purge limit of `{limit}` is too high. Maximum of 500.",
+                mention_author=False,
+            )
 
         def has_embed(m):
             return any((m.embeds, m.attachments, m.stickers))
@@ -803,14 +835,22 @@ class Mod(Cog):
         """This clears a given number of reactions.
 
         This does NOT delete their messages! Just the reactions!
-        Defaults to 50 messages in the current channel. Max of one million.
+        Defaults to 50 messages in the current channel. Max of five hundred.
 
         - `limit`
         The limit of reactions to delete. Optional.
         - `channel`
         The channel to purge from. Optional."""
+        if not limit:
+            limit = 50
+
         if not channel:
             channel = ctx.channel
+        if limit > 500:
+            return await ctx.reply(
+                content=f"Your purge limit of `{limit}` is too high. Maximum of 500.",
+                mention_author=False,
+            )
 
         should_purge: bool = await self.confirm_purge(ctx, channel)
         if not should_purge:
@@ -954,7 +994,7 @@ class Mod(Cog):
     async def typing(
         self,
         ctx,
-        channel: discord.abc.GuildChannel,
+        channel: discord.abc.TextChannel,
         duration: int,
     ):
         """This makes the bot type in a channel for some time.
