@@ -121,11 +121,14 @@ class RulePush(Cog):
         if session.users is None or len(session.users) <= 0:
             return await ctx.reply("There are no members to unrulepush", mention_author=False)
 
+        if session.type != RolebanType.RULEPUSH:
+            return await ctx.reply("This user is not rulepushed.", mention_author=False)
+
         channel = ctx.guild.get_channel(session.channel_id)
         released = await self.bot.roleban_service.unroleban_user(ctx, session, session.users[0].user_id, channel)
         deleted_channel = False
         if released:
-            deleted_channel = await self.bot.roleban_service.delete_roleban_channel(channel, "manually removed rulepush", session.id)
+            deleted_channel = await self.bot.roleban_service.delete_roleban_channel(channel=channel, reason="manually removed rulepush", session_id=session.id, delete_session=True)
 
         if ctx.channel.id != session.channel_id:
             if released and deleted_channel:
@@ -143,10 +146,10 @@ class RulePush(Cog):
         No arguments."""
         sessions: list[RolebanSession] | None = await self.bot.roleban_service.get_open_sessions(ctx.guild.id)
 
+        sessions = [session for session in sessions if session.type == RolebanType.RULEPUSH and session.users[0].status == RolebanStatus.ACTIVE.value]
+
         if not sessions:
             return await ctx.reply("No sessions found.", mention_author=False)
-
-        sessions = [session for session in sessions if session.type == RolebanType.RULEPUSH and session.users[0].status == RolebanStatus.ACTIVE.value]
 
         embed = stock_embed(self.bot)
         embed.title = "Rulepush Sessions"
@@ -387,7 +390,7 @@ class RulePush(Cog):
                 mention_author=False,
             )
 
-        session: RolebanSession = await self.bot.roleban_service.roleban_users(ctx, [member], RolebanType.RULEPUSH, not is_target_staff)
+        session: RolebanSession = await self.bot.roleban_service.roleban_users(ctx=ctx, members=[member], roleban_type=RolebanType.RULEPUSH, remove_roles=not is_target_staff, session_to_use=None)
         if session is None:
             return
 
@@ -396,7 +399,7 @@ class RulePush(Cog):
         except sqlite3.Error as err:
             self.bot.log.error(f"Error while adding keyword for rulepush session: {err}")
             await self.bot.roleban_service.unroleban_user(ctx, session, member.id, ctx.guild.get_channel(session.channel_id))
-            await self.bot.roleban_service.delete_roleban_channel(self.bot.get_channel(session.channel_id), "Keyword DB setup failed, deleting channel", session.id)
+            await self.bot.roleban_service.delete_roleban_channel(channel=self.bot.get_channel(session.channel_id), reason="Keyword DB setup failed, deleting channel", session_id=session.id, delete_session=True)
             return await ctx.reply(f"Error while creating rulepush session: {err}", mention_author=False)
 
         rulepush_channel: discord.TextChannel = self.bot.get_channel(session.channel_id)
@@ -441,7 +444,7 @@ class RulePush(Cog):
             return
 
         session: RolebanSession = await self.bot.roleban_service.get_roleban_session_by_channel(message.guild.id, message.channel.id)
-        if session is None or session.users is None or len(session.users) <= 0:
+        if session is None or session.type != RolebanType.RULEPUSH or session.users is None or len(session.users) <= 0:
             return
 
         #only ever one user in rulepush sessions
@@ -492,7 +495,7 @@ class RulePush(Cog):
             ctx: commands.Context = await self.bot.get_context(message)
             released = await self.bot.roleban_service.unroleban_user(ctx, session, message.author.id, message.channel)
             if released:
-                deleted_channel = await self.bot.roleban_service.delete_roleban_channel(message.channel, "user completed rulepush", session.id)
+                deleted_channel = await self.bot.roleban_service.delete_roleban_channel(channel=message.channel, reason="user completed rulepush", session_id=session.id, delete_session=True)
                 if not deleted_channel:
                     return await message.channel.send("User was unrulepushed, but I was unable to delete the channel.", mention_author=False)
             else:
@@ -551,42 +554,11 @@ class RulePush(Cog):
         await self.bot.wait_until_ready()
         guild = member.guild
 
-        try:
-            session = await self.bot.roleban_service.get_roleban_session_by_user(guild.id, member.id)
-        except sqlite3.Error as err:
-            return self.bot.log.error(f"Error fetching rulepush session on member join for user: {member.id}: {err}")
-
-        if session is None or session.type is not RolebanType.RULEPUSH or session.users is None or len(session.users) <= 0:
+        reactivated_session_info: tuple[discord.TextChannel, int, bool] | None = await self.bot.roleban_service.reactivate_user_session(guild, member, RolebanType.RULEPUSH)
+        if reactivated_session_info is None:
             return
 
-        # reuse the old channel if it still exists, otherwise recreate it
-        channel: discord.TextChannel = self.bot.get_channel(session.channel_id) if session.channel_id else None
-        channel_recreated = False
-        if channel is None:
-            channel = await self.bot.roleban_service.create_roleban_channel(guild, RolebanType.RULEPUSH)
-            channel_recreated = True
-
-            # channel creation failed
-            if channel is None:
-                return await self.send_rulepush_resume_failure_notification(member, "I could not create a new rulepush channel")
-
-        try:
-            await channel.set_permissions(member, read_messages=True)
-        except (discord.Forbidden, discord.HTTPException) as err:
-            self.bot.log.error(f"Error restoring channel permissions on rejoin in server {guild.id}: {err}")
-            return await self.send_rulepush_resume_failure_notification(member,"I could not assign the correct channel permissions for the user")
-
-        successful = await self.bot.roleban_service.assign_roleban_role(member, "User was automatically rulepushed on server join.")
-        if not successful:
-            return await self.send_rulepush_resume_failure_notification(member,"I could not assign the roleban role to the user")
-
-        try:
-            await self.bot.roleban_service.reactivate_user_session(session.id, member.id, channel.id)
-            session.users[0].status = RolebanStatus.ACTIVE.value
-            session.channel_id = channel.id
-        except sqlite3.Error as err:
-            self.bot.log.error(f"Error reactivating rulepush session {session.id}: {err}")
-            return await self.send_rulepush_resume_failure_notification(member,f"a database error prevented the session from being reactivated. The channel is {channel.mention}")
+        channel, session_id, channel_recreated = reactivated_session_info
 
         if channel_recreated:
             # re-render the rules with the same keywords (but possibly in different positions) so progress carries over
@@ -594,7 +566,7 @@ class RulePush(Cog):
             keywords = None
             try:
                 rules = await self.rule_repo.get_rules(member.guild.id)
-                found_keywords, not_found_keywords = await self.rule_push_repo.get_keywords_for_session(session.id)
+                found_keywords, not_found_keywords = await self.rule_push_repo.get_keywords_for_session(session_id)
                 keywords = found_keywords + not_found_keywords
             except sqlite3.Error as err:
                 self.bot.log.error(f"Error loading rules/keywords for user {member.id}: {err}")
@@ -615,14 +587,6 @@ class RulePush(Cog):
 
         await channel.send(f"🔁 {member.mention}, you left while a rulepush was in progress, so it has been resumed. Re-read the rules and type each hidden word that you find.", allowed_mentions=discord.AllowedMentions(users=True))
 
-        embed = stock_embed(self.bot)
-        embed.title = "🔁 Rulepush Resumed"
-        embed.color = discord.Color.orange()
-        embed.description = (
-            f"{member.mention} ({member.id}) rejoined while rulepushed. Continuing in {channel.mention}..."
-        )
-        await self.bot.notification_service.send_notification(member.guild, embed)
-
     @Cog.listener()
     async def on_member_ban(self, guild: discord.Guild, user: discord.User | discord.Member):
         if user is None or user.id is None:
@@ -637,17 +601,10 @@ class RulePush(Cog):
         except sqlite3.Error as err:
             self.bot.log.error(f"Error removing user {user.id} from rule push leaderboard: {err}")
 
-    async def send_rulepush_resume_failure_notification(self, member: discord.Member, reason: str):
-        embed = stock_embed(self.bot)
-        embed.title = "⚠️ Rulepush Resume Failed"
-        embed.color = discord.Color.red()
-        embed.description = f"{member.mention} rejoined with a pending rulepush, but {reason}."
-        return await self.bot.notification_service.send_notification(member.guild, embed)
-
     async def confirm_action(self, ctx: commands.Context, channel: discord.abc.GuildChannel) -> bool:
-        """Waits up to one minute for the purge invoking user to confirm they actually want to purge
+        """Waits up to one minute for the invoking user to confirm they actually want to run this command
 
-        Returns: true if a purge should actually occur, false otherwise"""
+        Returns: true if this command should actually run, false otherwise"""
         await ctx.reply(
             "**WARNING: sensitive information. Do not invoke command in general chat**. Type `yes` to continue, or `no` to cancel. (I will wait 1 minute for your response before automatically cancelling the command)",
             mention_author=False)

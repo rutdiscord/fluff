@@ -2,8 +2,6 @@ import discord
 from discord.ext.commands import Cog
 from discord.ext import commands
 from helpers.embeds import stock_embed
-from helpers.sv_config import get_config
-
 
 class ReactionLogging(Cog):
     def __init__(self, bot):
@@ -11,7 +9,7 @@ class ReactionLogging(Cog):
 
     def enabled(self, guild: discord.Guild):
         try:
-            possible_log_channel = self.bot.pull_channel(guild, get_config(guild.id, "logging", "reactlog"))
+            possible_log_channel = self.bot.pull_channel(guild, self.bot.config_service.get_server_config(guild.id, "logging", "reactlog"))
         except KeyError:
             return False # Don't Even Bother!
         
@@ -47,7 +45,7 @@ class ReactionLogging(Cog):
     
 
         log_channel = self.bot.get_channel(
-            get_config(user.guild.id, "logging", "reactlog")
+            self.bot.config_service.get_server_config(user.guild.id, "logging", "reactlog")
         )
 
         log_embed = stock_embed(self.bot)

@@ -2,7 +2,6 @@ from discord.ext import commands
 from discord.ext.commands import Cog
 import discord
 from helpers.checks import ismod, check_if_target_is_staff
-from helpers.sv_config import get_config
 from helpers.placeholders import random_msg
 
 
@@ -29,10 +28,12 @@ class ModLocks(Cog):
             pass
 
     async def unlock_for_staff(self, channel: discord.TextChannel, issuer):
+        admin_role: str = self.bot.config_service.get_server_config(channel.guild.id, "staff", "adminrole")
+        mod_role: str = self.bot.config_service.get_server_config(channel.guild.id, "staff", "modrole")
         await self.set_sendmessage(
             channel,
             self.bot.pull_role(
-                channel.guild, get_config(channel.guild.id, "staff", "adminrole")
+                channel.guild, admin_role
             ),
             True,
             issuer,
@@ -40,17 +41,18 @@ class ModLocks(Cog):
         await self.set_sendmessage(
             channel,
             self.bot.pull_role(
-                channel.guild, get_config(channel.guild.id, "staff", "modrole")
+                channel.guild, mod_role
             ),
             True,
             issuer,
         )
 
     async def unlock_for_bots(self, channel: discord.TextChannel, issuer):
+        bot_role: str = self.bot.config_service.get_server_config(channel.guild.id, "staff", "botrole")
         await self.set_sendmessage(
             channel,
             self.bot.pull_role(
-                channel.guild, get_config(channel.guild.id, "staff", "botrole")
+                channel.guild, bot_role
             ),
             True,
             issuer,
@@ -74,13 +76,16 @@ class ModLocks(Cog):
         if not channel:
             channel = ctx.channel
         adminrole = self.bot.pull_role(
-            ctx.guild, get_config(ctx.guild.id, "staff", "adminrole")
+            ctx.guild, self.bot.config_service.get_server_config(channel.guild.id, "staff", "adminrole")
+
         )
         modrole = self.bot.pull_role(
-            ctx.guild, get_config(ctx.guild.id, "staff", "modrole")
+            ctx.guild, self.bot.config_service.get_server_config(channel.guild.id, "staff", "modrole")
+
         )
         botrole = self.bot.pull_role(
-            ctx.guild, get_config(ctx.guild.id, "staff", "botrole")
+            ctx.guild, self.bot.config_service.get_server_config(channel.guild.id, "staff", "botrole")
+
         )
 
         if not adminrole and not modrole:

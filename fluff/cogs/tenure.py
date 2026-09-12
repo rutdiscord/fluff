@@ -2,7 +2,6 @@ from typing import Literal
 import discord
 from discord.ext.commands import Cog
 from discord.ext import commands
-from helpers.sv_config import get_config
 from helpers.checks import ismanager, isadmin
 from datetime import datetime, timedelta, UTC
 
@@ -16,23 +15,24 @@ class Tenure(Cog):
         return datetime.now(UTC) - member.joined_at if member.joined_at is not None else timedelta(0)
 
     def get_tenureconfig(self, guild: discord.Guild):
+        tenure_role: str = self.bot.config_service.get_server_config(guild.id, "tenure", "role")
         return {
             "role_disabled": self.bot.pull_role(
-                guild, get_config(guild.id, "tenure", "role_disabled")
+                guild, self.bot.config_service.get_server_config(guild.id, "tenure", "role_disabled")
             ),
-            "role": self.bot.pull_role(guild, get_config(guild.id, "tenure", "role")),
-            "threshold": get_config(guild.id, "tenure", "threshold"),
+            "role": self.bot.pull_role(guild, tenure_role),
+            "threshold": self.bot.config_service.get_server_config(guild.id, "tenure", "threshold"),
         }
 
     def enabled(self, guild: discord.Guild):
         try:
             return all(
                 (
-                    self.bot.pull_role(guild, get_config(guild.id, "tenure", "role")),
+                    self.bot.pull_role(guild, self.bot.config_service.get_server_config(guild.id, "tenure", "role")),
                     self.bot.pull_role(
-                        guild, get_config(guild.id, "tenure", "role_disabled")
+                        guild, self.bot.config_service.get_server_config(guild.id, "tenure", "role_disabled")
                     ),
-                    get_config(guild.id, "tenure", "threshold"),
+                    self.bot.config_service.get_server_config(guild.id, "tenure", "threshold"),
                 )
             )
         except KeyError:

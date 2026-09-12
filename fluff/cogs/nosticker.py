@@ -1,21 +1,19 @@
 import discord
 from discord.ext.commands import Cog
 from discord.ext import commands
-from helpers.sv_config import get_config
-
 
 class NoSticker(Cog):
     def __init__(self, bot):
         self.bot = bot
 
     def get_tenurerole(self, guild: discord.Guild):
-        return self.bot.pull_role(guild, get_config(guild.id, "tenure", "role"))
+        return self.bot.pull_role(guild, self.bot.config_service.get_server_config(guild.id, "tenure", "role"))
 
     def enabled(self, guild: discord.Guild):
         return all(
             (
-                self.bot.pull_role(guild, get_config(guild.id, "tenure", "role")),
-                get_config(guild.id, "tenure", "threshold"),
+                self.bot.pull_role(guild, self.bot.config_service.get_server_config(guild.id, "tenure", "role")),
+                self.bot.config_service.get_server_config(guild.id, "tenure", "threshold")
             )
         )
 
