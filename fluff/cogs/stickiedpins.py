@@ -1,88 +1,107 @@
-import json
+import sqlite3
+
 import discord
 from discord.ext import commands
-from helpers.datafiles import get_guildfile, set_guildfile
-from helpers.checks import ismod, ismanager
+
+from database.model.StickiedPin import StickiedPin
+from database.repository.stickied_pins_repository import StickiedPinsRepository
+from helpers.checks import ismod
+from helpers.embeds import stock_embed
 
 
 class StickiedPins(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        self.stickied_pins_repo: StickiedPinsRepository = StickiedPinsRepository(self.bot.db)
 
     async def update_pins(
-        self, guild: discord.Guild, channel: discord.abc.GuildChannel
+        self, channel: discord.abc.GuildChannel
     ):
-        guild_pins = get_guildfile(guild.id, "pins")
-        if str(channel.id) in guild_pins:
-            for pin in guild_pins[str(channel.id)]:
-                message = await channel.fetch_message(pin)
+        stickied_pins: list[StickiedPin] = []
+        try:
+            stickied_pins = await self.stickied_pins_repo.get_all_stickied_pins()
+        except sqlite3.Error as err:
+            self.bot.log.error(f"Error fetching stickied pins: {err}")
+            return
+
+        for stickied_pin in stickied_pins:
+            if channel.id == stickied_pin.channel_id:
+                channel: discord.TextChannel = self.bot.get_channel(stickied_pin.channel_id)
+                if channel is None:
+                    continue
+
+                message = await channel.fetch_message(stickied_pin.message_id)
 
                 if message.pinned:
                     await message.unpin()
                 await message.pin()
-        else:
-            return False
 
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
     @commands.guild_only()
     @commands.group(invoke_without_command=True, aliases=["pin"])
-    async def pins(self, ctx):
-        guild_pins = get_guildfile(ctx.guild.id, "pins")
+    async def pins(self, ctx: commands.Context):
+        stickied_pins: list[StickiedPin] = []
+        try:
+            stickied_pins = await self.stickied_pins_repo.get_all_stickied_pins()
+        except sqlite3.Error as err:
+            self.bot.log.error(f"Error fetching stickied pins: {err}")
+
+        if not stickied_pins:
+            return await ctx.reply("No stickied pins found.", mention_author=False)
+
+        embed = stock_embed(self.bot)
+        embed.title = "Stickied Pins"
+        embed.color = ctx.author.color
+
+        for stickied_pin in stickied_pins:
+            channel: discord.TextChannel = self.bot.get_channel(stickied_pin.channel_id)
+            link = f"https://discord.com/channels/{ctx.guild.id}/{stickied_pin.channel_id}/{stickied_pin.message_id}"
+            embed.add_field(
+                name=f"{channel.name}",
+                value=link,
+                inline=True
+            )
+
+        return await ctx.reply(embed=embed, mention_author=False)
 
     @commands.bot_has_permissions(manage_messages=True)
     @commands.check(ismod)
     @commands.guild_only()
     @pins.command()
     async def create(self, ctx: discord.abc.GuildChannel, msg: discord.Message):
-        guild_pins = get_guildfile(ctx.guild.id, "pins")
-        if str(msg.channel.id) not in guild_pins:
-            guild_pins[str(msg.channel.id)] = []
-        channel_pins = guild_pins[str(msg.channel.id)]
+        stickied_pin_added: bool = False
+        try:
+            stickied_pin_added: bool = await self.stickied_pins_repo.create_stickied_pin(msg.channel.id, msg.id)
+        except sqlite3.Error as err:
+            self.bot.log.error(f"Error creating stickied pin: {err}")
+            return await ctx.reply("Error adding stickied pin.", mention_author=False)
 
-        if msg.id in channel_pins:
-            return await ctx.reply(
-                f"Stickied pin already exists in channel: {msg.jump_url}",
-                mention_author=False,
-            )
-        else:
-            channel_pins.append(msg.id)
-            set_guildfile(ctx.guild.id, "pins", json.dumps(guild_pins))
-            return await ctx.reply(
-                f"Stickied pin created in <#{msg.channel.id}>.", mention_author=False
-            )
-        # await msg.channel.pins()
-        # guild_pins = get_guildfile(ctx.guild.id, "pins")
-        # channel_pins = None
-        # if str(msg.channel.id) not in guild_pins:
-        #     guild_pins[str(msg.channel.id)] = {}
-        #     channel_pins = guild_pins[str(msg.channel.id)]
+        if not stickied_pin_added:
+            return await ctx.reply(f"Stickied pin already exists.", mention_author=False)
 
-        # if msg.id in guild_pins[str(msg.channel.id)]:
-        #     return await ctx.reply(f"Stickied pin already exists in channel: {msg.jump_url}", mention_author=False)
+        await self.update_pins(msg.channel)
 
-        # channel_pins.append(msg.id)
-        # set_guildfile(ctx.guild.id, "pins", json.dumps(guild_pins))
-
-        # try:
-        #     if msg.id in guild_pins[str(msg.channel.id)]:
-        #       self.update_pins(ctx.guild, msg.channel)
-        #       return await ctx.reply(f"Stickied pin created in <#{msg.channel.id}>.", mention_author=False)
-        # except Exception as reason:
-        #     return await ctx.reply(f"Stickied pin failed to be created. {reason}")
+        return await ctx.reply(f"Stickied pin created in <#{msg.channel.id}>.", mention_author=False)
 
     @commands.bot_has_permissions(manage_messages=True)
-    @commands.check(ismanager)
+    @commands.check(ismod)
     @commands.guild_only()
     @pins.command()
-    async def force_update(
-        self,
-        ctx: discord.abc.GuildChannel,
-        target_channel: discord.abc.GuildChannel = None,
-    ):
-        guild = ctx.guild
-        channel = target_channel or ctx.channel
-        return await self.update_pins(guild, channel)
+    async def delete(self, ctx: discord.abc.GuildChannel, msg: discord.Message):
+        stickied_pin_deleted: bool = False
+        try:
+            stickied_pin_deleted: bool = await self.stickied_pins_repo.delete_stickied_pin(msg.channel.id, msg.id)
+        except sqlite3.Error as err:
+            self.bot.log.error(f"Error deleting stickied pin: {err}")
+            return await ctx.reply("Error deleting stickied pin.", mention_author=False)
+
+        if not stickied_pin_deleted:
+            return await ctx.reply(f"That message was not pinned..", mention_author=False)
+
+        await self.update_pins(msg.channel)
+
+        return await ctx.reply(f"Stickied pin deleted from <#{msg.channel.id}>.", mention_author=False)
 
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
@@ -95,7 +114,7 @@ class StickiedPins(commands.Cog):
             ]
         ):
 
-            await self.update_pins(message.guild, message.channel)
+            await self.update_pins(message.channel)
 
 
 async def setup(bot):

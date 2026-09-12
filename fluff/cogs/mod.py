@@ -11,10 +11,8 @@ import emoji
 from database.model.TempBannedUser import TempBannedUser
 from database.repository.tempban_repository import TempBanRepository
 from helpers.checks import ismod, isadmin, check_if_target_is_staff
-from helpers.datafiles import add_userlog
 from helpers.embeds import stock_embed
 from helpers.placeholders import random_msg
-from helpers.sv_config import get_config
 import re
 
 from helpers.time import parse_duration
@@ -56,8 +54,6 @@ class Mod(Cog):
 
         elif check_if_target_is_staff(self.bot, target, self.bot.config_service):
             return await ctx.send("I cannot kick Staff members.")
-
-        add_userlog(ctx.guild.id, target.id, ctx.author, reason, "kicks")
 
         safe_name = await commands.clean_content(escape_markdown=True).convert(
             ctx, str(target)
@@ -103,24 +99,14 @@ class Mod(Cog):
         #permanently banning them
         await self.remove_user_from_tempban(ctx, target.id)
 
-        if reason:
-            add_userlog(ctx.guild.id, target.id, ctx.author, reason, "bans")
-        else:
-            add_userlog(
-                ctx.guild.id,
-                target.id,
-                ctx.author,
-                f"No reason provided. ({ctx.message.jump_url})",
-                "bans",
-            )
-
+        appeal_url: str = self.bot.config_service.get_server_config(ctx.guild.id, "staff", "appealurl")
         dm_message = f"**You were banned** from `{ctx.guild.name}`."
         if reason:
             dm_message += f'\n*The given reason is:* "{reason}".'
         dm_message += "\n\nThis ban does not expire"
         dm_message += (
-            f", but you may appeal it here (although you must wait 1 week minimum before attempting to appeal):\n{get_config(ctx.guild.id, 'staff', 'appealurl')}"
-            if get_config(ctx.guild.id, "staff", "appealurl")
+            f", but you may appeal it here (although you must wait 1 week minimum before attempting to appeal):\n{appeal_url}"
+            if appeal_url
             else "."
         )
 
@@ -146,24 +132,14 @@ class Mod(Cog):
         # permanently banning them
         await self.remove_user_from_tempban(ctx, target.id)
 
-        if reason:
-            add_userlog(ctx.guild.id, target.id, ctx.author, reason, "bans")
-        else:
-            add_userlog(
-                ctx.guild.id,
-                target.id,
-                ctx.author,
-                f"No reason provided. ({ctx.message.jump_url})",
-                "bans",
-            )
-
+        appeal_url: str = self.bot.config_service.get_server_config(ctx.guild.id, "staff", "appealurl")
         dm_message = f"**You were banned** from `{ctx.guild.name}`."
         if reason:
             dm_message += f'\n*The given reason is:* "{reason}".'
         dm_message += "\n\nThis ban does not expire"
         dm_message += (
-            f", but you may appeal it here (although you must wait 1 week minimum before attempting to appeal):\n{get_config(ctx.guild.id, 'staff', 'appealurl')}"
-            if get_config(ctx.guild.id, "staff", "appealurl")
+            f", but you may appeal it here (although you must wait 1 week minimum before attempting to appeal):\n{appeal_url}"
+            if appeal_url
             else "."
         )
 
@@ -429,25 +405,15 @@ class Mod(Cog):
         # permanently banning them
         await self.remove_user_from_tempban(ctx, target.id, "d")
 
-        if reason:
-            add_userlog(ctx.guild.id, target.id, ctx.author, reason, "bans")
-        else:
-            add_userlog(
-                ctx.guild.id,
-                target.id,
-                ctx.author,
-                f"No reason provided. ({ctx.message.jump_url})",
-                "bans",
-            )
-
         failmsg = ""
         if ctx.guild.get_member(target.id) is not None:
             dm_message = f"**You were banned** from `{ctx.guild.name}`."
             if reason:
                 dm_message += f'\n*The given reason is:* "{reason}".'
+            appeal_url: str = self.bot.config_service.get_server_config(ctx.guild.id, "staff", "appealurl")
             appealmsg = (
-                f", but you may appeal it here (although you must wait 1 week minimum before attempting to appeal):\n{get_config(ctx.guild.id, 'staff', 'appealurl')}"
-                if get_config(ctx.guild.id, "staff", "appealurl")
+                f", but you may appeal it here (although you must wait 1 week minimum before attempting to appeal):\n{appeal_url}"
+                if appeal_url
                 else "."
             )
             dm_message += f"\n\nThis ban does not expire{appealmsg}"
@@ -495,14 +461,6 @@ class Mod(Cog):
             # remove the user from the temp ban table, if an entry exists. We dont want them to be unbanned automatically if we are
             # permanently banning them
             await self.remove_user_from_tempban(ctx, target, "mass")
-
-            add_userlog(
-                ctx.guild.id,
-                target,
-                ctx.author,
-                f"Part of a massban. [[Jump]({ctx.message.jump_url})]",
-                "bans",
-            )
 
             await ctx.guild.ban(
                 target_user,
@@ -559,17 +517,6 @@ class Mod(Cog):
         # remove the user from the temp ban table, if an entry exists. We dont want them to be unbanned automatically if we are
         # permanently banning them
         await self.remove_user_from_tempban(ctx, target.id, "s")
-
-        if reason:
-            add_userlog(ctx.guild.id, target.id, ctx.author, reason, "bans")
-        else:
-            add_userlog(
-                ctx.guild.id,
-                target.id,
-                ctx.author,
-                f"No reason provided. ({ctx.message.jump_url})",
-                "bans",
-            )
 
         safe_name = await commands.clean_content(escape_markdown=True).convert(
             ctx, str(target)

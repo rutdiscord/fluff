@@ -1,6 +1,5 @@
 from discord.ext import commands
 from discord.ext.commands import Cog
-from helpers.sv_config import get_config
 from helpers.embeds import stock_embed
 
 
@@ -18,10 +17,10 @@ class specific(Cog):
 
         No arguments."""
         adminrole = self.bot.pull_role(
-            ctx.guild, get_config(ctx.guild.id, "staff", "adminrole")
+            ctx.guild, self.bot.config_service.get_server_config(ctx.guild.id, "staff", "adminrole")
         )
         modrole = self.bot.pull_role(
-            ctx.guild, get_config(ctx.guild.id, "staff", "modrole")
+            ctx.guild, self.bot.config_service.get_server_config(ctx.guild.id, "staff", "modrole")
         )
 
         if not adminrole and not modrole:

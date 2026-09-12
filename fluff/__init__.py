@@ -29,7 +29,11 @@ log_format = logging.Formatter(
 )
 stdout_handler = logging.StreamHandler(sys.stdout)
 stdout_handler.setFormatter(log_format)
-logfile_handler = logging.FileHandler("logs/fluff.log", mode="w")
+logfile_handler = logging.handlers.RotatingFileHandler(
+    filename="logs/fluff.log",
+    maxBytes=20 * 1024 * 1024,  # 20 MB max per file, 5 files max = 100 MB
+    backupCount=5
+)
 logfile_handler.setFormatter(log_format)
 log = logging.getLogger("discord")
 log.setLevel(logging.INFO)

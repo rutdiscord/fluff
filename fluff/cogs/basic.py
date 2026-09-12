@@ -12,10 +12,7 @@ from discord.ext import commands
 from discord.ext.commands import Cog
 from helpers.checks import ismod, ismanager
 from helpers.embeds import stock_embed, sympage
-from helpers.sv_config import get_config
 import aiohttp
-from helpers.placeholders import random_msg
-
 
 THANKS_REGEX = re.compile(r'\b(ty|thanks|thank\s+you)\s+fluff\b', re.IGNORECASE)
 
@@ -32,8 +29,9 @@ class Basic(Cog):
     @commands.check(ismod)
     async def drive(self, ctx):
         """This spits out the Undertale Discord's Google Drive, but only if you're a mod."""
+        folder: str = self.bot.config_service.get_server_config(ctx.guild.id, "drive", "folder")
         await ctx.send(
-            f"https://drive.google.com/drive/folders/{get_config(ctx.guild.id, 'drive', 'folder')}?usp=sharing"
+            f"https://drive.google.com/drive/folders/{folder}?usp=sharing"
         )
 
     @commands.command()

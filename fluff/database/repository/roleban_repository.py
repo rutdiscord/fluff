@@ -26,6 +26,7 @@ class RolebanRepository:
                 "FROM roleban_session rs LEFT JOIN roleban_session_user rsu "
                 "ON rs.id = rsu.session_id "
                 "WHERE rs.server_id = ? "
+                "AND rsu.status = 'active' "
                 "GROUP BY rs.id "
                 "ORDER BY rs.id ASC",
                 (str(server_id),)
@@ -33,17 +34,22 @@ class RolebanRepository:
             rows = await cursor.fetchall()
             return [self.row_to_session(row) for row in rows]
 
-    async def create_session(self, server_id: int, user_ids_to_roles: dict[int, list[Role]], channel_id: int, rolebanned_by: int, roleban_type: RolebanType) -> RolebanSession:
-        """Creates a roleban session, and stores each users previous roles, if they exist.
+    async def create_or_add_to_session(self, server_id: int, user_ids_to_roles: dict[int, list[Role]], channel_id: int, rolebanned_by: int, roleban_type: RolebanType, session_id_to_add: int = None) -> RolebanSession:
+        """Creates a roleban session, or adds users to an existing session. Then, store each users previous roles, if they exist.
         Returns: an instance of RolebanSession"""
         async with self.db.get_write_connection() as conn:
+            session_id = None
             created_at = int(time.time())
-            cursor = await conn.execute(
-                "INSERT INTO roleban_session (server_id, channel_id, type, created_at) "
-                "VALUES (?, ?, ?, ?)",
-                (str(server_id), str(channel_id), roleban_type.value, str(created_at))
-            )
-            session_id = cursor.lastrowid
+
+            if not session_id_to_add:
+                cursor = await conn.execute(
+                    "INSERT INTO roleban_session (server_id, channel_id, type, created_at) "
+                    "VALUES (?, ?, ?, ?)",
+                    (str(server_id), str(channel_id), roleban_type.value, str(created_at))
+                )
+                session_id = cursor.lastrowid
+            else:
+                session_id = session_id_to_add
 
             if user_ids_to_roles:
                 await conn.executemany(
@@ -157,7 +163,7 @@ class RolebanRepository:
 
     async def get_session_by_user(self, server_id: int, user_id: int) -> RolebanSession | None:
         """Fetches the session for this user in this server
-        Returns: the session, or None if the user has no open session"""
+        Returns: the session, or None if the user has no session"""
         async with self.db.get_read_connection() as conn:
             cursor = await conn.execute(
                 "SELECT rs.id AS id, rs.server_id AS server_id, rs.channel_id AS channel_id, rs.type AS type, rs.created_at AS created_at, "
