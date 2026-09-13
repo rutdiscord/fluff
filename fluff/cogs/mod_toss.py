@@ -124,7 +124,7 @@ class ModToss(Cog):
     @commands.check(ismod)
     @commands.guild_only()
     @commands.command(aliases=["unroleban", "unmute"])
-    async def untoss(self, ctx, users: commands.Greedy[discord.Member] = None):
+    async def untoss(self, ctx, users: commands.Greedy[discord.User] = None):
         """This untosses a user.
 
         - `users`
@@ -133,7 +133,7 @@ class ModToss(Cog):
         if not users:
             return await ctx.reply("No users to untoss.", mention_author=False)
 
-        members_to_untoss: list[discord.Member] = []
+        members_to_untoss: list[discord.User] = []
         for member in list(users):
             members_to_untoss.append(member)
 
@@ -217,6 +217,8 @@ class ModToss(Cog):
         if session is None or session.type != RolebanType.TOSS or session.users is None or len(session.users) <= 0:
             return
 
+        await self.bot.roleban_service.update_user_session_status(session.id, member.id, RolebanStatus.LEFT)
+
         cutoff = datetime.now(timezone.utc) - timedelta(minutes=1)
 
         #check for kick
@@ -246,8 +248,6 @@ class ModToss(Cog):
         toss_channel: discord.TextChannel = self.bot.get_channel(session.channel_id)
         if toss_channel is None:
             return
-
-        await self.bot.roleban_service.update_user_session_status(session.id, member.id, RolebanStatus.LEFT)
         await self.bot.roleban_service.delete_roleban_channel(channel=toss_channel, reason="Channel closed because of toss evasion", session_id=session.id, delete_session=False)
 
     @Cog.listener()
