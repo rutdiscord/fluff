@@ -2,6 +2,7 @@ from typing import Literal
 import discord
 from discord.ext.commands import Cog
 from discord.ext import commands
+from fluff.helpers.types import GuildContext
 from helpers.checks import ismanager, isadmin
 from datetime import datetime, timedelta, UTC
 
@@ -41,7 +42,7 @@ class Tenure(Cog):
     @commands.guild_only()
     @commands.cooldown(1, 5, commands.BucketType.guild)
     @commands.group(invoke_without_command=True)
-    async def tenure(self, ctx, user: discord.Member | None | None):
+    async def tenure(self, ctx: GuildContext, user: discord.Member | None):
         """This shows the user their tenure in the server. Or, for staff, queries the status of that user's tenure.
 
         Any guild channel that has Tenure configured.
@@ -64,22 +65,26 @@ class Tenure(Cog):
                 return await ctx.reply(
                     f"{user.mention} has been prohibited from receiving the {tenure_role.name} role.",
                     mention_author=False,
+                    allowed_mentions=discord.AllowedMentions.none(),
                 )
             elif tenure_role not in user.roles:
                 if tenure_days >= tenure_threshold:
                     return await ctx.reply(
                         f"{user.mention} has been here for {tenure_days} days, and is eligible for the {tenure_role.name} role. They just haven't received it yet!",
                         mention_author=False,
+                        allowed_mentions=discord.AllowedMentions.none(),
                     )
                 else:
                     return await ctx.reply(
                         f"{user.mention} has been here for {tenure_days} days, and is not eligible for the {tenure_role.name} role. They need to wait {tenure_threshold - tenure_days} days.",
                         mention_author=False,
+                        allowed_mentions=discord.AllowedMentions.none(),
                     )
             elif tenure_role in user.roles:
                 return await ctx.reply(
                     f"{user.mention} has been here for {tenure_days} days, and has already received the {tenure_role.name} role.",
                     mention_author=False,
+                    allowed_mentions=discord.AllowedMentions.none(),
                 )
 
         tenure_dt = await self.check_joindelta(ctx.author)
@@ -118,7 +123,7 @@ class Tenure(Cog):
     @commands.check(ismanager)
     @commands.guild_only()
     @tenure.command()
-    async def force_sync(self, ctx):
+    async def force_sync(self, ctx: GuildContext):
         """THIS WILL FORCEFULLY SYNCHRONIZE THE SERVER MEMBERS WITH THE TENURE ROLE.
 
         THIS IS VERY TIME CONSUMING.
@@ -149,10 +154,7 @@ class Tenure(Cog):
     @commands.check(isadmin)
     @commands.guild_only()
     @tenure.command(aliases=["blacklist", "bl"])
-    async def disable(self, ctx: commands.Context, user: discord.Member):
-        if ctx.guild is None:
-            return await ctx.reply("This command can only be run in a server.", mention_author=False)
-
+    async def disable(self, ctx: GuildContext, user: discord.Member):
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
 
@@ -180,10 +182,7 @@ class Tenure(Cog):
     @commands.check(isadmin)
     @commands.guild_only()
     @tenure.command(aliases=["whitelist", "wl"])
-    async def enable(self, ctx: commands.Context, user: discord.Member):
-        if ctx.guild is None:
-            return await ctx.reply("This command can only be run in a server.", mention_author=False)
-
+    async def enable(self, ctx: GuildContext, user: discord.Member):
         if not self.enabled(ctx.guild):
             return await ctx.reply(self.nocfgmsg, mention_author=False)
 
