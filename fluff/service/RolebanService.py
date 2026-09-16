@@ -257,6 +257,10 @@ class RolebanService:
         if not RULEPUSH_CHANNEL_NAME_PATTERN.match(channel.name) and not TOSS_CHANNEL_NAME_PATTERN.match(channel.name):
             return False
 
+        toss_category = int(self.config_service.get_server_config(channel.guild.id, "toss", "tosscategory"))
+        if channel.category_id != toss_category:
+            return False
+
         try:
             if session_id is not None:
                 active_session_users: list[int] = await self.roleban_repo.get_active_users_in_session(session_id)
