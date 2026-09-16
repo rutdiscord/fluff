@@ -180,15 +180,16 @@ class ModToss(Cog):
         - No arguments.
         """
         session: RolebanSession | None = await self.bot.roleban_service.get_roleban_session_by_channel(ctx.guild.id, ctx.channel.id)
-        if session is None:
-            return await ctx.reply("No roleban session found for this channel.", mention_author=False)
+        session_id: int | None = None
+        if session is not None:
+            session_id = session.id
 
-        deleted_channel: bool = await self.bot.roleban_service.delete_roleban_channel(channel=ctx.channel, reason="Channel closed by staff", session_id=session.id, delete_session=False)
+        deleted_channel: bool = await self.bot.roleban_service.delete_roleban_channel(channel=ctx.channel, reason="Channel closed by staff", session_id=session_id, delete_session=False)
         if not deleted_channel:
-            return await ctx.reply(f"{session.type.value.capitalize()} channel was not removed. Either an error occurred, some users are still rolebanned, or the channel no longer exists.", mention_author=False)
+            return await ctx.reply(f"{session.type.value.capitalize() if session else 'Roleban'} channel was not removed. Either this is not a valid roleban channel, an error occurred, some users are still rolebanned, or the channel no longer exists.", mention_author=False)
 
         embed = stock_embed(self.bot)
-        embed.title = f"{session.type.value.capitalize()} Session Closed (Fluff)"
+        embed.title = f"{session.type.value.capitalize() if session else 'Roleban'} Session Closed (Fluff)"
         embed.description = f"`#{ctx.channel.name}`'s session was closed by {ctx.author.mention} ({ctx.author.id})."
         embed.color = ctx.author.color
         embed.set_author(name=ctx.author, icon_url=ctx.author.display_avatar.url)
