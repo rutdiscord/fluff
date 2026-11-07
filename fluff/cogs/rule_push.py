@@ -1,6 +1,7 @@
 import asyncio
 import re
 import sqlite3
+import io
 from datetime import datetime, timezone, timedelta
 
 import discord
@@ -236,7 +237,7 @@ class RulePush(Cog):
                 embed.add_field(name="", value=chunk, inline=False)
 
         if len(embed) > 6000:
-            file_content = ", ".join(server_keywords).encode("utf-8")
+            file_content = ", ".join(server_keywords)
             return await ctx.send(
                 file=discord.File(
                     io.StringIO(file_content),  # type:ignore

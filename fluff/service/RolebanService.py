@@ -37,6 +37,7 @@ class RolebanService:
         """Rolebans a user by creating a new roleban channel, removing the users roles (if remove_roles = true), and adding the roleban role
         Returns: an instance of RolebanSession if the user was successfully rolebanned, otherwise None, meaning an error occurred and the user was not rolebanned"""
 
+        roleban_role = self.bot.pull_role(ctx.guild, self.config_service.get_server_config(ctx.guild.id, "toss", "tossrole"))
         for member in members:
             try:
                 existing = await self.roleban_repo.get_session_by_user(ctx.guild.id, member.id)
@@ -53,6 +54,10 @@ class RolebanService:
                 )
                 return None
 
+            if await self.does_user_have_roleban_role(member, roleban_role):
+                await ctx.reply(f"{member.mention} is already rolebanned.", mention_author=False)
+                return None
+
         channel: TextChannel | None = None
         if session_to_use:
             channel = await self.get_channel(session_to_use.channel_id)
@@ -64,7 +69,6 @@ class RolebanService:
             await ctx.reply(f"Failed to {channel_action_type} the roleban channel.", mention_author=False)
             return None
 
-        roleban_role = self.bot.pull_role(ctx.guild, self.config_service.get_server_config(ctx.guild.id, "toss", "tossrole"))
         user_ids_to_all_roles: dict[int, list[Role]] = {}
         user_ids_to_unassignable_roles: dict[int, list[Role]] = {}
         if remove_roles:
@@ -403,8 +407,6 @@ class RolebanService:
 
         return True
 
-
-
     async def get_non_rolebanned_user_roles(self, guild: discord.Guild, member: discord.Member, roleban_role: discord.Role) -> tuple[list[discord.Role], list[discord.Role]]:
         """Fetches all roles (excluding the guild default role and the roleban role) that belong to a user, and unassignable roles,
         which is a subset of the all roles list, but only including roles that we cannot assign the user (like the server
@@ -412,6 +414,14 @@ class RolebanService:
         all_roles = [r for r in member.roles if r != guild.default_role and r != roleban_role]
         unassignable_roles = [r for r in all_roles if not r.is_assignable()]
         return all_roles, unassignable_roles
+
+    async def does_user_have_roleban_role(self, member: discord.Member, roleban_role: discord.Role) -> bool:
+        """Determines if a user has the roleban role"""
+        for role in member.roles:
+            if role == roleban_role:
+                return True
+
+        return False
 
     def get_next_channel_name(self, guild: discord.Guild, roleban_type: RolebanType) -> str:
         """Picks the lowest rolebanN name not currently in use in this guild"""
