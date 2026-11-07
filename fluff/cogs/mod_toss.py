@@ -83,7 +83,7 @@ class ModToss(Cog):
 
             user_session: RolebanSession | None = await self.bot.roleban_service.get_roleban_session_by_user(ctx.guild.id, us.id)
             if user_session is not None:
-                return await ctx.reply(f"{us.mention} is already apart of a roleban session in <#{user_session.channel_id}>", mention_author=False)
+                return await ctx.reply(f"{us.mention} is already a part of a roleban session in <#{user_session.channel_id}>", mention_author=False)
 
             members_to_roleban.append(us)
 
